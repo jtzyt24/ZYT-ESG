@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>People & Commuting — ZYT.ESG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#15140d;--ink2:#42403a;--ink3:#84827a;--ink4:#c2bfb6;--bg:#f3f0e9;--card:#ffffff;--b1:#e0dbd2;--b2:#eae6de;--s3c:#27500a;--s3b:#eaf4ee;--s3d:#b4d9c4;--gc:#1a6b4a;--gb:#eaf4ee;--gd:#b4d9c4;--ac:#7a5a0a;--ab:#fdf3e0;--ad:#e8c87a;--wc:#7a1a1a;--wb:#fdf0ec;--wd:#f0b4b4;--pc:#4a1a7a;--pb:#f3eafe;--pd:#ccb4e8;--r:10px;--rl:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:14px}
+nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30}
+.logo{font-family:'Fraunces',serif;font-size:17px;font-weight:300;display:flex;align-items:center;gap:8px}
+.logo-tag{font-family:'DM Mono',monospace;font-size:10px;color:var(--gc);background:var(--gb);border:1px solid var(--gd);padding:2px 7px;border-radius:20px;letter-spacing:.5px}
+.nav-steps{display:flex;align-items:center;gap:4px;font-size:12px}
+.ns{padding:3px 10px;border-radius:20px;color:var(--ink3)}.ns.done{color:var(--gc)}.ns.done::before{content:'✓ ';font-size:10px}.ns.active{background:var(--ink);color:white;font-weight:500}.ns-sep{color:var(--ink4);font-size:10px}
+.btn-back{font-size:12px;color:var(--ink3);background:transparent;border:.5px solid var(--b1);padding:5px 12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px}
+.layout{display:grid;grid-template-columns:1fr 300px;gap:20px;max-width:1060px;margin:0 auto;padding:28px 24px 100px;align-items:start}
+.cluster-hdr{background:var(--card);border:1px solid var(--b1);border-radius:var(--rl);padding:20px 22px;margin-bottom:16px;display:flex;align-items:flex-start;gap:14px}
+.hdr-icon{font-size:26px;width:50px;height:50px;background:var(--bg);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hdr-body{flex:1}
+.hdr-name{font-family:'Fraunces',serif;font-size:22px;font-weight:300;letter-spacing:-.3px;margin-bottom:3px}
+.hdr-sub{font-size:12px;color:var(--ink3);line-height:1.5;margin-bottom:8px}
+.hdr-role{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3);background:var(--bg);border:1px solid var(--b2);padding:3px 9px;border-radius:20px}
+.prog-bar{height:3px;background:var(--b2);border-radius:2px;overflow:hidden;margin-top:10px}
+.prog-fill{height:100%;background:var(--gc);border-radius:2px;transition:width .5s ease}
+.prog-label{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);margin-top:4px}
+.data-note{background:var(--pb);border:.5px solid var(--pd);border-radius:var(--r);padding:12px 14px;margin-bottom:16px;font-size:11px;color:var(--pc);line-height:1.6}
+.boundary-note{background:var(--s3b);border:.5px solid var(--s3d);border-radius:var(--r);padding:10px 12px;margin-bottom:14px;font-size:11px;color:var(--s3c);line-height:1.5}
+.section{margin-bottom:12px}
+.sec-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card);border:1px solid var(--b1);border-radius:10px 10px 0 0;cursor:pointer;user-select:none}
+.sec-hdr:hover{background:var(--bg)}
+.scope-pill{font-size:10px;font-family:'DM Mono',monospace;font-weight:500;padding:2px 8px;border-radius:8px;white-space:nowrap}
+.s3-pill{background:var(--s3b);color:var(--s3c);border:1px solid var(--s3d)}
+.sec-title{font-size:13px;font-weight:500;color:var(--ink);flex:1}
+.sec-total{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);transition:color .3s}
+.sec-total.live{color:var(--gc);font-weight:500}
+.sec-chev{width:12px;height:12px;color:var(--ink3);transition:transform .2s;flex-shrink:0}
+.sec-chev.open{transform:rotate(90deg)}
+.sec-body{display:none;background:var(--card);border:1px solid var(--b1);border-top:none;border-radius:0 0 10px 10px;overflow:hidden}
+.sec-body.open{display:block}
+.activity{padding:16px;border-bottom:1px solid var(--b2)}.activity:last-child{border-bottom:none}
+.act-name-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.act-name{font-size:13px;font-weight:500;color:var(--ink)}
+.opt-tag{font-size:9px;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:6px;background:var(--ab);color:var(--ac);border:1px solid var(--ad)}
+.tip-btn{width:16px;height:16px;border-radius:50%;background:var(--bg);border:1px solid var(--b1);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;color:var(--ink3);font-family:'DM Mono',monospace;font-weight:500;flex-shrink:0;transition:background .15s,color .15s}
+.tip-btn:hover{background:var(--ink);color:white;border-color:var(--ink)}
+.act-sub{font-size:11px;color:var(--ink3);margin-bottom:10px;line-height:1.4}
+.tip-panel{display:none;background:var(--ink);color:white;border-radius:8px;padding:12px 14px;font-size:11px;line-height:1.6;margin-bottom:10px}
+.tip-panel.open{display:block;animation:fadein .15s ease}
+.tip-analogy{margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.15);font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.65)}
+.tip-ef{margin-top:4px;font-size:10px;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace}
+.mode-tabs{display:flex;gap:3px;background:var(--bg);border:1px solid var(--b1);border-radius:8px;padding:3px;width:fit-content;margin-bottom:10px;flex-wrap:wrap}
+.mtab{font-size:11px;padding:5px 11px;border-radius:6px;border:none;background:transparent;color:var(--ink3);cursor:pointer;transition:all .15s;white-space:nowrap}
+.mtab.active{background:var(--card);color:var(--ink);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.mode-panel{display:none}.mode-panel.active{display:block}
+.mode-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.mode-row{background:var(--bg);border:.5px solid var(--b2);border-radius:8px;padding:10px 12px;display:grid;grid-template-columns:28px 1fr 90px 90px 80px;gap:8px;align-items:center}
+.mode-row.active-row{background:var(--gb);border-color:var(--gd)}
+.mode-icon{font-size:16px;text-align:center}
+.mode-name{font-size:12px;font-weight:500;color:var(--ink)}
+.mode-ef{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3)}
+.mode-inp{height:32px;border:.5px solid var(--b1);border-radius:6px;background:var(--card);padding:0 8px;font-size:12px;color:var(--ink);outline:none;width:100%;transition:border-color .15s}
+.mode-inp:focus{border-color:var(--gc)}
+.mode-co2{font-size:11px;font-family:'DM Mono',monospace;color:var(--gc);font-weight:500}
+.mode-co2.empty{color:var(--ink4);font-weight:400}
+.mode-lbl{font-size:9px;font-family:'DM Mono',monospace;color:var(--ink3);text-align:right}
+.wfh-calc{background:var(--gb);border:.5px solid var(--gd);border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.wfh-title{font-size:11px;font-weight:500;color:var(--gc);margin-bottom:8px}
+.wfh-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px}
+.wfh-result-text{font-size:11px;color:var(--gc);font-family:'DM Mono',monospace;padding-top:6px;border-top:.5px solid var(--gd)}
+.field-row{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:8px}
+.fwrap{flex:1;min-width:90px}
+.fwrap label{display:block;font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.inp{width:100%;height:36px;border:.5px solid var(--b1);border-radius:7px;background:var(--card);padding:0 10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .15s}
+.inp:focus{border-color:var(--gc)}
+.sel{width:100%;height:36px;border:.5px solid var(--b1);border-radius:7px;background:var(--card);padding:0 10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;cursor:pointer;transition:border-color .15s}
+.sel:focus{border-color:var(--gc)}
+.unit-box{height:36px;padding:0 10px;background:var(--bg);border:.5px solid var(--b2);border-radius:7px;font-size:11px;color:var(--ink3);display:flex;align-items:center;white-space:nowrap;font-family:'DM Mono',monospace}
+.na-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.na-cb{width:14px;height:14px;cursor:pointer;accent-color:var(--ink3)}
+.na-lbl{font-size:11px;color:var(--ink3);cursor:pointer}
+.result-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:.5px solid var(--b2);align-items:center}
+.rpill{display:flex;align-items:center;gap:4px;font-size:11px;padding:3px 9px;border-radius:16px;border:.5px solid;white-space:nowrap}
+.rpill.co2{background:var(--gb);color:var(--gc);border-color:var(--gd)}
+.rpill.cost{background:var(--ab);color:var(--ac);border-color:var(--ad)}
+.rpill.empty{background:var(--bg);color:var(--ink4);border-color:var(--b2)}
+.rpill-val{font-family:'DM Mono',monospace;font-weight:500}
+.comparison{display:none;margin-top:6px;padding:8px 10px;background:var(--s3b);border:.5px solid var(--s3d);border-radius:7px;font-size:11px;color:var(--s3c);line-height:1.5}
+.comparison.show{display:block}
+.summary-col{position:sticky;top:72px}
+.sum-card{background:var(--ink);border-radius:var(--rl);overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.12)}
+.sum-hdr{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-hdr-title{font-family:'Fraunces',serif;font-size:15px;font-weight:300;color:white;margin-bottom:2px}
+.sum-hdr-sub{font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.35)}
+.sum-breakdown{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-break-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.3);margin-bottom:8px}
+.break-row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px}
+.break-name{color:rgba(255,255,255,.55)}.break-val{font-family:'DM Mono',monospace;font-weight:500;color:white}
+.sum-total{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-est-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.3);margin-bottom:5px}
+.sum-total-val{font-family:'Fraunces',serif;font-size:26px;font-weight:300;color:white;line-height:1;letter-spacing:-.5px;transition:all .3s}
+.sum-total-unit{font-size:11px;color:rgba(255,255,255,.4);margin-top:2px}
+.sum-mode-breakdown{margin-top:10px;padding:10px 12px;background:rgba(255,255,255,.06);border-radius:8px;border:.5px solid rgba(255,255,255,.1)}
+.sum-mode-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.3);margin-bottom:6px}
+.mode-bar-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:10px}
+.mode-bar-label{color:rgba(255,255,255,.5);width:60px;flex-shrink:0}
+.mode-bar-track{flex:1;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.mode-bar-fill{height:100%;border-radius:2px;transition:width .4s ease}
+.mode-bar-val{font-family:'DM Mono',monospace;color:rgba(255,255,255,.6);width:40px;text-align:right;flex-shrink:0}
+.sum-insight{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-insight-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.25);margin-bottom:5px}
+.sum-insight-text{font-size:11px;color:rgba(255,255,255,.6);line-height:1.55;font-style:italic}
+.sum-ef{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-ef-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.25);margin-bottom:6px}
+.ef-row{display:flex;justify-content:space-between;font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.4);margin-bottom:3px}
+.ef-row span:last-child{color:rgba(255,255,255,.6)}
+.sum-actions{padding:14px 18px;display:flex;flex-direction:column;gap:8px}
+.btn-next{width:100%;height:40px;background:white;color:var(--ink);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
+.btn-next:hover{background:#f0ede6}
+.btn-next svg{width:13px;height:13px;transition:transform .15s}
+.btn-next:hover svg{transform:translateX(2px)}
+.btn-save-draft{width:100%;height:36px;background:transparent;color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.12);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s}
+.btn-save-draft:hover{color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.3)}
+@keyframes fadein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:768px){.layout{grid-template-columns:1fr}.summary-col{position:static}.nav-steps{display:none}.mode-row{grid-template-columns:24px 1fr 80px;gap:6px}.mode-lbl,.mode-co2{display:none}.wfh-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">ZYT.ESG <span class="logo-tag">ESG</span></div>
+  <div class="nav-steps">
+    <div class="ns done">Profile</div><div class="ns-sep">›</div>
+    <div class="ns active">Data entry</div><div class="ns-sep">›</div>
+    <div class="ns">Results</div><div class="ns-sep">›</div>
+    <div class="ns">Targets</div><div class="ns-sep">›</div>
+    <div class="ns">Report</div>
+  </div>
+  <button class="btn-back">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 2L4 6l4 4"/></svg>
+    Back to hub
+  </button>
+</nav>
+
+<div class="layout">
+<div class="form-col">
+
+<div class="cluster-hdr">
+  <div class="hdr-icon">🚶</div>
+  <div class="hdr-body">
+    <div class="hdr-name">People & commuting</div>
+    <div class="hdr-sub">Emissions from staff travelling between home and workplace, and electricity used when working from home. Scope 3 Category 7 — employee commuting.</div>
+    <div class="hdr-role">
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="6" cy="4" r="2.5"/><path d="M2 11c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>
+      HR manager / admin
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="prog-label" id="prog-label">0 of 3 sections completed</div>
+  </div>
+</div>
+
+<div class="boundary-note">
+  <strong>Scope boundary:</strong> This cluster covers daily home→workplace→home travel by all staff (Cat 7). Business trips during work hours go in <strong>S-11 Transport & fleet</strong> (Cat 6). If you are a home-based business, your own work electricity goes in <strong>S-10 Power & energy</strong>.
+</div>
+
+<div class="data-note">
+  <strong>Where does this data come from?</strong> Commuting data isn't on any bill. The most practical approach: a brief staff survey asking each person their usual transport mode and one-way distance. Alternatively use the estimation method below — enter total staff per mode with Singapore average distances. GHG Protocol permits reasonable estimation for Cat 7.
+</div>
+
+<!-- SECTION 1: PUBLIC TRANSPORT -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('pt')">
+    <svg class="sec-chev open" id="chev-pt" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s3-pill">Cat 7</span>
+    <span class="sec-title">Public transport commuting — MRT, LRT, bus</span>
+    <span class="sec-total" id="st-pt">—</span>
+  </div>
+  <div class="sec-body open" id="body-pt">
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">Staff commuting by MRT, LRT, or public bus</div>
+        <span class="tip-btn" onclick="toggleTip('tip-pt')">?</span>
+      </div>
+      <div class="act-sub">Daily home-to-work-and-back travel by public transport. Singapore's MRT is the lowest-carbon commute mode — far below private cars.</div>
+      <div class="tip-panel" id="tip-pt">
+        Public transport emissions come from electricity (MRT) and diesel (buses) allocated per passenger-km. Even with Singapore's current grid, MRT emits about one-quarter of a private car per km travelled.
+        <div class="tip-analogy">🚇 MRT: 0.042 kgCO₂/km · Bus: 0.074 kgCO₂/km · Petrol car: 0.173 kgCO₂/km — MRT is 4× cleaner than driving</div>
+        <div class="tip-ef">SEFR: Land Transport → MRT/LRT: 0.0416 kgCO₂/person-km · Public Bus: 0.0737 kgCO₂/person-km · Source: MOT Singapore</div>
+      </div>
+
+      <div class="mode-tabs" id="pt-tabs">
+        <button class="mtab active" onclick="switchMode('pt',['pt-detail','pt-simple'],'pt-detail',this)">By transport mode</button>
+        <button class="mtab" onclick="switchMode('pt',['pt-detail','pt-simple'],'pt-simple',this)">Simple estimate</button>
+      </div>
+
+      <div class="mode-panel active" id="pt-detail">
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:10px">Enter staff count and average one-way distance for each mode. Leave blank for modes not used.</div>
+        <div class="mode-grid">
+          <div class="mode-row" id="mrt-row">
+            <div class="mode-icon">🚇</div>
+            <div><div class="mode-name">MRT / LRT</div><div class="mode-ef">0.042 kgCO₂/km</div></div>
+            <div><div class="mode-lbl">Staff count</div><input class="mode-inp" type="number" id="mrt-staff" placeholder="0" min="0" oninput="calcPT()"></div>
+            <div><div class="mode-lbl">Avg km (one-way)</div><input class="mode-inp" type="number" id="mrt-km" placeholder="e.g. 12" min="0" step="0.5" oninput="calcPT()"></div>
+            <div class="mode-co2 empty" id="mrt-co2">—</div>
+          </div>
+          <div class="mode-row" id="bus-row">
+            <div class="mode-icon">🚌</div>
+            <div><div class="mode-name">Public bus</div><div class="mode-ef">0.074 kgCO₂/km</div></div>
+            <div><div class="mode-lbl">Staff count</div><input class="mode-inp" type="number" id="bus-staff" placeholder="0" min="0" oninput="calcPT()"></div>
+            <div><div class="mode-lbl">Avg km (one-way)</div><input class="mode-inp" type="number" id="bus-km" placeholder="e.g. 10" min="0" step="0.5" oninput="calcPT()"></div>
+            <div class="mode-co2 empty" id="bus-co2">—</div>
+          </div>
+          <div class="mode-row" id="mix-row">
+            <div class="mode-icon">🔀</div>
+            <div><div class="mode-name">Mixed MRT + bus</div><div class="mode-ef">0.058 kgCO₂/km</div></div>
+            <div><div class="mode-lbl">Staff count</div><input class="mode-inp" type="number" id="mix-staff" placeholder="0" min="0" oninput="calcPT()"></div>
+            <div><div class="mode-lbl">Avg km (one-way)</div><input class="mode-inp" type="number" id="mix-km" placeholder="e.g. 14" min="0" step="0.5" oninput="calcPT()"></div>
+            <div class="mode-co2 empty" id="mix-co2">—</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--ink3)">Average Singapore one-way commute: 12–15 km. A quick staff survey will give you mode split and typical distances in under 10 minutes.</div>
+      </div>
+
+      <div class="mode-panel" id="pt-simple">
+        <div class="field-row">
+          <div class="fwrap"><label>Staff on public transport</label><input class="inp" type="number" id="pt-simple-staff" placeholder="e.g. 8" oninput="calcPTSimple()"></div>
+          <div class="fwrap"><label>Avg one-way distance (km)</label><input class="inp" type="number" id="pt-simple-km" placeholder="e.g. 12" oninput="calcPTSimple()"></div>
+          <div class="fwrap" style="flex:.6"><label>Mode</label>
+            <select class="sel" id="pt-simple-mode" onchange="calcPTSimple()">
+              <option value="0.0416">Mainly MRT (0.042)</option>
+              <option value="0.0737">Mainly bus (0.074)</option>
+              <option value="0.0577" selected>Mixed (0.058 avg)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-row" id="result-pt">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: PRIVATE VEHICLE -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('car')">
+    <svg class="sec-chev" id="chev-car" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s3-pill">Cat 7</span>
+    <span class="sec-title">Private vehicle commuting — car, motorcycle</span>
+    <span class="sec-total" id="st-car">—</span>
+  </div>
+  <div class="sec-body" id="body-car">
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">Staff commuting by private car or motorcycle</div>
+        <span class="tip-btn" onclick="toggleTip('tip-car')">?</span>
+      </div>
+      <div class="act-sub">Staff who drive or ride their own vehicles to work. Higher emission factor than public transport — a key lever if your workplace is well-served by MRT.</div>
+      <div class="tip-panel" id="tip-car">
+        Private cars emit 4× more per km than MRT. For staff in industrial areas (Tuas, Jurong, Senoko) or on shift work, private vehicles may be the only practical option. Motorcycles emit roughly half a car per km.
+        <div class="tip-analogy">🚗 1 staff member driving 12 km each way, 22 days/month ≈ 0.87 tCO₂e/year from commuting alone</div>
+        <div class="tip-ef">SEFR: Land Transport → ICE Car: 0.1732 · Hybrid: 0.1343 · EV: 0.0618 · Motorcycle: 0.0834 kgCO₂/person-km · Source: MOT Singapore</div>
+      </div>
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="car-na" onchange="toggleNA('car-inputs',this,'car')">
+        <label class="na-lbl" for="car-na">No staff drive or ride to work</label>
+      </div>
+      <div id="car-inputs">
+        <div class="mode-grid">
+          <div class="mode-row" id="car-row">
+            <div class="mode-icon">🚗</div>
+            <div><div class="mode-name">Petrol / diesel car</div><div class="mode-ef">0.173 kgCO₂/km</div></div>
+            <div><div class="mode-lbl">Staff count</div><input class="mode-inp" type="number" id="car-staff" placeholder="0" min="0" oninput="calcCar()"></div>
+            <div><div class="mode-lbl">Avg km (one-way)</div><input class="mode-inp" type="number" id="car-km" placeholder="e.g. 12" min="0" step="0.5" oninput="calcCar()"></div>
+            <div class="mode-co2 empty" id="car-co2">—</div>
+          </div>
+          <div class="mode-row" id="hybrid-row">
+            <div class="mode-icon">🔋</div>
+            <div><div class="mode-name">Hybrid car</div><div class="mode-ef">0.134 kgCO₂/km</div></div>
+            <div><div class="mode-lbl">Staff count</div><input class="mode-inp" type="number" id="hybrid-staff" placeholder="0" min="0" oninput="calcCar()"></div>
+            <div><div class="mode-lbl">Avg km (one-way)</div><input class="mode-inp" type="number" id="hybrid-km" placeholder="e.g. 12" min="0" step="0.5" oninput="calcCar()"></div>
+            <div class="mode-co2 empty" id="hybrid-co2">—</div>
+          </div>
+          <div class="mode-row" id="ev-row">
+            <div class="mode-icon">⚡</div>
+            <div><div class="mode-name">Electric car (EV)</div><div class="mode-ef">0.062 kgCO₂/km</div></div>
+            <div><div class="mode-lbl">Staff count</div><input class="mode-inp" type="number" id="ev-staff" placeholder="0" min="0" oninput="calcCar()"></div>
+            <div><div class="mode-lbl">Avg km (one-way)</div><input class="mode-inp" type="number" id="ev-km" placeholder="e.g. 12" min="0" step="0.5" oninput="calcCar()"></div>
+            <div class="mode-co2 empty" id="ev-co2">—</div>
+          </div>
+          <div class="mode-row" id="moto-row">
+            <div class="mode-icon">🏍</div>
+            <div><div class="mode-name">Motorcycle</div><div class="mode-ef">0.083 kgCO₂/km</div></div>
+            <div><div class="mode-lbl">Staff count</div><input class="mode-inp" type="number" id="moto-staff" placeholder="0" min="0" oninput="calcCar()"></div>
+            <div><div class="mode-lbl">Avg km (one-way)</div><input class="mode-inp" type="number" id="moto-km" placeholder="e.g. 10" min="0" step="0.5" oninput="calcCar()"></div>
+            <div class="mode-co2 empty" id="moto-co2">—</div>
+          </div>
+        </div>
+        <div class="field-row" style="margin-top:4px">
+          <div class="fwrap" style="max-width:200px"><label>Working days per year</label><input class="inp" type="number" id="working-days" value="264" min="1" max="365" oninput="calcCar()"></div>
+          <div style="font-size:11px;color:var(--ink3);align-self:flex-end;padding-bottom:2px">Default: 22 days/month × 12. Adjust for shift patterns or operational calendars.</div>
+        </div>
+      </div>
+      <div class="result-row" id="result-car">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+      </div>
+      <div class="comparison" id="car-comparison">
+        💡 If these staff switched to MRT for the same distances, commuting emissions would fall to approximately <strong id="car-mrt-equiv">—</strong> — a <strong id="car-reduction-pct">—</strong> reduction. A public transport incentive policy could achieve this.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: WFH ELECTRICITY -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('wfh')">
+    <svg class="sec-chev" id="chev-wfh" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s3-pill">Cat 7</span>
+    <span class="sec-title">Work from home — staff electricity</span>
+    <span class="sec-total" id="st-wfh">—</span>
+  </div>
+  <div class="sec-body" id="body-wfh">
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">Staff WFH electricity <span class="opt-tag">optional</span></div>
+        <span class="tip-btn" onclick="toggleTip('tip-wfh')">?</span>
+      </div>
+      <div class="act-sub">When staff work from home, they use electricity for their work equipment. This is part of your company's Scope 3 Cat 7 footprint — even though it appears on employees' personal bills. Only business-use electricity counts, not the household's full consumption.</div>
+      <div class="tip-panel" id="tip-wfh">
+        GHG Protocol includes WFH electricity as Cat 7 because it is caused by company work activities, even if consumed at the employee's home. Emission factor is Singapore's EMA Grid EF (0.412 kgCO₂/kWh). Only the business-use proportion is included — the same equipment wattage methodology used in S-10.
+        <div class="tip-analogy">🏠 5 staff WFH 8 days/month with computer + fan (85W), 8 hrs/day = 27.2 kWh/month · 326 kWh/year · 0.134 tCO₂e/year — small but visible at scale</div>
+        <div class="tip-ef">EMA Grid EF 2023: 0.412 kgCO₂/kWh · Business-use equipment wattage only · GHG Protocol Scope 3 Cat 7</div>
+      </div>
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="wfh-na" onchange="toggleNA('wfh-inputs',this,'wfh')">
+        <label class="na-lbl" for="wfh-na">Staff do not work from home</label>
+      </div>
+      <div id="wfh-inputs">
+        <div class="wfh-calc">
+          <div class="wfh-title">Staff WFH electricity calculator</div>
+          <div class="wfh-grid">
+            <div>
+              <div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--gc);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Staff WFH</div>
+              <input class="mode-inp" style="background:var(--card);border-color:var(--gd)" type="number" id="wfh-staff" placeholder="e.g. 5" oninput="calcWFH()">
+            </div>
+            <div>
+              <div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--gc);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">WFH days/month</div>
+              <input class="mode-inp" style="background:var(--card);border-color:var(--gd)" type="number" id="wfh-days" placeholder="e.g. 8" oninput="calcWFH()">
+            </div>
+            <div>
+              <div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--gc);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Hrs/day working</div>
+              <input class="mode-inp" style="background:var(--card);border-color:var(--gd)" type="number" id="wfh-hrs" value="8" oninput="calcWFH()">
+            </div>
+            <div>
+              <div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--gc);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Equipment</div>
+              <select class="mode-inp" id="wfh-device" onchange="calcWFH()" style="background:var(--card);border-color:var(--gd);cursor:pointer;font-family:'DM Sans',sans-serif">
+                <option value="85">Computer + fan (85W)</option>
+                <option value="350">Computer + AC (350W)</option>
+                <option value="125">Computer + fan + monitor (125W)</option>
+                <option value="390">Computer + AC + monitor (390W)</option>
+                <option value="0">Custom wattage</option>
+              </select>
+            </div>
+          </div>
+          <div id="wfh-custom-row" style="display:none;margin-bottom:8px">
+            <div class="field-row" style="margin-bottom:0">
+              <div class="fwrap" style="max-width:160px"><label>Custom wattage per staff</label><input class="inp" type="number" id="wfh-custom-w" placeholder="e.g. 200" oninput="calcWFH()"></div>
+              <div class="unit-box">W</div>
+            </div>
+          </div>
+          <div class="wfh-result-text" id="wfh-result-text">Enter staff count and WFH days to calculate</div>
+        </div>
+      </div>
+      <div class="result-row" id="result-wfh">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>est. WFH electricity</span></div>
+      </div>
+      <div style="margin-top:6px;font-size:11px;color:var(--ink3);line-height:1.5">This electricity is on employees' personal bills — not a company expense. It is reported here because it is caused by company work activities under GHG Protocol Cat 7.</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /form-col -->
+
+<!-- SUMMARY PANEL -->
+<div class="summary-col">
+<div class="sum-card">
+  <div class="sum-hdr">
+    <div class="sum-hdr-title">Estimated cluster total</div>
+    <div class="sum-hdr-sub">People & commuting · Cat 7 · 2024</div>
+  </div>
+  <div class="sum-breakdown">
+    <div class="sum-break-lbl">Breakdown</div>
+    <div class="break-row"><span class="break-name">Public transport</span><span class="break-val" id="sum-pt">—</span></div>
+    <div class="break-row"><span class="break-name">Private vehicles</span><span class="break-val" id="sum-car">—</span></div>
+    <div class="break-row"><span class="break-name">WFH electricity</span><span class="break-val" id="sum-wfh">—</span></div>
+  </div>
+  <div class="sum-total">
+    <div class="sum-est-lbl">Estimated total</div>
+    <div class="sum-total-val" id="sum-total">0</div>
+    <div class="sum-total-unit">tCO₂e / year</div>
+    <div class="sum-mode-breakdown" id="mode-bars" style="display:none">
+      <div class="sum-mode-lbl">Mode split by emissions</div>
+      <div id="mode-bar-rows"></div>
+    </div>
+  </div>
+  <div class="sum-insight">
+    <div class="sum-insight-lbl">Insight</div>
+    <div class="sum-insight-text" id="sum-insight">Enter commuting data to see your staff travel emissions.</div>
+  </div>
+  <div class="sum-ef">
+    <div class="sum-ef-lbl">Emission factors (SEFR / MOT Singapore)</div>
+    <div class="ef-row"><span>MRT / LRT</span><span>0.042 kgCO₂/km</span></div>
+    <div class="ef-row"><span>Public bus</span><span>0.074 kgCO₂/km</span></div>
+    <div class="ef-row"><span>Petrol/diesel car</span><span>0.173 kgCO₂/km</span></div>
+    <div class="ef-row"><span>Hybrid car</span><span>0.134 kgCO₂/km</span></div>
+    <div class="ef-row"><span>Electric car</span><span>0.062 kgCO₂/km</span></div>
+    <div class="ef-row"><span>Motorcycle</span><span>0.083 kgCO₂/km</span></div>
+    <div class="ef-row"><span>WFH (EMA grid EF)</span><span>0.412 kgCO₂/kWh</span></div>
+  </div>
+  <div class="sum-actions">
+    <button class="btn-next" onclick="saveAndNext()">
+      Save & go to Digital & IT
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg>
+    </button>
+    <button class="btn-save-draft">Save & exit</button>
+  </div>
+</div>
+</div>
+
+</div><!-- /layout -->
+
+<script>
+const EF={mrt:0.0416,bus:0.0737,mix:0.0577,car:0.1732,hybrid:0.1343,ev:0.0618,moto:0.0834,wfh_grid:0.412};
+const S={pt:{co2:0,detail:{mrt:0,bus:0,mix:0}},car:{co2:0,detail:{car:0,hybrid:0,ev:0,moto:0}},wfh:{co2:0,sgd:0},workingDays:264};
+
+function toggleSec(id){const b=document.getElementById('body-'+id),c=document.getElementById('chev-'+id);b.classList.toggle('open',!b.classList.contains('open'));c.classList.toggle('open',!c.classList.contains('open'));}
+function toggleTip(id){document.getElementById(id).classList.toggle('open');}
+function switchMode(group,panels,activeId,btn){btn.parentElement.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');panels.forEach(p=>document.getElementById(p).classList.toggle('active',p===activeId));}
+function toggleNA(inputId,cb,key){const el=document.getElementById(inputId);el.style.opacity=cb.checked?'0.3':'1';el.style.pointerEvents=cb.checked?'none':'';if(cb.checked&&S[key])S[key].co2=0;updateProgress();updateSummary();}
+
+function getWD(){return parseFloat(document.getElementById('working-days')?.value)||264;}
+function annualKm(staff,km){return(parseFloat(staff)||0)*(parseFloat(km)||0)*2*getWD();}
+function setModeRow(id,co2){const el=document.getElementById(id+'-co2');if(!el)return;const row=el.closest('.mode-row');if(co2>0){el.className='mode-co2';el.textContent=co2.toFixed(2)+'t';row.classList.add('active-row');}else{el.className='mode-co2 empty';el.textContent='—';row.classList.remove('active-row');}}
+
+function calcPT(){
+  const mrt=annualKm(document.getElementById('mrt-staff').value,document.getElementById('mrt-km').value)*EF.mrt/1000;
+  const bus=annualKm(document.getElementById('bus-staff').value,document.getElementById('bus-km').value)*EF.bus/1000;
+  const mix=annualKm(document.getElementById('mix-staff').value,document.getElementById('mix-km').value)*EF.mix/1000;
+  setModeRow('mrt',mrt);setModeRow('bus',bus);setModeRow('mix',mix);
+  S.pt.co2=mrt+bus+mix;S.pt.detail={mrt,bus,mix};showPTResult();updateSummary();
+}
+function calcPTSimple(){
+  const s=parseFloat(document.getElementById('pt-simple-staff').value)||0;
+  const k=parseFloat(document.getElementById('pt-simple-km').value)||0;
+  const ef=parseFloat(document.getElementById('pt-simple-mode').value)||EF.mix;
+  S.pt.co2=s*k*2*getWD()*ef/1000;showPTResult();updateSummary();
+}
+function showPTResult(){const r=document.getElementById('result-pt').querySelectorAll('.rpill');if(S.pt.co2>0){r[0].className='rpill co2';r[0].innerHTML=`<span class="rpill-val">~ ${S.pt.co2.toFixed(2)}</span><span>tCO₂e / yr</span>`;document.getElementById('st-pt').textContent=`~ ${S.pt.co2.toFixed(2)} tCO₂e`;document.getElementById('st-pt').className='sec-total live';}}
+
+function calcCar(){
+  S.workingDays=getWD();
+  const car=annualKm(document.getElementById('car-staff').value,document.getElementById('car-km').value)*EF.car/1000;
+  const hybrid=annualKm(document.getElementById('hybrid-staff').value,document.getElementById('hybrid-km').value)*EF.hybrid/1000;
+  const ev=annualKm(document.getElementById('ev-staff').value,document.getElementById('ev-km').value)*EF.ev/1000;
+  const moto=annualKm(document.getElementById('moto-staff').value,document.getElementById('moto-km').value)*EF.moto/1000;
+  setModeRow('car',car);setModeRow('hybrid',hybrid);setModeRow('ev',ev);setModeRow('moto',moto);
+  S.car.co2=car+hybrid+ev+moto;S.car.detail={car,hybrid,ev,moto};
+  // MRT comparison
+  const cStaff=parseFloat(document.getElementById('car-staff').value)||0;
+  const cKm=parseFloat(document.getElementById('car-km').value)||0;
+  const mrtEquiv=annualKm(cStaff,cKm)*EF.mrt/1000;
+  const cmp=document.getElementById('car-comparison');
+  if(car>0&&cKm>0){const pct=Math.round((car-mrtEquiv)/car*100);document.getElementById('car-mrt-equiv').textContent=mrtEquiv.toFixed(2)+' tCO₂e/yr';document.getElementById('car-reduction-pct').textContent=pct+'%';cmp.className='comparison show';}
+  else cmp.className='comparison';
+  const r=document.getElementById('result-car').querySelectorAll('.rpill');
+  if(S.car.co2>0){r[0].className='rpill co2';r[0].innerHTML=`<span class="rpill-val">~ ${S.car.co2.toFixed(2)}</span><span>tCO₂e / yr</span>`;document.getElementById('st-car').textContent=`~ ${S.car.co2.toFixed(2)} tCO₂e`;document.getElementById('st-car').className='sec-total live';}
+  updateSummary();
+}
+
+function calcWFH(){
+  let watts=parseFloat(document.getElementById('wfh-device').value)||0;
+  if(watts===0){document.getElementById('wfh-custom-row').style.display='block';watts=parseFloat(document.getElementById('wfh-custom-w').value)||0;}
+  else document.getElementById('wfh-custom-row').style.display='none';
+  const staff=parseFloat(document.getElementById('wfh-staff').value)||0;
+  const days=parseFloat(document.getElementById('wfh-days').value)||0;
+  const hrs=parseFloat(document.getElementById('wfh-hrs').value)||8;
+  const mo_kwh=watts*hrs*days/1000;
+  const annual=mo_kwh*staff*12;
+  S.wfh.co2=annual*EF.wfh_grid/1000;S.wfh.sgd=annual*0.2972;
+  document.getElementById('wfh-result-text').textContent=staff>0&&days>0?`${staff} staff × ${mo_kwh.toFixed(1)} kWh/mo each = ${(mo_kwh*staff).toFixed(0)} kWh/mo · ${annual.toFixed(0)} kWh/yr`:'Enter staff count and WFH days to calculate';
+  const r=document.getElementById('result-wfh').querySelectorAll('.rpill');
+  if(S.wfh.co2>0){r[0].className='rpill co2';r[0].innerHTML=`<span class="rpill-val">~ ${S.wfh.co2.toFixed(3)}</span><span>tCO₂e / yr</span>`;r[1].className='rpill cost';r[1].innerHTML=`<span class="rpill-val">≈ SGD ${Math.round(S.wfh.sgd).toLocaleString()}</span><span>est. WFH electricity</span>`;document.getElementById('st-wfh').textContent=`~ ${S.wfh.co2.toFixed(3)} tCO₂e`;document.getElementById('st-wfh').className='sec-total live';}
+  updateSummary();
+}
+
+function updateSummary(){
+  const total=S.pt.co2+S.car.co2+S.wfh.co2;
+  document.getElementById('sum-pt').textContent=S.pt.co2>0?`~ ${S.pt.co2.toFixed(2)} tCO₂e`:'—';
+  document.getElementById('sum-car').textContent=S.car.co2>0?`~ ${S.car.co2.toFixed(2)} tCO₂e`:'—';
+  document.getElementById('sum-wfh').textContent=S.wfh.co2>0?`~ ${S.wfh.co2.toFixed(3)} tCO₂e`:'—';
+  document.getElementById('sum-total').textContent=total.toFixed(2);
+  const bars=document.getElementById('mode-bars'),barRows=document.getElementById('mode-bar-rows');
+  if(total>0){
+    bars.style.display='block';
+    const modes=[{label:'MRT/Bus',val:S.pt.co2,color:'#8ab4f4'},{label:'Car',val:S.car.detail.car+(S.car.detail.hybrid||0),color:'#f4a88a'},{label:'EV',val:S.car.detail.ev||0,color:'#a8d4a8'},{label:'Moto',val:S.car.detail.moto||0,color:'#d4c4a8'},{label:'WFH',val:S.wfh.co2,color:'#d4a8d4'}].filter(m=>m.val>0);
+    barRows.innerHTML=modes.map(m=>{const pct=Math.round(m.val/total*100);return`<div class="mode-bar-row"><span class="mode-bar-label">${m.label}</span><div class="mode-bar-track"><div class="mode-bar-fill" style="width:${pct}%;background:${m.color}"></div></div><span class="mode-bar-val">${pct}%</span></div>`;}).join('');
+  } else bars.style.display='none';
+  if(total>0){
+    const carPct=Math.round((S.car.detail.car||0)/total*100);
+    let insight=`${total.toFixed(2)} tCO₂e from staff commuting and WFH.`;
+    if(carPct>40)insight+=` Private car commuting accounts for ${carPct}% — the largest source. A public transport incentive policy could significantly reduce this.`;
+    else if(S.pt.co2>S.car.co2)insight+=` Most staff commute by public transport — your commuting footprint is relatively low. Maintaining this through office location choices and travel policies helps keep it low.`;
+    document.getElementById('sum-insight').textContent=insight;
+  } else document.getElementById('sum-insight').textContent='Enter commuting data to see your staff travel emissions.';
+  updateProgress();
+}
+
+function updateProgress(){
+  let done=0;
+  if(S.pt.co2>0)done++;
+  if(S.car.co2>0||document.getElementById('car-na')?.checked)done++;
+  if(S.wfh.co2>0||document.getElementById('wfh-na')?.checked)done++;
+  document.getElementById('prog-fill').style.width=Math.round(done/3*100)+'%';
+  document.getElementById('prog-label').textContent=done+' of 3 sections completed';
+}
+
+localStorage.setItem('zyt_s15_people_commuting_data', JSON.stringify({saved:true}));
+  window.location.href = '/S-16-digital-it.html';}
+
+window.addEventListener('load',()=>{
+  document.getElementById('mrt-staff').value=6;document.getElementById('mrt-km').value=14;calcPT();
+  document.getElementById('car-staff').value=2;document.getElementById('car-km').value=12;calcCar();
+  updateProgress();
+});
+</script>
+</body>
+</html>

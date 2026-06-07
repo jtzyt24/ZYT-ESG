@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Power & Energy — ZYT.ESG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#15140d;--ink2:#42403a;--ink3:#84827a;--ink4:#c2bfb6;
+  --bg:#f3f0e9;--card:#ffffff;--b1:#e0dbd2;--b2:#eae6de;
+  --s1c:#b04020;--s1b:#fdf0ec;--s1d:#f0c4b4;
+  --s2c:#1a4a8b;--s2b:#edf2fc;--s2d:#b4c8f0;
+  --s3c:#27500a;--s3b:#eaf4ee;--s3d:#b4d9c4;
+  --gc:#1a6b4a;--gb:#eaf4ee;--gd:#b4d9c4;
+  --ac:#7a5a0a;--ab:#fdf3e0;--ad:#e8c87a;
+  --wc:#7a1a1a;--wb:#fdf0ec;--wd:#f0b4b4;
+  --r:10px;--rl:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:14px}
+
+nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30}
+.logo{font-family:'Fraunces',serif;font-size:17px;font-weight:300;display:flex;align-items:center;gap:8px}
+.logo-tag{font-family:'DM Mono',monospace;font-size:10px;color:var(--gc);background:var(--gb);border:1px solid var(--gd);padding:2px 7px;border-radius:20px;letter-spacing:.5px}
+.nav-steps{display:flex;align-items:center;gap:4px;font-size:12px}
+.ns{padding:3px 10px;border-radius:20px;color:var(--ink3)}
+.ns.done{color:var(--gc)}.ns.done::before{content:'✓ ';font-size:10px}
+.ns.active{background:var(--ink);color:white;font-weight:500}
+.ns-sep{color:var(--ink4);font-size:10px}
+.btn-back{font-size:12px;color:var(--ink3);background:transparent;border:.5px solid var(--b1);padding:5px 12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:color .15s,border-color .15s}
+.btn-back:hover{color:var(--ink);border-color:var(--ink3)}
+
+.layout{display:grid;grid-template-columns:1fr 300px;gap:20px;max-width:1060px;margin:0 auto;padding:28px 24px 100px;align-items:start}
+
+.cluster-hdr{background:var(--card);border:1px solid var(--b1);border-radius:var(--rl);padding:20px 22px;margin-bottom:16px;display:flex;align-items:flex-start;gap:14px}
+.hdr-icon{font-size:26px;width:50px;height:50px;background:var(--bg);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hdr-body{flex:1}
+.hdr-name{font-family:'Fraunces',serif;font-size:22px;font-weight:300;letter-spacing:-.3px;margin-bottom:3px}
+.hdr-sub{font-size:12px;color:var(--ink3);line-height:1.5;margin-bottom:8px}
+.hdr-role{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3);background:var(--bg);border:1px solid var(--b2);padding:3px 9px;border-radius:20px}
+.prog-bar{height:3px;background:var(--b2);border-radius:2px;overflow:hidden;margin-top:10px}
+.prog-fill{height:100%;background:var(--gc);border-radius:2px;transition:width .5s ease}
+.prog-label{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);margin-top:4px}
+
+.routing-card{background:var(--card);border:1px solid var(--b1);border-radius:var(--rl);padding:18px 20px;margin-bottom:14px}
+.routing-title{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:12px}
+.routing-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.route-btn{padding:12px;border:1px solid var(--b1);border-radius:var(--r);cursor:pointer;background:var(--card);text-align:left;transition:border-color .15s,background .15s}
+.route-btn:hover{border-color:var(--ink3)}
+.route-btn.active{border-color:var(--gc);background:var(--gb)}
+.route-icon{font-size:18px;margin-bottom:4px}
+.route-name{font-size:12px;font-weight:500;color:var(--ink)}
+.route-desc{font-size:11px;color:var(--ink3);margin-top:2px;line-height:1.4}
+.route-note{margin-top:10px;font-size:11px;color:var(--ink3);padding:8px 10px;background:var(--bg);border-radius:7px;line-height:1.5;display:none}
+.route-note.show{display:block}
+
+.section{margin-bottom:12px}
+.sec-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card);border:1px solid var(--b1);border-radius:10px 10px 0 0;cursor:pointer;user-select:none}
+.sec-hdr:hover{background:var(--bg)}
+.scope-pill{font-size:10px;font-family:'DM Mono',monospace;font-weight:500;padding:2px 8px;border-radius:8px;white-space:nowrap}
+.s2-pill{background:var(--s2b);color:var(--s2c);border:1px solid var(--s2d)}
+.s1-pill{background:var(--s1b);color:var(--s1c);border:1px solid var(--s1d)}
+.s3-pill{background:var(--s3b);color:var(--s3c);border:1px solid var(--s3d)}
+.sec-title{font-size:13px;font-weight:500;color:var(--ink);flex:1}
+.sec-total{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);transition:color .3s}
+.sec-total.live{color:var(--gc);font-weight:500}
+.sec-chev{width:12px;height:12px;color:var(--ink3);transition:transform .2s;flex-shrink:0}
+.sec-chev.open{transform:rotate(90deg)}
+.sec-body{display:none;background:var(--card);border:1px solid var(--b1);border-top:none;border-radius:0 0 10px 10px;overflow:hidden}
+.sec-body.open{display:block}
+
+.activity{padding:16px;border-bottom:1px solid var(--b2)}
+.activity:last-child{border-bottom:none}
+.act-name-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.act-name{font-size:13px;font-weight:500;color:var(--ink)}
+.opt-tag{font-size:9px;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:6px;background:var(--ab);color:var(--ac);border:1px solid var(--ad)}
+.tip-btn{width:16px;height:16px;border-radius:50%;background:var(--bg);border:1px solid var(--b1);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;color:var(--ink3);font-family:'DM Mono',monospace;font-weight:500;flex-shrink:0;transition:background .15s,color .15s}
+.tip-btn:hover{background:var(--ink);color:white;border-color:var(--ink)}
+.act-sub{font-size:11px;color:var(--ink3);margin-bottom:10px;line-height:1.4}
+.tip-panel{display:none;background:var(--ink);color:white;border-radius:8px;padding:12px 14px;font-size:11px;line-height:1.6;margin-bottom:10px}
+.tip-panel.open{display:block;animation:fadein .15s ease}
+.tip-analogy{margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.15);font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.65)}
+.tip-ef{margin-top:4px;font-size:10px;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace}
+
+/* MODES */
+.mode-tabs{display:flex;gap:3px;background:var(--bg);border:1px solid var(--b1);border-radius:8px;padding:3px;width:fit-content;margin-bottom:10px;flex-wrap:wrap}
+.mtab{font-size:11px;padding:5px 11px;border-radius:6px;border:none;background:transparent;color:var(--ink3);cursor:pointer;transition:all .15s;white-space:nowrap}
+.mtab.active{background:var(--card);color:var(--ink);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.mode-panel{display:none}
+.mode-panel.active{display:block}
+
+/* MONTHLY GRID */
+.month-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px}
+.mcell{}
+.mcell label{display:block;font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);margin-bottom:3px}
+.month-row{display:flex;gap:4px;align-items:center}
+.minp{width:100%;height:32px;border:.5px solid var(--b1);border-radius:6px;background:var(--card);padding:0 7px;font-size:12px;color:var(--ink);outline:none;transition:border-color .15s;min-width:0}
+.minp:focus{border-color:var(--gc)}
+.minp.filled{background:var(--gb);border-color:var(--gd)}
+.attach-month-btn{width:24px;height:32px;border:.5px solid var(--b2);border-radius:5px;background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s;color:var(--ink4)}
+.attach-month-btn:hover{border-color:var(--gc);color:var(--gc);background:var(--gb)}
+.attach-month-btn.has-file{border-color:var(--gc);color:var(--gc);background:var(--gb)}
+.month-summary{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:7px 10px;background:var(--bg);border-radius:7px;font-size:11px;color:var(--ink2);margin-bottom:8px}
+.ms-val{font-family:'DM Mono',monospace;font-weight:500;color:var(--ink)}
+.comp-wrap{display:flex;align-items:center;gap:5px;margin-left:auto}
+.comp-bar{width:50px;height:3px;background:var(--b2);border-radius:2px;overflow:hidden}
+.comp-fill{height:100%;background:var(--gc);border-radius:2px;transition:width .3s}
+.comp-lbl{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3)}
+
+/* FIELDS */
+.field-row{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:8px}
+.fwrap{flex:1;min-width:100px}
+.fwrap label{display:block;font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.inp{width:100%;height:36px;border:.5px solid var(--b1);border-radius:7px;background:var(--card);padding:0 10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .15s}
+.inp:focus{border-color:var(--gc)}
+.sel{width:100%;height:36px;border:.5px solid var(--b1);border-radius:7px;background:var(--card);padding:0 10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;cursor:pointer;transition:border-color .15s}
+.sel:focus{border-color:var(--gc)}
+.unit-box{height:36px;padding:0 10px;background:var(--bg);border:.5px solid var(--b2);border-radius:7px;font-size:11px;color:var(--ink3);display:flex;align-items:center;white-space:nowrap;font-family:'DM Mono',monospace}
+.tog-row{display:flex;gap:3px;background:var(--bg);border:.5px solid var(--b1);border-radius:7px;padding:2px;width:fit-content;margin-bottom:6px}
+.tog{font-size:11px;padding:4px 10px;border-radius:5px;border:none;background:transparent;color:var(--ink3);cursor:pointer;transition:all .15s}
+.tog.active{background:var(--card);color:var(--ink);font-weight:500}
+
+/* WFH CALCULATOR */
+.wfh-calc{background:var(--gb);border:1px solid var(--gd);border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.wfh-title{font-size:11px;font-weight:500;color:var(--gc);margin-bottom:8px}
+.wfh-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px}
+.wfh-result{font-size:11px;color:var(--gc);font-family:'DM Mono',monospace;padding-top:6px;border-top:1px solid var(--gd)}
+
+/* SOLAR CONTEXT NOTE */
+.solar-ctx{display:none;padding:9px 11px;border-radius:7px;font-size:11px;line-height:1.5;margin-bottom:8px}
+.solar-ctx.show{display:block}
+.solar-ctx.blocked{background:var(--wb);border:.5px solid var(--wd);color:var(--wc)}
+.solar-ctx.caution{background:var(--ab);border:.5px solid var(--ad);color:var(--ac)}
+.solar-ctx.encouraged{background:var(--gb);border:.5px solid var(--gd);color:var(--gc)}
+
+/* N/A */
+.na-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.na-cb{width:14px;height:14px;cursor:pointer;accent-color:var(--ink3)}
+.na-lbl{font-size:11px;color:var(--ink3);cursor:pointer}
+
+/* RESULTS */
+.result-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:.5px solid var(--b2);align-items:center}
+.rpill{display:flex;align-items:center;gap:4px;font-size:11px;padding:3px 9px;border-radius:16px;border:.5px solid;white-space:nowrap}
+.rpill.co2{background:var(--gb);color:var(--gc);border-color:var(--gd)}
+.rpill.cost{background:var(--ab);color:var(--ac);border-color:var(--ad)}
+.rpill.empty{background:var(--bg);color:var(--ink4);border-color:var(--b2)}
+.rpill-val{font-family:'DM Mono',monospace;font-weight:500}
+.acc-tag{font-size:9px;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:6px}
+.acc-h{background:var(--gb);color:var(--gc)}
+.acc-m{background:var(--ab);color:var(--ac)}
+.acc-l{background:var(--wb);color:var(--wc)}
+
+/* COST CONTEXT — explains what SGD means */
+.cost-context{display:none;margin-top:6px;font-size:11px;color:var(--ac);line-height:1.5;padding:7px 10px;background:var(--ab);border:.5px solid var(--ad);border-radius:7px}
+.cost-context.show{display:block}
+
+/* ATTACH */
+.attach-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.attach-btn{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3);background:transparent;border:.5px solid var(--b1);padding:4px 10px;border-radius:6px;cursor:pointer;transition:all .15s}
+.attach-btn:hover{color:var(--ink);border-color:var(--ink3)}
+.attach-btn svg{width:12px;height:12px}
+.attach-info{font-size:10px;color:var(--ink3);font-style:italic}
+
+/* S3 NOTE */
+.s3-note{margin:0 16px 12px;padding:10px 12px;background:var(--s3b);border:.5px solid var(--s3d);border-radius:8px;font-size:11px;color:var(--s3c);line-height:1.5}
+
+/* SUMMARY PANEL */
+.summary-col{position:sticky;top:72px}
+.sum-card{background:var(--ink);border-radius:var(--rl);overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.12)}
+.sum-hdr{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-hdr-title{font-family:'Fraunces',serif;font-size:15px;font-weight:300;color:white;margin-bottom:2px}
+.sum-hdr-sub{font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.35)}
+.sum-scopes{padding:14px 18px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid rgba(255,255,255,.1)}
+.scope-row{display:flex;align-items:flex-start;justify-content:space-between}
+.scope-lbl{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,.55)}
+.scope-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.scope-val{text-align:right}
+.scope-co2{font-family:'Fraunces',serif;font-size:17px;font-weight:300;color:white;line-height:1;transition:all .3s}
+.scope-sgd{font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.35);margin-top:2px}
+.sum-total{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-est-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.3);margin-bottom:5px}
+.sum-total-val{font-family:'Fraunces',serif;font-size:26px;font-weight:300;color:white;line-height:1;letter-spacing:-.5px;transition:all .3s}
+.sum-total-unit{font-size:11px;color:rgba(255,255,255,.4);margin-top:2px}
+.sum-cost-block{margin-top:10px;padding:10px 12px;background:rgba(255,255,255,.06);border-radius:8px;border:.5px solid rgba(255,255,255,.1)}
+.sum-cost-label{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.3);margin-bottom:4px}
+.sum-cost-val{font-family:'Fraunces',serif;font-size:18px;font-weight:300;color:#f0d090;line-height:1;transition:all .3s}
+.sum-cost-desc{font-size:10px;color:rgba(255,255,255,.4);margin-top:3px;line-height:1.4}
+.sum-saving{margin-top:6px;padding:7px 10px;background:rgba(26,107,74,.25);border-radius:6px;font-size:11px;color:#a8e4c4;line-height:1.4}
+.sum-analogy{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-anal-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.25);margin-bottom:5px}
+.sum-anal-text{font-size:11px;color:rgba(255,255,255,.6);line-height:1.55;font-style:italic;min-height:32px;transition:all .3s}
+.sum-ef{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-ef-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.25);margin-bottom:6px}
+.ef-row{display:flex;justify-content:space-between;font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.4);margin-bottom:3px}
+.ef-row span:last-child{color:rgba(255,255,255,.6)}
+.sum-actions{padding:14px 18px;display:flex;flex-direction:column;gap:8px}
+.btn-next{width:100%;height:40px;background:white;color:var(--ink);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
+.btn-next:hover{background:#f0ede6}
+.btn-next svg{width:13px;height:13px;transition:transform .15s}
+.btn-next:hover svg{transform:translateX(2px)}
+.btn-save-draft{width:100%;height:36px;background:transparent;color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.12);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s}
+.btn-save-draft:hover{color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.3)}
+
+@keyframes fadein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:768px){.layout{grid-template-columns:1fr}.summary-col{position:static}.nav-steps{display:none}.routing-opts{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">ZYT.ESG <span class="logo-tag">ESG</span></div>
+  <div class="nav-steps">
+    <div class="ns done">Profile</div><div class="ns-sep">›</div>
+    <div class="ns active">Data entry</div><div class="ns-sep">›</div>
+    <div class="ns">Results</div><div class="ns-sep">›</div>
+    <div class="ns">Targets</div><div class="ns-sep">›</div>
+    <div class="ns">Report</div>
+  </div>
+  <button class="btn-back">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 2L4 6l4 4"/></svg>
+    Back to hub
+  </button>
+</nav>
+
+<div class="layout">
+<div class="form-col">
+
+<!-- CLUSTER HEADER -->
+<div class="cluster-hdr">
+  <div class="hdr-icon">⚡</div>
+  <div class="hdr-body">
+    <div class="hdr-name">Power & energy</div>
+    <div class="hdr-sub">Electricity, diesel generators, solar generation, and district cooling. Covers Scope 1 (diesel generator) and Scope 2 (purchased electricity). Upstream Cat 3 emissions are auto-calculated.</div>
+    <div class="hdr-role">
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="6" cy="4" r="2.5"/><path d="M2 11c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>
+      Owner / Facilities manager
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="prog-label" id="prog-label">0 of 4 sections completed</div>
+  </div>
+</div>
+
+<!-- PREMISES ROUTING -->
+<div class="routing-card">
+  <div class="routing-title">Where does your business primarily operate from?</div>
+  <div class="routing-opts">
+    <button class="route-btn active" data-r="own" onclick="setRoute('own',this)">
+      <div class="route-icon">🏢</div>
+      <div class="route-name">Own or rented premises</div>
+      <div class="route-desc">Shop, office, restaurant — you receive the electricity bill directly</div>
+    </button>
+    <button class="route-btn" data-r="home" onclick="setRoute('home',this)">
+      <div class="route-icon">🏠</div>
+      <div class="route-name">Home-based business</div>
+      <div class="route-desc">Business run from home — only the business-use portion counts</div>
+    </button>
+    <button class="route-btn" data-r="serviced" onclick="setRoute('serviced',this)">
+      <div class="route-icon">🏙</div>
+      <div class="route-name">Serviced / co-working space</div>
+      <div class="route-desc">WeWork, JustCo etc. — electricity included in tenancy</div>
+    </button>
+    <button class="route-btn" data-r="multiple" onclick="setRoute('multiple',this)">
+      <div class="route-icon">📍</div>
+      <div class="route-name">Multiple locations</div>
+      <div class="route-desc">More than one premises — add each separately</div>
+    </button>
+  </div>
+  <div class="route-note" id="route-note"></div>
+</div>
+
+<!-- ══ GRID ELECTRICITY ══ -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('elec')">
+    <svg class="sec-chev open" id="chev-elec" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s2-pill">Scope 2</span>
+    <span class="sec-title">Electricity consumption</span>
+    <span class="sec-total" id="st-elec">—</span>
+  </div>
+  <div class="sec-body open" id="body-elec">
+
+    <!-- HOME-BASED WFH CALCULATOR -->
+    <div class="activity" id="wfh-section" style="display:none">
+      <div class="act-name-row"><div class="act-name">Business electricity — home office calculator</div></div>
+      <div class="act-sub">Enter only the electricity used by your business activities. Your full household electricity bill is not relevant to your company's carbon report.</div>
+      <div class="wfh-calc">
+        <div class="wfh-title">What equipment do you use for work?</div>
+        <div class="wfh-grid">
+          <div class="mcell">
+            <label>Equipment</label>
+            <select class="sel" id="wfh-device" onchange="calcWFH()" style="height:32px;font-size:12px">
+              <option value="85">Computer + fan (85W)</option>
+              <option value="350">Computer + AC 1HP (350W)</option>
+              <option value="125">Computer + fan + monitor (125W)</option>
+              <option value="390">Computer + AC 1HP + monitor (390W)</option>
+              <option value="0">Custom — enter wattage →</option>
+            </select>
+          </div>
+          <div class="mcell">
+            <label>Hours per day</label>
+            <input class="minp" type="number" id="wfh-hrs" value="3" min="0.5" max="16" step="0.5" oninput="calcWFH()">
+          </div>
+          <div class="mcell">
+            <label>Working days / mo</label>
+            <input class="minp" type="number" id="wfh-days" value="22" min="1" max="31" oninput="calcWFH()">
+          </div>
+        </div>
+        <div id="wfh-custom-row" style="display:none;margin-bottom:6px">
+          <div class="field-row">
+            <div class="fwrap"><label>Total wattage (W)</label><input class="inp" type="number" id="wfh-custom-w" placeholder="e.g. 200" oninput="calcWFH()"></div>
+            <div class="unit-box">W</div>
+          </div>
+        </div>
+        <div class="wfh-result" id="wfh-result">Monthly business electricity: — kWh · Annual: — kWh</div>
+      </div>
+      <div class="result-row" id="result-wfh">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual electricity cost</span></div>
+      </div>
+      <div class="cost-context" id="cost-ctx-wfh">
+        💡 This is what you're already spending on work-related electricity. Reducing it saves you money directly.
+      </div>
+      <div class="attach-row">
+        <button class="attach-btn" onclick="attachFile('wfh')"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 1H3a1 1 0 00-1 1v8a1 1 0 001 1h6a1 1 0 001-1V4L8 1z"/><path d="M8 1v3h3"/></svg>Attach electricity bill (documentation)</button>
+        <span class="attach-info">For audit reference only — data not extracted</span>
+      </div>
+    </div>
+
+    <!-- SERVICED OFFICE ESTIMATOR -->
+    <div class="activity" id="serviced-section" style="display:none">
+      <div class="act-name-row">
+        <div class="act-name">Electricity estimate — serviced / co-working space <span class="scope-pill s3-pill" style="font-size:9px;margin-left:4px">Scope 3 Cat 8</span></div>
+      </div>
+      <div class="act-sub">Electricity is included in your tenancy — no direct bill. We estimate using Singapore's BCA Energy Use Intensity benchmark for office space (~180 kWh/m²/year).</div>
+      <div class="field-row">
+        <div class="fwrap"><label>Office floor area</label><input class="inp" type="number" id="serv-area" placeholder="e.g. 50" oninput="calcServiced()"></div>
+        <div class="unit-box">m²</div>
+        <div style="display:flex;align-items:center;padding-bottom:2px;font-size:11px;color:var(--ink3)">or</div>
+        <div class="fwrap"><label>Number of desks</label><input class="inp" type="number" id="serv-desks" placeholder="e.g. 5" oninput="calcServicedDesks()"></div>
+      </div>
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:8px">BCA benchmark: ~180 kWh/m²/yr · ~1,200 kWh/desk/yr. Flagged as estimated in your report.</div>
+      <div class="result-row" id="result-serviced">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr (BCA estimate)</span></div>
+      </div>
+    </div>
+
+    <!-- OWN / RENTED PREMISES: 3-MODE INPUT -->
+    <div class="activity" id="own-elec-section">
+      <div class="act-name-row">
+        <div class="act-name">Electricity consumption</div>
+        <span class="tip-btn" onclick="toggleTip('tip-elec')">?</span>
+      </div>
+      <div class="act-sub">Enter from your electricity bills. Choose the method that matches what you have available — you can switch modes at any time.</div>
+      <div class="tip-panel" id="tip-elec">
+        Singapore's grid runs primarily on natural gas. Every kWh consumed generates approximately 0.412 kg CO₂ — EMA's official Grid Emission Factor for 2023. Your bill shows consumption in kWh.
+        <div class="tip-analogy">💡 1 kWh ≈ 1 hour of 1HP air-conditioning, or ~80 smartphone charges, or a 10W LED on for 100 hours</div>
+        <div class="tip-ef">SEFR: Purchased Energy → Grid EF 2023 → 0.412 kgCO₂e/kWh · Source: EMA Singapore</div>
+      </div>
+
+      <div class="mode-tabs" id="elec-mode-tabs">
+        <button class="mtab" data-m="monthly" onclick="switchElecMode('monthly',this)">Month by month ★</button>
+        <button class="mtab" data-m="annual" onclick="switchElecMode('annual',this)">Annual total</button>
+        <button class="mtab active" data-m="single" onclick="switchElecMode('single',this)">One bill (quick start)</button>
+      </div>
+
+      <!-- MONTHLY MODE -->
+      <div class="mode-panel" id="elec-monthly">
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:8px">Enter kWh from each electricity bill. Click 📎 beside each month to attach the bill for documentation.</div>
+        <div class="month-grid" id="elec-month-grid"></div>
+        <div class="month-summary" id="elec-month-summary">
+          <span>Total: <span class="ms-val" id="em-total">0</span> kWh</span>
+          <span style="color:var(--ink4)">·</span>
+          <span>Avg: <span class="ms-val" id="em-avg">—</span>/mo</span>
+          <span style="color:var(--ink4)">·</span>
+          <span>~ <span class="ms-val" id="em-co2">0</span> tCO₂e/yr</span>
+          <div class="comp-wrap">
+            <div class="comp-bar"><div class="comp-fill" id="em-comp-fill" style="width:0%"></div></div>
+            <span class="comp-lbl" id="em-comp-lbl">0/12</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANNUAL MODE -->
+      <div class="mode-panel" id="elec-annual">
+        <div class="field-row">
+          <div class="fwrap"><label>Annual consumption (kWh)</label><input class="inp" type="number" id="ea-kwh" placeholder="e.g. 34,560" oninput="calcElecAnnual()"></div>
+          <div class="unit-box">kWh / yr</div>
+          <div style="display:flex;align-items:center;padding-bottom:2px;font-size:11px;color:var(--ink3)">or</div>
+          <div class="fwrap"><label>Annual bill total (SGD)</label><input class="inp" type="number" id="ea-sgd" placeholder="SGD" oninput="calcElecAnnualBill()"></div>
+        </div>
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:8px">Useful if you have an energy audit report or SP utilities portal annual summary. Conversion uses 29.72 cents/kWh (SP Q2 2026 Low Tension Non-Domestic incl. GST).</div>
+        <div class="attach-row">
+          <button class="attach-btn" onclick="attachFile('elec-annual')"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 1H3a1 1 0 00-1 1v8a1 1 0 001 1h6a1 1 0 001-1V4L8 1z"/><path d="M8 1v3h3"/></svg>Attach annual bill or energy audit</button>
+        </div>
+      </div>
+
+      <!-- SINGLE BILL MODE -->
+      <div class="mode-panel active" id="elec-single">
+        <div class="field-row">
+          <div class="fwrap" style="flex:.5;min-width:80px">
+            <label>Month</label>
+            <select class="sel" id="es-month">
+              <option>Jan</option><option>Feb</option><option>Mar</option>
+              <option selected>Apr</option><option>May</option><option>Jun</option>
+              <option>Jul</option><option>Aug</option><option>Sep</option>
+              <option>Oct</option><option>Nov</option><option>Dec</option>
+            </select>
+          </div>
+          <div class="fwrap">
+            <label>Consumption (kWh)</label>
+            <input class="inp" type="number" id="es-kwh" placeholder="e.g. 360" oninput="calcElecSingle()">
+          </div>
+          <div class="unit-box">kWh</div>
+          <div style="display:flex;align-items:center;padding-bottom:2px;font-size:11px;color:var(--ink3)">or</div>
+          <div class="fwrap">
+            <label>Bill amount (SGD)</label>
+            <input class="inp" type="number" id="es-bill" placeholder="e.g. 856" oninput="calcElecSingleBill()">
+          </div>
+        </div>
+        <div id="es-rate-note" style="font-size:11px;color:var(--ink3);margin-bottom:6px;display:none">
+          Your actual electricity rate: <strong id="es-rate-val"></strong> · Reference: SP Q2 2026 Non-Domestic 27.27¢/kWh ex-GST
+        </div>
+        <div class="attach-row">
+          <button class="attach-btn" onclick="attachFile('elec-single')"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 1H3a1 1 0 00-1 1v8a1 1 0 001 1h6a1 1 0 001-1V4L8 1z"/><path d="M8 1v3h3"/></svg>Attach this bill (documentation)</button>
+        </div>
+      </div>
+
+      <!-- SHARED RESULT ROW FOR OWN-ELEC -->
+      <div class="result-row" id="result-elec-main">
+        <div class="rpill empty" id="re-co2"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty" id="re-sgd"><span class="rpill-val">—</span><span>annual electricity spend</span></div>
+        <span class="acc-tag" id="re-acc" style="display:none"></span>
+      </div>
+      <div class="cost-context" id="cost-ctx-elec">
+        💡 This is what you're already paying for electricity. Reducing consumption by 10% saves you approximately <strong id="cost-ctx-saving">—</strong>/year on bills — and reduces your carbon footprint by the same proportion.
+      </div>
+    </div>
+
+    <!-- SOLAR -->
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">Solar panels — on-site generation <span class="opt-tag">optional</span></div>
+        <span class="tip-btn" onclick="toggleTip('tip-solar')">?</span>
+      </div>
+      <div class="act-sub">If your business has solar panels, enter the monthly generation consumed on-site. This offsets your grid electricity emissions.</div>
+      <div class="tip-panel" id="tip-solar">
+        On-site solar generation has zero Scope 2 emissions under GHG Protocol's market-based method. It directly offsets your grid electricity consumption. Enter only what you consume on-site — exclude any surplus sold back to the grid via EMA's REBS scheme.
+        <div class="tip-analogy">☀️ A 10kWp commercial rooftop system generates ~12,000 kWh/year in Singapore — saving ~4.9 tCO₂e and approximately SGD 3,600/year in electricity cost</div>
+        <div class="tip-ef">GHG Protocol: Market-based Scope 2 · Self-generated solar = 0 kgCO₂e/kWh</div>
+      </div>
+
+      <!-- Context note changes based on premises type -->
+      <div class="solar-ctx blocked" id="solar-hdb-note">
+        🚫 <strong>HDB flat:</strong> Solar panels are not approved for installation in HDB flats by HDB. This section does not apply.
+      </div>
+      <div class="solar-ctx caution" id="solar-tenant-note">
+        ⚠️ <strong>Commercial tenant:</strong> Installing solar panels requires landlord consent and EMA/BCA approval. Check with your building owner before proceeding. If you don't have solar, mark as N/A below.
+      </div>
+      <div class="solar-ctx encouraged" id="solar-own-note">
+        ✅ <strong>Own premises:</strong> Solar installation is encouraged. EMA's SolarNova programme and ENGIE/Sunseap offer turnkey solutions for commercial properties. Consider this as a reduction action after completing your baseline.
+      </div>
+
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="solar-na" checked onchange="toggleNA('solar-inputs',this,'solar')">
+        <label class="na-lbl" for="solar-na">We do not have solar panels</label>
+      </div>
+      <div id="solar-inputs" style="opacity:.3;pointer-events:none">
+        <div class="field-row">
+          <div class="fwrap"><label>Average monthly generation (on-site consumed)</label><input class="inp" type="number" id="solar-kwh" placeholder="e.g. 800" oninput="calcSolar()"></div>
+          <div class="unit-box">kWh / month</div>
+        </div>
+      </div>
+      <div class="result-row" id="result-solar">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e offset / yr</span></div>
+      </div>
+    </div>
+
+    <!-- DISTRICT COOLING -->
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">District cooling system <span class="opt-tag">optional</span></div>
+        <span class="tip-btn" onclick="toggleTip('tip-dc')">?</span>
+      </div>
+      <div class="act-sub">Centralised chilled water supply — applicable in Marina Bay, Jurong Lake District, and select business parks.</div>
+      <div class="tip-panel" id="tip-dc">
+        District cooling plants use electricity to generate chilled water for multiple buildings. Your bill shows cooling consumed in RT-hr or kWh thermal. We convert to electricity using the plant's efficiency (kW/RT), then apply the EMA grid emission factor.
+        <div class="tip-analogy">🏢 Mainly relevant for tenants in Marina Bay Financial Centre, Marina One, Asia Square, Jurong Lake District</div>
+        <div class="tip-ef">Formula: RT-hr × kW/RT × 0.412 kgCO₂/kWh · kW/RT = 3.517 ÷ COP</div>
+      </div>
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="dc-na" checked onchange="toggleNA('dc-inputs',this,'dc')">
+        <label class="na-lbl" for="dc-na">We are not connected to district cooling</label>
+      </div>
+      <div id="dc-inputs" style="opacity:.3;pointer-events:none">
+        <div class="field-row" style="margin-bottom:6px">
+          <div class="fwrap"><label>District cooling provider</label>
+            <select class="sel" id="dc-provider" onchange="handleDCProvider()">
+              <option value="0.55">SP Group District Cooling (0.55 kW/RT)</option>
+              <option value="0.62">Keppel District Cooling (0.62 kW/RT)</option>
+              <option value="0.55">Singapore District Cooling / JLD (0.55 kW/RT)</option>
+              <option value="0.65">Unknown — use BCA default (0.65 kW/RT)</option>
+              <option value="custom">Enter efficiency manually</option>
+            </select>
+          </div>
+        </div>
+        <div id="dc-custom-row" style="display:none;margin-bottom:6px">
+          <div class="field-row">
+            <div class="fwrap"><label>Plant efficiency (kW/RT)</label><input class="inp" type="number" id="dc-ef" placeholder="e.g. 0.60" step="0.01" oninput="calcDC()"></div>
+            <div style="display:flex;align-items:center;padding-bottom:2px;font-size:11px;color:var(--ink3)">or COP:</div>
+            <div class="fwrap"><label>COP</label><input class="inp" type="number" id="dc-cop" placeholder="e.g. 5.7" step="0.1" oninput="calcDCfromCOP()"></div>
+          </div>
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">kW/RT = 3.517 ÷ COP · Ask your building management for the plant's published efficiency.</div>
+        </div>
+        <div class="tog-row">
+          <button class="tog active" onclick="switchDCUnit('rt',this)">RT-hr / month</button>
+          <button class="tog" onclick="switchDCUnit('kwht',this)">kWh thermal / month</button>
+        </div>
+        <div id="dc-rt-inp"><div class="field-row"><div class="fwrap"><label>Monthly cooling consumed</label><input class="inp" type="number" id="dc-rt" placeholder="e.g. 120" oninput="calcDC()"></div><div class="unit-box">RT-hr / month</div></div></div>
+        <div id="dc-kwht-inp" style="display:none"><div class="field-row"><div class="fwrap"><label>Monthly cooling consumed</label><input class="inp" type="number" id="dc-kwht" placeholder="e.g. 422" oninput="calcDCkwht()"></div><div class="unit-box">kWh thermal / month</div></div></div>
+      </div>
+      <div class="result-row" id="result-dc">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual cooling cost (est.)</span></div>
+      </div>
+    </div>
+
+    <!-- CAT 3 AUTO NOTE -->
+    <div class="s3-note">
+      <strong>Upstream electricity (Scope 3, Cat 3) — auto-calculated</strong><br>
+      Emissions from extracting and transporting fuel to Singapore's power stations are calculated automatically using SEFR's upstream factor of 0.00212 kgCO₂e/kWh. This appears in Section 6 of your report — no input needed.
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ DIESEL GENERATOR ══ -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('gen')">
+    <svg class="sec-chev" id="chev-gen" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s1-pill">Scope 1</span>
+    <span class="sec-title">Diesel generator</span>
+    <span class="sec-total" id="st-gen">—</span>
+  </div>
+  <div class="sec-body" id="body-gen">
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">Diesel consumed in generator</div>
+        <span class="tip-btn" onclick="toggleTip('tip-gen')">?</span>
+      </div>
+      <div class="act-sub">Diesel burned in a backup or primary generator on your premises. This is a direct Scope 1 emission — you own the source.</div>
+      <div class="tip-panel" id="tip-gen">
+        Burning diesel directly releases CO₂, CH₄, and N₂O — all three greenhouse gases expressed as CO₂-equivalent. If you only use your generator during power outages, annual consumption may be very low.
+        <div class="tip-analogy">⛽ 1 litre of diesel ≈ driving 12 km in Singapore traffic, or running a 5kVA generator for ~1 hour</div>
+        <div class="tip-ef">SEFR: Fuel → Combustion → Gas/Diesel Oil → 3,196.749 kgCO₂e/metric ton · Diesel density 0.832 kg/L → 2.660 kgCO₂e/litre</div>
+      </div>
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="gen-na" onchange="toggleNA('gen-inputs',this,'gen')">
+        <label class="na-lbl" for="gen-na">We do not have a diesel generator</label>
+      </div>
+      <div id="gen-inputs">
+        <div class="mode-tabs" id="gen-mode-tabs">
+          <button class="mtab" data-m="gen-monthly" onclick="switchGenMode('gen-monthly',this)">Month by month</button>
+          <button class="mtab active" data-m="gen-annual" onclick="switchGenMode('gen-annual',this)">Average / annual</button>
+        </div>
+        <div class="mode-panel" id="gen-monthly">
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:8px">Enter litres of diesel purchased or delivered each month.</div>
+          <div class="month-grid" id="gen-month-grid"></div>
+          <div class="month-summary">
+            Total: <span class="ms-val" id="gm-total">0</span> L &nbsp;·&nbsp;
+            ~ <span class="ms-val" id="gm-co2">0</span> tCO₂e/yr
+            <div class="comp-wrap"><div class="comp-bar"><div class="comp-fill" id="gm-comp" style="width:0%"></div></div><span class="comp-lbl" id="gm-comp-lbl">0/12</span></div>
+          </div>
+        </div>
+        <div class="mode-panel active" id="gen-annual">
+          <div class="field-row">
+            <div class="fwrap"><label>Average monthly consumption</label><input class="inp" type="number" id="gen-litres" placeholder="e.g. 50" oninput="calcGen()"></div>
+            <div class="unit-box">litres / month</div>
+            <div style="display:flex;align-items:center;padding-bottom:2px;font-size:11px;color:var(--ink3)">or</div>
+            <div class="fwrap"><label>Annual total</label><input class="inp" type="number" id="gen-litres-yr" placeholder="litres / year" oninput="calcGenAnnual()"></div>
+          </div>
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:8px">Check with your facilities team or fuel delivery records. Reference: SGD 2.80/litre (Singapore pump, Q2 2026).</div>
+        </div>
+      </div>
+      <div class="result-row" id="result-gen">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual diesel cost</span></div>
+      </div>
+      <div class="cost-context" id="cost-ctx-gen">
+        💡 This is what you're spending on diesel. Reducing generator use or switching to a more efficient unit cuts both carbon and fuel costs directly.
+      </div>
+      <div class="attach-row">
+        <button class="attach-btn" onclick="attachFile('gen')"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 1H3a1 1 0 00-1 1v8a1 1 0 001 1h6a1 1 0 001-1V4L8 1z"/><path d="M8 1v3h3"/></svg>Attach delivery records (documentation)</button>
+        <span class="attach-info">Delivery notes, purchase receipts, fuel card statements</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /form-col -->
+
+<!-- ══ SUMMARY PANEL ══ -->
+<div class="summary-col">
+<div class="sum-card">
+  <div class="sum-hdr">
+    <div class="sum-hdr-title">Estimated cluster total</div>
+    <div class="sum-hdr-sub">Power & energy · Reporting year 2024</div>
+  </div>
+  <div class="sum-scopes">
+    <div class="scope-row">
+      <div class="scope-lbl"><div class="scope-dot" style="background:#f4a88a"></div>Scope 1 — direct</div>
+      <div class="scope-val"><div class="scope-co2" id="sum-s1">0</div><div class="scope-sgd" id="sum-s1-sgd">—</div></div>
+    </div>
+    <div class="scope-row">
+      <div class="scope-lbl"><div class="scope-dot" style="background:#8ab4f4"></div>Scope 2 — electricity</div>
+      <div class="scope-val"><div class="scope-co2" id="sum-s2">0</div><div class="scope-sgd" id="sum-s2-sgd">—</div></div>
+    </div>
+    <div class="scope-row">
+      <div class="scope-lbl"><div class="scope-dot" style="background:#a8d4a8"></div>Scope 3 Cat 3 — upstream</div>
+      <div class="scope-val"><div class="scope-co2" id="sum-s3" style="font-size:13px;color:rgba(255,255,255,.4)">auto</div><div class="scope-sgd">kWh × 0.00212</div></div>
+    </div>
+  </div>
+  <div class="sum-total">
+    <div class="sum-est-lbl">Estimated total</div>
+    <div class="sum-total-val" id="sum-total">0</div>
+    <div class="sum-total-unit">tCO₂e / year</div>
+    <div class="sum-cost-block">
+      <div class="sum-cost-label">What you spend on this energy</div>
+      <div class="sum-cost-val" id="sum-cost">—</div>
+      <div class="sum-cost-desc">This is your actual annual spend on electricity and diesel — not a carbon tax or penalty. Reducing emissions means reducing these costs.</div>
+      <div class="sum-saving" id="sum-saving" style="display:none">
+        💡 A 20% reduction could save you approximately <strong id="sum-saving-val">—</strong>/year
+      </div>
+    </div>
+  </div>
+  <div class="sum-analogy">
+    <div class="sum-anal-lbl">What this means in everyday terms</div>
+    <div class="sum-anal-text" id="sum-analogy">Enter your electricity data above to see your carbon footprint in everyday terms.</div>
+  </div>
+  <div class="sum-ef">
+    <div class="sum-ef-lbl">Emission factors used</div>
+    <div class="ef-row"><span>Grid electricity (EMA 2023)</span><span>0.412 kgCO₂/kWh</span></div>
+    <div class="ef-row"><span>Upstream Cat 3 (SEFR 2022)</span><span>0.00212 kgCO₂/kWh</span></div>
+    <div class="ef-row"><span>Diesel generator (NEA/SEFR)</span><span>2.660 kgCO₂/litre</span></div>
+    <div class="ef-row"><span>Tariff ref (SP Q2 2026)</span><span>27.27¢/kWh ex-GST</span></div>
+  </div>
+  <div class="sum-actions">
+    <button class="btn-next" onclick="saveAndNext()">
+      Save & go to Transport & fleet
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg>
+    </button>
+    <button class="btn-save-draft">Save & exit</button>
+  </div>
+</div>
+</div>
+
+</div><!-- /layout -->
+
+<script>
+// ── CONSTANTS ──
+const EF = { grid:0.412, upstream:0.00212, diesel:2.6597 };
+const PRICE = { elec:0.2972, diesel:2.80 }; // incl GST
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ── STATE ──
+const S = {
+  route:'own',
+  elec_kwh_yr:0, elec_sgd_yr:0, elec_acc:null,
+  solar_kwh_yr:0, dc_kwh_yr:0,
+  gen_litres_yr:0,
+  wfh_kwh_yr:0, serv_kwh_yr:0,
+  dcUnit:'rt',
+  attachedFiles:{},
+  monthlyFiles:{},
+};
+
+// ── ROUTE ──
+const ROUTE_NOTES = {
+  own:'',
+  home:'Only the electricity used for business activities counts — not your full household consumption. Use the calculator below to estimate your business share based on the equipment you use for work.',
+  serviced:'You don\'t receive a direct electricity bill — it\'s included in your tenancy fee. We estimate your consumption using Singapore\'s BCA benchmarks. This is reported as Scope 3 Category 8 (upstream leased assets).',
+  multiple:'Enter each premises separately. Start with your primary location here, then click + Add location to add others.'
+};
+
+function setRoute(r, btn) {
+  document.querySelectorAll('.route-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  S.route = r;
+  const note = document.getElementById('route-note');
+  note.textContent = ROUTE_NOTES[r];
+  note.className = 'route-note' + (ROUTE_NOTES[r] ? ' show' : '');
+  document.getElementById('wfh-section').style.display = r === 'home' ? 'block' : 'none';
+  document.getElementById('serviced-section').style.display = r === 'serviced' ? 'block' : 'none';
+  document.getElementById('own-elec-section').style.display = (r === 'own' || r === 'multiple') ? 'block' : 'none';
+  // Solar context
+  updateSolarContext(r);
+  updateSummary();
+}
+
+function updateSolarContext(r) {
+  document.getElementById('solar-hdb-note').className = 'solar-ctx blocked' + (r === 'home' ? ' show' : '');
+  document.getElementById('solar-tenant-note').className = 'solar-ctx caution' + (r === 'own' ? ' show' : '');
+  document.getElementById('solar-own-note').className = 'solar-ctx encouraged' + (r === 'own' ? ' show' : '');
+  // For simplicity: show tenant caution for 'own' (rented), encouraged note on hover — in production we'd know if they own or rent
+}
+
+// ── SECTION TOGGLE ──
+function toggleSec(id) {
+  const body = document.getElementById('body-' + id);
+  const chev = document.getElementById('chev-' + id);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chev.classList.toggle('open', !isOpen);
+}
+
+// ── TOOLTIP ──
+function toggleTip(id) { document.getElementById(id).classList.toggle('open'); }
+
+// ── ELEC MODE SWITCHING (fix: clear result on mode switch) ──
+function switchElecMode(mode, btn) {
+  document.querySelectorAll('#elec-mode-tabs .mtab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  ['elec-monthly','elec-annual','elec-single'].forEach(id => {
+    document.getElementById(id).classList.toggle('active', id === 'elec-' + mode);
+  });
+  // Clear result when switching modes unless new mode has data
+  if (mode !== 'single') {
+    // recalc from existing data
+    if (mode === 'monthly') calcElecMonthly();
+    if (mode === 'annual') calcElecAnnual();
+  } else {
+    calcElecSingle();
+  }
+}
+
+function switchGenMode(mode, btn) {
+  document.querySelectorAll('#gen-mode-tabs .mtab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  ['gen-monthly','gen-annual'].forEach(id => {
+    document.getElementById(id).classList.toggle('active', id === mode);
+  });
+}
+
+function switchDCUnit(unit, btn) {
+  document.querySelectorAll('.tog').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  S.dcUnit = unit;
+  document.getElementById('dc-rt-inp').style.display = unit === 'rt' ? '' : 'none';
+  document.getElementById('dc-kwht-inp').style.display = unit === 'kwht' ? '' : 'none';
+}
+
+// ── N/A TOGGLE ──
+function toggleNA(inputId, cb, key) {
+  const el = document.getElementById(inputId);
+  el.style.opacity = cb.checked ? '0.3' : '1';
+  el.style.pointerEvents = cb.checked ? 'none' : '';
+  if (cb.checked) { if (key==='solar') S.solar_kwh_yr=0; if (key==='dc') S.dc_kwh_yr=0; if (key==='gen') S.gen_litres_yr=0; }
+  updateProgress(); updateSummary();
+}
+
+// ── BUILD MONTH GRIDS ──
+function buildGrid(containerId, unit, calcFn, showAttach) {
+  const grid = document.getElementById(containerId);
+  if (!grid) return;
+  MONTHS.forEach((m, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'mcell';
+    const attachBtn = showAttach
+      ? `<button class="attach-month-btn" id="attach-${containerId}-${i}" onclick="attachMonthFile('${containerId}',${i},'${m}')" title="Attach ${m} bill">
+           <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M4 6.5V4a2 2 0 114 0v3a3 3 0 01-6 0V3"/></svg>
+         </button>` : '';
+    cell.innerHTML = `<label>${m}</label>
+      <div class="month-row">
+        <input class="minp empty" type="number" id="${containerId}-${i}" placeholder="${unit}" oninput="${calcFn}()" style="flex:1">
+        ${attachBtn}
+      </div>`;
+    grid.appendChild(cell);
+  });
+}
+buildGrid('elec-month-grid', 'kWh', 'calcElecMonthly', true);
+buildGrid('gen-month-grid', 'L', 'calcGenMonthly', false);
+
+// ── ELECTRICITY CALCULATIONS ──
+function calcElecMonthly() {
+  let total = 0, filled = 0;
+  MONTHS.forEach((_, i) => {
+    const inp = document.getElementById(`elec-month-grid-${i}`);
+    const v = parseFloat(inp.value) || 0;
+    if (v > 0) { total += v; filled++; inp.className = 'minp filled'; }
+    else inp.className = 'minp empty';
+  });
+  const annual = filled > 0 ? (total / filled) * 12 : 0;
+  S.elec_kwh_yr = annual;
+  S.elec_sgd_yr = annual * PRICE.elec;
+  const pct = Math.round(filled / 12 * 100);
+  document.getElementById('em-total').textContent = total.toLocaleString();
+  document.getElementById('em-avg').textContent = filled > 0 ? Math.round(total/filled).toLocaleString() : '—';
+  document.getElementById('em-co2').textContent = (annual * EF.grid / 1000).toFixed(2);
+  document.getElementById('em-comp-fill').style.width = pct + '%';
+  document.getElementById('em-comp-lbl').textContent = filled + '/12';
+  if (filled > 0) {
+    S.elec_acc = filled === 12 ? 'h' : filled >= 6 ? 'm' : 'l';
+    const label = filled === 12 ? 'Accuracy: high — all 12 months'
+      : filled >= 6 ? `Accuracy: medium — ${filled} months (extrapolated)`
+      : `Accuracy: low — ${filled} month${filled!==1?'s':''} (extrapolated)`;
+    setElecResult(annual * EF.grid/1000, S.elec_sgd_yr, label);
+  } else {
+    clearElecResult();
+  }
+  updateSummary();
+}
+
+function calcElecAnnual() {
+  const kwh = parseFloat(document.getElementById('ea-kwh').value) || 0;
+  if (!kwh) { clearElecResult(); S.elec_kwh_yr=0; updateSummary(); return; }
+  S.elec_kwh_yr = kwh; S.elec_sgd_yr = kwh * PRICE.elec; S.elec_acc = 'm';
+  document.getElementById('ea-sgd').value = '';
+  setElecResult(kwh*EF.grid/1000, S.elec_sgd_yr, 'Accuracy: medium — annual total');
+  updateSummary();
+}
+
+function calcElecAnnualBill() {
+  const sgd = parseFloat(document.getElementById('ea-sgd').value) || 0;
+  if (!sgd) { clearElecResult(); S.elec_kwh_yr=0; updateSummary(); return; }
+  S.elec_kwh_yr = sgd / PRICE.elec; S.elec_sgd_yr = sgd; S.elec_acc = 'm';
+  document.getElementById('ea-kwh').value = Math.round(S.elec_kwh_yr);
+  setElecResult(S.elec_kwh_yr*EF.grid/1000, sgd, 'Accuracy: medium — from annual bill');
+  updateSummary();
+}
+
+function calcElecSingle() {
+  const kwh = parseFloat(document.getElementById('es-kwh').value) || 0;
+  const bill = parseFloat(document.getElementById('es-bill').value) || 0;
+  if (!kwh && !bill) { clearElecResult(); S.elec_kwh_yr=0; updateSummary(); return; }
+  const kwhVal = kwh || bill / PRICE.elec;
+  const sgdVal = bill || kwhVal * PRICE.elec;
+  if (kwh && bill) {
+    const rate = (bill / kwh * 100).toFixed(2);
+    document.getElementById('es-rate-note').style.display = 'block';
+    document.getElementById('es-rate-val').textContent = rate + ' cents/kWh (from your bill)';
+  }
+  S.elec_kwh_yr = kwhVal * 12; S.elec_sgd_yr = sgdVal * 12; S.elec_acc = 'l';
+  // FIXED: accuracy tag only shows for single mode
+  setElecResult(S.elec_kwh_yr*EF.grid/1000, S.elec_sgd_yr, 'Accuracy: low — 1 month extrapolated to full year');
+  updateSummary();
+}
+
+function calcElecSingleBill() {
+  calcElecSingle();
+}
+
+function setElecResult(co2, sgd, accLabel) {
+  const co2El = document.getElementById('re-co2');
+  const sgdEl = document.getElementById('re-sgd');
+  const accEl = document.getElementById('re-acc');
+  const pre = S.elec_acc === 'h' ? '' : '~';
+  co2El.className = 'rpill co2';
+  co2El.innerHTML = `<span class="rpill-val">${pre}${co2.toFixed(2)}</span><span>tCO₂e / yr</span>`;
+  sgdEl.className = 'rpill cost';
+  sgdEl.innerHTML = `<span class="rpill-val">≈ SGD ${Math.round(sgd).toLocaleString()}</span><span>annual electricity spend</span>`;
+  accEl.style.display = 'inline-block';
+  accEl.className = 'acc-tag ' + {h:'acc-h',m:'acc-m',l:'acc-l'}[S.elec_acc];
+  accEl.textContent = accLabel;
+  document.getElementById('st-elec').textContent = `~ ${co2.toFixed(1)} tCO₂e`;
+  document.getElementById('st-elec').className = 'sec-total live';
+  // Show cost context with 10% saving estimate
+  const ctx = document.getElementById('cost-ctx-elec');
+  ctx.className = 'cost-context show';
+  document.getElementById('cost-ctx-saving').textContent = 'SGD ' + Math.round(sgd * 0.1).toLocaleString();
+}
+
+function clearElecResult() {
+  document.getElementById('re-co2').className = 'rpill empty';
+  document.getElementById('re-co2').innerHTML = '<span class="rpill-val">—</span><span>tCO₂e / yr</span>';
+  document.getElementById('re-sgd').className = 'rpill empty';
+  document.getElementById('re-sgd').innerHTML = '<span class="rpill-val">—</span><span>annual electricity spend</span>';
+  document.getElementById('re-acc').style.display = 'none';
+  document.getElementById('cost-ctx-elec').className = 'cost-context';
+  document.getElementById('st-elec').textContent = '—';
+  document.getElementById('st-elec').className = 'sec-total';
+  S.elec_acc = null;
+}
+
+// ── WFH CALCULATOR ──
+function calcWFH() {
+  let watts = parseFloat(document.getElementById('wfh-device').value) || 0;
+  if (watts === 0) {
+    document.getElementById('wfh-custom-row').style.display = 'block';
+    watts = parseFloat(document.getElementById('wfh-custom-w').value) || 0;
+  } else {
+    document.getElementById('wfh-custom-row').style.display = 'none';
+  }
+  const hrs = parseFloat(document.getElementById('wfh-hrs').value) || 0;
+  const days = parseFloat(document.getElementById('wfh-days').value) || 0;
+  const monthly = watts * hrs * days / 1000;
+  const annual = monthly * 12;
+  S.wfh_kwh_yr = annual;
+  document.getElementById('wfh-result').textContent =
+    `Monthly business electricity: ${monthly.toFixed(1)} kWh · Annual: ${annual.toFixed(0)} kWh`;
+  const co2 = annual * EF.grid / 1000;
+  const sgd = annual * PRICE.elec;
+  const r = document.getElementById('result-wfh').querySelectorAll('.rpill');
+  r[0].className='rpill co2'; r[0].innerHTML=`<span class="rpill-val">~ ${co2.toFixed(3)}</span><span>tCO₂e / yr</span>`;
+  r[1].className='rpill cost'; r[1].innerHTML=`<span class="rpill-val">≈ SGD ${sgd.toFixed(0)}</span><span>annual work electricity cost</span>`;
+  document.getElementById('cost-ctx-wfh').className = 'cost-context show';
+  updateSummary();
+}
+
+// ── SERVICED OFFICE ──
+function calcServiced() {
+  const kwh = (parseFloat(document.getElementById('serv-area').value)||0) * 180;
+  S.serv_kwh_yr = kwh; showServedResult(kwh);
+}
+function calcServicedDesks() {
+  const kwh = (parseFloat(document.getElementById('serv-desks').value)||0) * 1200;
+  S.serv_kwh_yr = kwh;
+  document.getElementById('serv-area').value = kwh>0 ? Math.round(kwh/180) : '';
+  showServedResult(kwh);
+}
+function showServedResult(kwh) {
+  const co2 = kwh*EF.grid/1000;
+  const r = document.getElementById('result-serviced').querySelectorAll('.rpill');
+  r[0].className='rpill co2'; r[0].innerHTML=`<span class="rpill-val">~ ${co2.toFixed(2)}</span><span>tCO₂e / yr (BCA estimate)</span>`;
+  updateSummary();
+}
+
+// ── SOLAR ──
+function calcSolar() {
+  const kwh = (parseFloat(document.getElementById('solar-kwh').value)||0)*12;
+  S.solar_kwh_yr = kwh;
+  const offset = kwh*EF.grid/1000;
+  const r = document.getElementById('result-solar').querySelectorAll('.rpill');
+  r[0].className='rpill co2'; r[0].innerHTML=`<span class="rpill-val">− ${offset.toFixed(2)}</span><span>tCO₂e offset / yr</span>`;
+  updateSummary();
+}
+
+// ── DISTRICT COOLING ──
+function handleDCProvider() {
+  const val = document.getElementById('dc-provider').value;
+  document.getElementById('dc-custom-row').style.display = val==='custom' ? 'block' : 'none';
+  calcDC();
+}
+function getKwRT() {
+  const val = document.getElementById('dc-provider').value;
+  if (val==='custom') return parseFloat(document.getElementById('dc-ef').value)||0.65;
+  return parseFloat(val)||0.65;
+}
+function calcDC() {
+  const rt=(parseFloat(document.getElementById('dc-rt').value)||0)*12;
+  S.dc_kwh_yr = rt*getKwRT();
+  showDCResult();
+}
+function calcDCkwht() {
+  const kwht=(parseFloat(document.getElementById('dc-kwht').value)||0)*12;
+  S.dc_kwh_yr = kwht/(3.517/getKwRT());
+  showDCResult();
+}
+function calcDCfromCOP() {
+  const cop=parseFloat(document.getElementById('dc-cop').value)||0;
+  if(cop>0) document.getElementById('dc-ef').value=(3.517/cop).toFixed(3);
+  calcDC();
+}
+function showDCResult() {
+  const co2=S.dc_kwh_yr*EF.grid/1000;
+  const r=document.getElementById('result-dc').querySelectorAll('.rpill');
+  if(co2>0){r[0].className='rpill co2';r[0].innerHTML=`<span class="rpill-val">~ ${co2.toFixed(2)}</span><span>tCO₂e / yr</span>`;}
+  updateSummary();
+}
+
+// ── GENERATOR ──
+function calcGen() {
+  S.gen_litres_yr=(parseFloat(document.getElementById('gen-litres').value)||0)*12; updateGenResult();
+}
+function calcGenAnnual() {
+  S.gen_litres_yr=parseFloat(document.getElementById('gen-litres-yr').value)||0; updateGenResult();
+}
+function calcGenMonthly() {
+  let total=0,filled=0;
+  MONTHS.forEach((_,i)=>{const inp=document.getElementById(`gen-month-grid-${i}`);const v=parseFloat(inp.value)||0;if(v>0){total+=v;filled++;inp.className='minp filled';}else inp.className='minp empty';});
+  S.gen_litres_yr=filled>0?(total/filled)*12:0;
+  document.getElementById('gm-total').textContent=total.toFixed(0);
+  document.getElementById('gm-co2').textContent=(S.gen_litres_yr*EF.diesel/1000).toFixed(2);
+  const pct=Math.round(filled/12*100);
+  document.getElementById('gm-comp').style.width=pct+'%';
+  document.getElementById('gm-comp-lbl').textContent=filled+'/12';
+  updateGenResult();
+}
+function updateGenResult() {
+  const co2=S.gen_litres_yr*EF.diesel/1000;
+  const sgd=S.gen_litres_yr*PRICE.diesel;
+  const r=document.getElementById('result-gen').querySelectorAll('.rpill');
+  if(co2>0){
+    r[0].className='rpill co2';r[0].innerHTML=`<span class="rpill-val">~ ${co2.toFixed(2)}</span><span>tCO₂e / yr</span>`;
+    r[1].className='rpill cost';r[1].innerHTML=`<span class="rpill-val">≈ SGD ${Math.round(sgd).toLocaleString()}</span><span>annual diesel cost</span>`;
+    document.getElementById('cost-ctx-gen').className='cost-context show';
+    document.getElementById('st-gen').textContent=`~ ${co2.toFixed(2)} tCO₂e`;
+    document.getElementById('st-gen').className='sec-total live';
+  }
+  updateSummary();
+}
+
+// ── SUMMARY ──
+function updateSummary() {
+  const elecKwh = S.route==='home' ? S.wfh_kwh_yr : S.route==='serviced' ? S.serv_kwh_yr : S.elec_kwh_yr;
+  const net = Math.max(0, elecKwh - S.solar_kwh_yr);
+  const s2 = (net + S.dc_kwh_yr) * EF.grid / 1000;
+  const s3 = net * EF.upstream / 1000;
+  const s1 = S.gen_litres_yr * EF.diesel / 1000;
+  const total = s1 + s2;
+  const s2Sgd = S.route==='home' ? S.wfh_kwh_yr*PRICE.elec : S.route==='serviced' ? 0 : S.elec_sgd_yr;
+  const s1Sgd = S.gen_litres_yr * PRICE.diesel;
+  const totalSgd = s1Sgd + s2Sgd;
+
+  document.getElementById('sum-s1').textContent = s1.toFixed(2);
+  document.getElementById('sum-s2').textContent = s2.toFixed(2);
+  document.getElementById('sum-s3').textContent = s3>0 ? '~'+s3.toFixed(3) : 'auto';
+  document.getElementById('sum-total').textContent = total.toFixed(2);
+  document.getElementById('sum-s1-sgd').textContent = s1Sgd>0 ? '≈ SGD '+Math.round(s1Sgd).toLocaleString() : '—';
+  document.getElementById('sum-s2-sgd').textContent = s2Sgd>0 ? '≈ SGD '+Math.round(s2Sgd).toLocaleString() : '—';
+
+  if (totalSgd > 0) {
+    document.getElementById('sum-cost').textContent = '≈ SGD ' + Math.round(totalSgd).toLocaleString() + ' / yr';
+    document.getElementById('sum-saving').style.display = 'block';
+    document.getElementById('sum-saving-val').textContent = 'SGD ' + Math.round(totalSgd*0.2).toLocaleString();
+  } else {
+    document.getElementById('sum-cost').textContent = '—';
+    document.getElementById('sum-saving').style.display = 'none';
+  }
+
+  if (total > 0) {
+    const carKm = Math.round(total*1000/0.173);
+    const ac = Math.round(total*1000/0.412);
+    document.getElementById('sum-analogy').textContent =
+      `${total.toFixed(1)} tCO₂e is the same as driving a petrol car ${carKm.toLocaleString()} km, or running 1HP air-conditioning for ${ac.toLocaleString()} hours.`;
+  } else {
+    document.getElementById('sum-analogy').textContent = 'Enter your electricity data above to see your carbon footprint in everyday terms.';
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  let done=0;
+  const elecDone = S.elec_kwh_yr>0||S.wfh_kwh_yr>0||S.serv_kwh_yr>0;
+  if(elecDone)done++;
+  if(document.getElementById('solar-na').checked||S.solar_kwh_yr>=0)done++;
+  if(document.getElementById('dc-na').checked||S.dc_kwh_yr>=0)done++;
+  if(document.getElementById('gen-na').checked||S.gen_litres_yr>=0)done++;
+  document.getElementById('prog-fill').style.width=Math.round(done/4*100)+'%';
+  document.getElementById('prog-label').textContent=done+' of 4 sections completed';
+}
+
+// ── FILE ATTACHMENT ──
+function attachMonthFile(grid, idx, month) {
+  const btn = document.getElementById(`attach-${grid}-${idx}`);
+  const key = `${grid}-${idx}`;
+  if (S.monthlyFiles[key]) {
+    if (confirm(`Remove attached ${month} bill?`)) {
+      delete S.monthlyFiles[key];
+      btn.classList.remove('has-file');
+      btn.title = `Attach ${month} bill`;
+    }
+  } else {
+    S.monthlyFiles[key] = `${month}_electricity_bill.pdf`;
+    btn.classList.add('has-file');
+    btn.title = `${month} bill attached — click to remove`;
+    // In production: open file picker → upload to Supabase Storage
+    console.log(`Attaching file for ${month} in ${grid}`);
+  }
+}
+
+function attachFile(section) {
+  S.attachedFiles[section] = true;
+  alert(`File attachment for ${section}\n\nIn production:\n→ Opens file picker (PDF/JPG/PNG, max 10MB)\n→ Stored in Supabase Storage: /docs/{company_id}/{period_id}/${section}/\n→ Linked to emissions_data record\n→ Listed in report appendix as supporting documentation`);
+}
+
+function saveAndNext() {
+  localStorage.setItem('zyt_power_data', JSON.stringify({saved:true}));
+  window.location.href = '/S-11-transport-fleet.html';
+}
+
+// ── INIT: pre-fill with demo data ──
+window.addEventListener('load', () => {
+  document.getElementById('es-kwh').value = 360;
+  document.getElementById('es-bill').value = 94.68;
+  calcElecSingle();
+  // Show tenant solar note by default (own/rented premises)
+  updateSolarContext('own');
+  updateProgress();
+});
+</script>
+
+</body>
+</html>

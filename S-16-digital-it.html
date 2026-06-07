@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital & IT — ZYT.ESG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#15140d;--ink2:#42403a;--ink3:#84827a;--ink4:#c2bfb6;--bg:#f3f0e9;--card:#fff;--b1:#e0dbd2;--b2:#eae6de;--s3c:#27500a;--s3b:#eaf4ee;--s3d:#b4d9c4;--gc:#1a6b4a;--gb:#eaf4ee;--gd:#b4d9c4;--ac:#7a5a0a;--ab:#fdf3e0;--ad:#e8c87a;--r:10px;--rl:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30}
+.logo{font-family:'Fraunces',serif;font-size:17px;font-weight:300;display:flex;align-items:center;gap:8px}
+.logo-tag{font-family:'DM Mono',monospace;font-size:10px;color:var(--gc);background:var(--gb);border:1px solid var(--gd);padding:2px 7px;border-radius:20px;letter-spacing:.5px}
+.nav-steps{display:flex;align-items:center;gap:4px;font-size:12px}
+.ns{padding:3px 10px;border-radius:20px;color:var(--ink3)}.ns.done{color:var(--gc)}.ns.done::before{content:'✓ ';font-size:10px}.ns.active{background:var(--ink);color:#fff;font-weight:500}.ns-sep{color:var(--ink4);font-size:10px}
+.btn-back{font-size:12px;color:var(--ink3);background:transparent;border:.5px solid var(--b1);padding:5px 12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px}
+.layout{display:grid;grid-template-columns:1fr 300px;gap:20px;max-width:1060px;margin:0 auto;padding:28px 24px 100px;align-items:start}
+.cluster-hdr{background:var(--card);border:1px solid var(--b1);border-radius:var(--rl);padding:20px 22px;margin-bottom:16px;display:flex;align-items:flex-start;gap:14px}
+.hdr-icon{font-size:26px;width:50px;height:50px;background:var(--bg);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hdr-body{flex:1}
+.hdr-name{font-family:'Fraunces',serif;font-size:22px;font-weight:300;letter-spacing:-.3px;margin-bottom:3px}
+.hdr-sub{font-size:12px;color:var(--ink3);line-height:1.5;margin-bottom:8px}
+.hdr-role{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3);background:var(--bg);border:1px solid var(--b2);padding:3px 9px;border-radius:20px}
+.prog-bar{height:3px;background:var(--b2);border-radius:2px;overflow:hidden;margin-top:10px}
+.prog-fill{height:100%;background:var(--gc);border-radius:2px;transition:width .5s}
+.prog-label{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);margin-top:4px}
+.section{margin-bottom:12px}
+.sec-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card);border:1px solid var(--b1);border-radius:10px 10px 0 0;cursor:pointer;user-select:none}
+.sec-hdr:hover{background:var(--bg)}
+.scope-pill{font-size:10px;font-family:'DM Mono',monospace;font-weight:500;padding:2px 8px;border-radius:8px;white-space:nowrap;background:var(--s3b);color:var(--s3c);border:1px solid var(--s3d)}
+.sec-title{font-size:13px;font-weight:500;flex:1}
+.sec-total{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3)}
+.sec-total.live{color:var(--gc);font-weight:500}
+.sec-chev{width:12px;height:12px;color:var(--ink3);transition:transform .2s;flex-shrink:0}
+.sec-chev.open{transform:rotate(90deg)}
+.sec-body{display:none;background:var(--card);border:1px solid var(--b1);border-top:none;border-radius:0 0 10px 10px}
+.sec-body.open{display:block}
+.activity{padding:16px;border-bottom:1px solid var(--b2)}.activity:last-child{border-bottom:none}
+.act-name{font-size:13px;font-weight:500;margin-bottom:4px}
+.act-sub{font-size:11px;color:var(--ink3);margin-bottom:10px;line-height:1.4}
+.opt-tag{font-size:9px;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:6px;background:var(--ab);color:var(--ac);border:1px solid var(--ad);margin-left:6px}
+.tip-btn{width:16px;height:16px;border-radius:50%;background:var(--bg);border:1px solid var(--b1);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;color:var(--ink3);font-family:'DM Mono',monospace;font-weight:500;flex-shrink:0;transition:background .15s}
+.tip-btn:hover{background:var(--ink);color:#fff}
+.tip-panel{display:none;background:var(--ink);color:#fff;border-radius:8px;padding:12px 14px;font-size:11px;line-height:1.6;margin-bottom:10px}
+.tip-panel.open{display:block}
+.tip-ef{margin-top:4px;font-size:10px;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace}
+.field-row{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:8px}
+.fwrap{flex:1;min-width:90px}
+.fwrap label{display:block;font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.inp{width:100%;height:36px;border:.5px solid var(--b1);border-radius:7px;background:var(--card);padding:0 10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .15s}
+.inp:focus{border-color:var(--gc)}
+.sel{width:100%;height:36px;border:.5px solid var(--b1);border-radius:7px;background:var(--card);padding:0 10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;cursor:pointer}
+.unit-box{height:36px;padding:0 10px;background:var(--bg);border:.5px solid var(--b2);border-radius:7px;font-size:11px;color:var(--ink3);display:flex;align-items:center;white-space:nowrap;font-family:'DM Mono',monospace}
+.na-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.na-cb{width:14px;height:14px;cursor:pointer;accent-color:var(--ink3)}
+.na-lbl{font-size:11px;color:var(--ink3);cursor:pointer}
+.result-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:.5px solid var(--b2);align-items:center}
+.rpill{display:flex;align-items:center;gap:4px;font-size:11px;padding:3px 9px;border-radius:16px;border:.5px solid;white-space:nowrap}
+.rpill.co2{background:var(--gb);color:var(--gc);border-color:var(--gd)}
+.rpill.cost{background:var(--ab);color:var(--ac);border-color:var(--ad)}
+.rpill.empty{background:var(--bg);color:var(--ink4);border-color:var(--b2)}
+.rpill-val{font-family:'DM Mono',monospace;font-weight:500}
+/* SUMMARY */
+.summary-col{position:sticky;top:72px}
+.sum-card{background:var(--ink);border-radius:var(--rl);overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.12)}
+.sum-hdr{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-hdr-title{font-family:'Fraunces',serif;font-size:15px;font-weight:300;color:#fff;margin-bottom:2px}
+.sum-hdr-sub{font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.35)}
+.sum-breakdown{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-break-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.3);margin-bottom:8px}
+.break-row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px}
+.break-name{color:rgba(255,255,255,.55)}.break-val{font-family:'DM Mono',monospace;font-weight:500;color:#fff}
+.sum-total{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-est-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.3);margin-bottom:5px}
+.sum-total-val{font-family:'Fraunces',serif;font-size:26px;font-weight:300;color:#fff;line-height:1;letter-spacing:-.5px}
+.sum-total-unit{font-size:11px;color:rgba(255,255,255,.4);margin-top:2px}
+.sum-ef{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-ef-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.25);margin-bottom:6px}
+.ef-row{display:flex;justify-content:space-between;font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.4);margin-bottom:3px}
+.ef-row span:last-child{color:rgba(255,255,255,.6)}
+.sum-actions{padding:14px 18px;display:flex;flex-direction:column;gap:8px}
+.btn-next{width:100%;height:40px;background:#fff;color:var(--ink);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-next:hover{background:#f0ede6}
+.btn-next svg{width:13px;height:13px}
+.btn-save-draft{width:100%;height:36px;background:transparent;color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.12);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">ZYT.ESG <span class="logo-tag">ESG</span></div>
+  <div class="nav-steps">
+    <div class="ns done">Profile</div><div class="ns-sep">›</div>
+    <div class="ns active">Data entry</div><div class="ns-sep">›</div>
+    <div class="ns">Results</div><div class="ns-sep">›</div>
+    <div class="ns">Targets</div><div class="ns-sep">›</div>
+    <div class="ns">Report</div>
+  </div>
+  <button class="btn-back">← Back to hub</button>
+</nav>
+
+<div class="layout">
+<div class="form-col">
+
+<div class="cluster-hdr">
+  <div class="hdr-icon">💻</div>
+  <div class="hdr-body">
+    <div class="hdr-name">Digital & IT</div>
+    <div class="hdr-sub">Cloud services, hosted servers, and IT hardware. All Scope 3 — emissions occur at data centres and during hardware manufacturing, not on your premises. Primarily relevant for ICT businesses and companies with significant cloud usage.</div>
+    <div class="hdr-role">👤 IT manager / operations</div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="prog-label" id="prog-label">0 of 3 sections completed</div>
+  </div>
+</div>
+
+<!-- SECTION 1: CLOUD SERVICES -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('cloud')">
+    <svg class="sec-chev open" id="chev-cloud" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill">Cat 1</span>
+    <span class="sec-title">Cloud services — AWS, Google Cloud, Azure, others</span>
+    <span class="sec-total" id="st-cloud">—</span>
+  </div>
+  <div class="sec-body open" id="body-cloud">
+    <div class="activity">
+      <div class="act-name">Cloud storage & compute <span style="font-size:11px;font-weight:400;color:var(--ink3)">· Scope 3 Cat 1</span>
+        <span class="tip-btn" onclick="toggleTip('tip-cloud')" style="margin-left:6px">?</span>
+      </div>
+      <div class="act-sub">Storage, virtual machines, databases, and other cloud services. Emissions come from electricity used in data centres. Singapore's major cloud providers all operate regional data centres using Singapore's grid.</div>
+      <div class="tip-panel" id="tip-cloud">
+        Cloud providers publish carbon footprint tools and emission factors. For Singapore-hosted workloads, IMDA/NUS ESI published factors apply (0.412 kgCO₂/kWh grid EF). For global/multi-region providers, location-specific factors vary. The most accurate approach is to use the provider's own carbon footprint report.
+        <div class="tip-ef">SEFR/IMDA: Cloud storage (hot tier) ~0.0000335 kgCO₂/GB/month · VM general purpose ~0.000533 kgCO₂/instance-hour · Source: NUS ESI / IMDA Singapore</div>
+      </div>
+
+      <div style="display:flex;gap:3px;background:var(--bg);border:1px solid var(--b1);border-radius:8px;padding:3px;width:fit-content;margin-bottom:10px">
+        <button class="mtab active" id="cloud-tab-spend" onclick="switchCloudMode('spend',this)">By monthly spend (SGD)</button>
+        <button class="mtab" id="cloud-tab-provider" onclick="switchCloudMode('provider',this)">By provider carbon report</button>
+      </div>
+      <div class="mode-panel active" id="cloud-spend">
+        <div class="field-row">
+          <div class="fwrap"><label>Monthly cloud spend (SGD)</label><input class="inp" type="number" id="cloud-sgd" placeholder="e.g. 500" oninput="calcCloud()"></div>
+          <div class="unit-box">SGD / month</div>
+        </div>
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">Spend-based estimate using EEIO methodology. Check your AWS/GCP/Azure billing dashboard. More accurate: use provider's own carbon footprint tool below.</div>
+      </div>
+      <div class="mode-panel" id="cloud-provider">
+        <div class="field-row">
+          <div class="fwrap" style="flex:.6"><label>Provider</label>
+            <select class="sel" id="cloud-provider-sel">
+              <option>AWS</option><option>Google Cloud</option><option>Microsoft Azure</option><option>Alibaba Cloud</option><option>Other</option>
+            </select>
+          </div>
+          <div class="fwrap"><label>Annual carbon (tCO₂e) from provider report</label><input class="inp" type="number" id="cloud-tco2" placeholder="e.g. 0.45" step="0.01" oninput="calcCloudDirect()"></div>
+          <div class="unit-box">tCO₂e / yr</div>
+        </div>
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">AWS: Customer Carbon Footprint Tool · Google: Carbon Footprint Dashboard · Azure: Emissions Impact Dashboard. Most enterprise accounts have these in their billing console.</div>
+      </div>
+      <div class="result-row" id="result-cloud">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual cloud spend</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: IT HARDWARE -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('hw')">
+    <svg class="sec-chev" id="chev-hw" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill">Cat 2</span>
+    <span class="sec-title">IT hardware purchases — computers, servers, phones</span>
+    <span class="sec-total" id="st-hw">—</span>
+  </div>
+  <div class="sec-body" id="body-hw">
+    <div class="activity">
+      <div class="act-name">Capital IT equipment purchased this year <span class="opt-tag">optional</span>
+        <span class="tip-btn" onclick="toggleTip('tip-hw')" style="margin-left:6px">?</span>
+      </div>
+      <div class="act-sub">Laptops, desktops, servers, printers, phones, and other IT hardware purchased during the reporting year. Emissions come from manufacturing — a one-time cost allocated to the year of purchase.</div>
+      <div class="tip-panel" id="tip-hw">
+        IT hardware manufacturing is Scope 3 Cat 2 (capital goods). The emission factor covers the full manufacturing lifecycle — materials, fabrication, and transport to point of sale. For a laptop this is typically 300–400 kg CO₂e. For a server: 500–2,000 kg CO₂e. These are one-time emissions in the year of purchase.
+        <div class="tip-ef">GHG Protocol Cat 2: Laptop ~350 kgCO₂e · Desktop ~500 kgCO₂e · Server ~1,200 kgCO₂e · Smartphone ~70 kgCO₂e · Source: manufacturer EPDs and IEA lifecycle data</div>
+      </div>
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="hw-na" onchange="toggleNA('hw-inputs',this,'hw')">
+        <label class="na-lbl" for="hw-na">No significant IT hardware purchased this year</label>
+      </div>
+      <div id="hw-inputs">
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px" id="hw-list"></div>
+        <button onclick="addHWItem()" style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gc);background:transparent;border:1px dashed var(--gd);padding:7px 14px;border-radius:var(--r);cursor:pointer;width:100%;justify-content:center;margin-bottom:8px">
+          + Add equipment type
+        </button>
+      </div>
+      <div class="result-row" id="result-hw">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e (this year's purchases)</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>hardware spend</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: HOSTED SERVERS / DATA CENTRE -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('dc')">
+    <svg class="sec-chev" id="chev-dc" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill">Cat 1</span>
+    <span class="sec-title">Co-location & hosted servers</span>
+    <span class="sec-total" id="st-dc">—</span>
+  </div>
+  <div class="sec-body" id="body-dc">
+    <div class="activity">
+      <div class="act-name">Co-located or hosted servers <span class="opt-tag">optional</span>
+        <span class="tip-btn" onclick="toggleTip('tip-dc')" style="margin-left:6px">?</span>
+      </div>
+      <div class="act-sub">Physical servers hosted in a third-party data centre (Equinix, Keppel DC, Starhub, etc.) that you pay for by rack space or server instance. Different from cloud — you own or lease the hardware.</div>
+      <div class="tip-panel" id="tip-dc">
+        Co-located servers draw electricity from the data centre, which charges you for rack space. The emission is based on your power draw × the data centre's PUE (Power Usage Effectiveness) × Singapore's grid factor. Most Singapore Tier 3+ data centres have PUE of 1.3–1.5.
+        <div class="tip-ef">Formula: Monthly kWh × PUE × 0.412 kgCO₂/kWh · Or: monthly spend × spend-based factor</div>
+      </div>
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="dc-na2" checked onchange="toggleNA('dc2-inputs',this,'dc2')">
+        <label class="na-lbl" for="dc-na2">We don't use co-location or hosted servers</label>
+      </div>
+      <div id="dc2-inputs" style="opacity:.3;pointer-events:none">
+        <div class="field-row">
+          <div class="fwrap"><label>Monthly power draw (kWh)</label><input class="inp" type="number" id="dc-kwh" placeholder="e.g. 200" oninput="calcDC2()"></div>
+          <div class="unit-box">kWh / month</div>
+          <div class="fwrap" style="flex:.5"><label>PUE</label><input class="inp" type="number" id="dc-pue" value="1.4" step="0.05" oninput="calcDC2()"></div>
+        </div>
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">PUE (Power Usage Effectiveness): Tier 3 SG data centres typically 1.3–1.5. Check with your data centre provider.</div>
+      </div>
+      <div class="result-row" id="result-dc2">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /form-col -->
+
+<!-- SUMMARY -->
+<div class="summary-col">
+<div class="sum-card">
+  <div class="sum-hdr"><div class="sum-hdr-title">Digital & IT</div><div class="sum-hdr-sub">Scope 3 Cat 1 + Cat 2 · 2024</div></div>
+  <div class="sum-breakdown">
+    <div class="sum-break-lbl">Breakdown</div>
+    <div class="break-row"><span class="break-name">Cloud services</span><span class="break-val" id="sum-cloud">—</span></div>
+    <div class="break-row"><span class="break-name">IT hardware (capex)</span><span class="break-val" id="sum-hw">—</span></div>
+    <div class="break-row"><span class="break-name">Co-location servers</span><span class="break-val" id="sum-dc2">—</span></div>
+  </div>
+  <div class="sum-total">
+    <div class="sum-est-lbl">Estimated total</div>
+    <div class="sum-total-val" id="sum-total">0</div>
+    <div class="sum-total-unit">tCO₂e / year</div>
+  </div>
+  <div class="sum-ef">
+    <div class="sum-ef-lbl">Emission factors</div>
+    <div class="ef-row"><span>Cloud (spend-based)</span><span>~0.0002 tCO₂/SGD</span></div>
+    <div class="ef-row"><span>Laptop (manufacturing)</span><span>~350 kgCO₂e each</span></div>
+    <div class="ef-row"><span>Server (manufacturing)</span><span>~1,200 kgCO₂e each</span></div>
+    <div class="ef-row"><span>Co-lo: grid × PUE</span><span>0.412 kgCO₂/kWh</span></div>
+    <div class="ef-row"><span>Source</span><span>IMDA/NUS ESI · IEA</span></div>
+  </div>
+  <div class="sum-actions">
+    <button class="btn-next" onclick="localStorage.setItem('zyt_digital_data', JSON.stringify({saved:true})); window.location.href='/S-17-procurement.html'">Save & go to Procurement <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg></button>
+    <button class="btn-save-draft">Save & exit</button>
+  </div>
+</div>
+</div>
+</div>
+
+<script>
+const S={cloud:{co2:0,sgd:0},hw:{co2:0,sgd:0},dc2:{co2:0}};
+const HW_EF={laptop:0.350,desktop:0.500,server:1.200,phone:0.070,tablet:0.100,printer:0.150,monitor:0.200,other:0.300};
+const HW_PRICE={laptop:1800,desktop:1500,server:8000,phone:1200,tablet:800,printer:400,monitor:500,other:1000};
+let hwItems=[];
+
+function toggleSec(id){const b=document.getElementById('body-'+id),c=document.getElementById('chev-'+id);b.classList.toggle('open',!b.classList.contains('open'));c.classList.toggle('open',!c.classList.contains('open'));}
+function toggleTip(id){document.getElementById(id).classList.toggle('open');}
+function toggleNA(el,cb,k){const e=document.getElementById(el);e.style.opacity=cb.checked?'0.3':'1';e.style.pointerEvents=cb.checked?'none':'';if(cb.checked&&S[k])S[k].co2=0;updateSummary();}
+
+function switchCloudMode(m,btn){
+  document.querySelectorAll('#cloud-spend,#cloud-provider').forEach(p=>p.style.display='none');
+  document.getElementById('cloud-'+m).style.display='block';
+  document.getElementById('cloud-tab-spend').classList.toggle('active',m==='spend');
+  document.getElementById('cloud-tab-provider').classList.toggle('active',m==='provider');
+}
+// init cloud mode panels
+document.getElementById('cloud-provider').style.display='none';
+
+function calcCloud(){
+  const sgd=(parseFloat(document.getElementById('cloud-sgd').value)||0)*12;
+  S.cloud.co2=sgd*0.0002; S.cloud.sgd=sgd;
+  showResult('result-cloud',S.cloud.co2,sgd,'annual cloud spend');
+  document.getElementById('st-cloud').textContent=S.cloud.co2>0?`~ ${S.cloud.co2.toFixed(3)} tCO₂e`:'—';
+  document.getElementById('st-cloud').className=S.cloud.co2>0?'sec-total live':'sec-total';
+  updateSummary();
+}
+function calcCloudDirect(){
+  S.cloud.co2=parseFloat(document.getElementById('cloud-tco2').value)||0;
+  showResult('result-cloud',S.cloud.co2,0,'from provider report');
+  document.getElementById('st-cloud').textContent=S.cloud.co2>0?`~ ${S.cloud.co2.toFixed(3)} tCO₂e`:'—';
+  document.getElementById('st-cloud').className=S.cloud.co2>0?'sec-total live':'sec-total';
+  updateSummary();
+}
+
+function addHWItem(){
+  const id='hw'+Date.now();
+  const div=document.createElement('div');
+  div.style.cssText='display:flex;gap:8px;align-items:flex-end;background:var(--bg);padding:10px 12px;border-radius:8px;border:.5px solid var(--b2)';
+  div.id=id;
+  div.innerHTML=`
+    <div style="flex:1.2"><div style="font-size:10px;font-family:monospace;color:var(--ink3);margin-bottom:4px;text-transform:uppercase">Equipment</div>
+    <select class="sel" id="${id}-type" onchange="calcHW()" style="height:32px;font-size:12px">
+      <option value="laptop">Laptop (350 kgCO₂e)</option>
+      <option value="desktop">Desktop (500 kgCO₂e)</option>
+      <option value="server">Server (1,200 kgCO₂e)</option>
+      <option value="phone">Smartphone (70 kgCO₂e)</option>
+      <option value="tablet">Tablet (100 kgCO₂e)</option>
+      <option value="monitor">Monitor (200 kgCO₂e)</option>
+      <option value="printer">Printer (150 kgCO₂e)</option>
+      <option value="other">Other (300 kgCO₂e est.)</option>
+    </select></div>
+    <div style="width:80px"><div style="font-size:10px;font-family:monospace;color:var(--ink3);margin-bottom:4px;text-transform:uppercase">Quantity</div>
+    <input class="inp" type="number" id="${id}-qty" value="1" min="1" oninput="calcHW()" style="height:32px;font-size:12px"></div>
+    <div style="font-family:monospace;font-size:11px;color:var(--gc);padding-bottom:6px;min-width:60px" id="${id}-co2">—</div>
+    <button onclick="document.getElementById('${id}').remove();calcHW()" style="width:24px;height:32px;border:.5px solid var(--b1);background:transparent;border-radius:6px;cursor:pointer;color:var(--ink3);font-size:11px">✕</button>`;
+  document.getElementById('hw-list').appendChild(div);
+  hwItems.push(id);
+  calcHW();
+}
+
+function calcHW(){
+  let totalCo2=0,totalSgd=0;
+  document.querySelectorAll('#hw-list > div').forEach(div=>{
+    const id=div.id;
+    const type=document.getElementById(id+'-type')?.value||'laptop';
+    const qty=parseFloat(document.getElementById(id+'-qty')?.value)||0;
+    const co2=qty*HW_EF[type];
+    const sgd=qty*HW_PRICE[type];
+    totalCo2+=co2; totalSgd+=sgd;
+    const el=document.getElementById(id+'-co2');
+    if(el) el.textContent=co2>0?`~ ${co2.toFixed(2)}t`:'—';
+  });
+  S.hw.co2=totalCo2; S.hw.sgd=totalSgd;
+  showResult('result-hw',totalCo2,totalSgd,'hardware spend (est.)');
+  document.getElementById('st-hw').textContent=totalCo2>0?`~ ${totalCo2.toFixed(2)} tCO₂e`:'—';
+  document.getElementById('st-hw').className=totalCo2>0?'sec-total live':'sec-total';
+  updateSummary();
+}
+
+function calcDC2(){
+  const kwh=(parseFloat(document.getElementById('dc-kwh').value)||0)*12;
+  const pue=parseFloat(document.getElementById('dc-pue').value)||1.4;
+  S.dc2.co2=kwh*pue*0.412/1000;
+  const r=document.getElementById('result-dc2').querySelectorAll('.rpill');
+  if(S.dc2.co2>0){r[0].className='rpill co2';r[0].innerHTML=`<span class="rpill-val">~ ${S.dc2.co2.toFixed(3)}</span><span>tCO₂e / yr</span>`;}
+  document.getElementById('st-dc').textContent=S.dc2.co2>0?`~ ${S.dc2.co2.toFixed(3)} tCO₂e`:'—';
+  document.getElementById('st-dc').className=S.dc2.co2>0?'sec-total live':'sec-total';
+  updateSummary();
+}
+
+function showResult(id,co2,sgd,sgdLabel){
+  const r=document.getElementById(id).querySelectorAll('.rpill');
+  if(co2>0){r[0].className='rpill co2';r[0].innerHTML=`<span class="rpill-val">~ ${co2.toFixed(3)}</span><span>tCO₂e / yr</span>`;}
+  if(sgd>0){r[1].className='rpill cost';r[1].innerHTML=`<span class="rpill-val">≈ SGD ${Math.round(sgd).toLocaleString()}</span><span>${sgdLabel}</span>`;}
+}
+
+function updateSummary(){
+  const total=S.cloud.co2+S.hw.co2+S.dc2.co2;
+  document.getElementById('sum-cloud').textContent=S.cloud.co2>0?`~ ${S.cloud.co2.toFixed(3)} tCO₂e`:'—';
+  document.getElementById('sum-hw').textContent=S.hw.co2>0?`~ ${S.hw.co2.toFixed(3)} tCO₂e`:'—';
+  document.getElementById('sum-dc2').textContent=S.dc2.co2>0?`~ ${S.dc2.co2.toFixed(3)} tCO₂e`:'—';
+  document.getElementById('sum-total').textContent=total.toFixed(3);
+  let done=0;
+  if(S.cloud.co2>0)done++;
+  if(S.hw.co2>0||document.getElementById('hw-na')?.checked)done++;
+  if(S.dc2.co2>0||document.getElementById('dc-na2')?.checked)done++;
+  document.getElementById('prog-fill').style.width=Math.round(done/3*100)+'%';
+  document.getElementById('prog-label').textContent=done+' of 3 sections completed';
+}
+
+// mtab style
+document.querySelectorAll('.mtab').forEach(t=>t.style.cssText='font-size:11px;padding:5px 11px;border-radius:6px;border:none;background:transparent;color:var(--ink3);cursor:pointer;white-space:nowrap');
+document.querySelectorAll('.mtab.active').forEach(t=>t.style.cssText+='background:var(--card);color:var(--ink);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.08)');
+</script>
+</body>
+</html>

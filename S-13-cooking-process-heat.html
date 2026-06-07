@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cooking & Process Heat — ZYT.ESG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#15140d;--ink2:#42403a;--ink3:#84827a;--ink4:#c2bfb6;
+  --bg:#f3f0e9;--card:#ffffff;--b1:#e0dbd2;--b2:#eae6de;
+  --s1c:#b04020;--s1b:#fdf0ec;--s1d:#f0c4b4;
+  --gc:#1a6b4a;--gb:#eaf4ee;--gd:#b4d9c4;
+  --ac:#7a5a0a;--ab:#fdf3e0;--ad:#e8c87a;
+  --wc:#7a1a1a;--wb:#fdf0ec;--wd:#f0b4b4;
+  --fc:#6b3a1a;--fb:#fdf5ec;--fd:#e8c8a0;
+  --r:10px;--rl:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:14px}
+
+nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30}
+.logo{font-family:'Fraunces',serif;font-size:17px;font-weight:300;display:flex;align-items:center;gap:8px}
+.logo-tag{font-family:'DM Mono',monospace;font-size:10px;color:var(--gc);background:var(--gb);border:1px solid var(--gd);padding:2px 7px;border-radius:20px;letter-spacing:.5px}
+.nav-steps{display:flex;align-items:center;gap:4px;font-size:12px}
+.ns{padding:3px 10px;border-radius:20px;color:var(--ink3)}
+.ns.done{color:var(--gc)}.ns.done::before{content:'✓ ';font-size:10px}
+.ns.active{background:var(--ink);color:white;font-weight:500}
+.ns-sep{color:var(--ink4);font-size:10px}
+.btn-back{font-size:12px;color:var(--ink3);background:transparent;border:.5px solid var(--b1);padding:5px 12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px}
+.btn-back:hover{color:var(--ink);border-color:var(--ink3)}
+
+.layout{display:grid;grid-template-columns:1fr 300px;gap:20px;max-width:1060px;margin:0 auto;padding:28px 24px 100px;align-items:start}
+
+/* CLUSTER HEADER */
+.cluster-hdr{background:var(--card);border:1px solid var(--b1);border-radius:var(--rl);padding:20px 22px;margin-bottom:16px;display:flex;align-items:flex-start;gap:14px}
+.hdr-icon{font-size:26px;width:50px;height:50px;background:var(--bg);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hdr-body{flex:1}
+.hdr-name{font-family:'Fraunces',serif;font-size:22px;font-weight:300;letter-spacing:-.3px;margin-bottom:3px}
+.hdr-sub{font-size:12px;color:var(--ink3);line-height:1.5;margin-bottom:8px}
+.hdr-roles{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.hdr-role{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3);background:var(--bg);border:1px solid var(--b2);padding:3px 9px;border-radius:20px}
+.prog-bar{height:3px;background:var(--b2);border-radius:2px;overflow:hidden;margin-top:10px}
+.prog-fill{height:100%;background:var(--gc);border-radius:2px;transition:width .5s ease}
+.prog-label{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);margin-top:4px}
+
+/* SECTION */
+.section{margin-bottom:12px}
+.sec-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card);border:1px solid var(--b1);border-radius:10px 10px 0 0;cursor:pointer;user-select:none}
+.sec-hdr:hover{background:var(--bg)}
+.scope-pill{font-size:10px;font-family:'DM Mono',monospace;font-weight:500;padding:2px 8px;border-radius:8px;white-space:nowrap}
+.s1-pill{background:var(--s1b);color:var(--s1c);border:1px solid var(--s1d)}
+.sec-title{font-size:13px;font-weight:500;color:var(--ink);flex:1}
+.sec-total{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);transition:color .3s}
+.sec-total.live{color:var(--gc);font-weight:500}
+.sec-chev{width:12px;height:12px;color:var(--ink3);transition:transform .2s;flex-shrink:0}
+.sec-chev.open{transform:rotate(90deg)}
+.sec-body{display:none;background:var(--card);border:1px solid var(--b1);border-top:none;border-radius:0 0 10px 10px;overflow:hidden}
+.sec-body.open{display:block}
+
+/* ACTIVITY */
+.activity{padding:16px;border-bottom:1px solid var(--b2)}
+.activity:last-child{border-bottom:none}
+.act-name-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.act-name{font-size:13px;font-weight:500;color:var(--ink)}
+.opt-tag{font-size:9px;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:6px;background:var(--ab);color:var(--ac);border:1px solid var(--ad)}
+.tip-btn{width:16px;height:16px;border-radius:50%;background:var(--bg);border:1px solid var(--b1);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;color:var(--ink3);font-family:'DM Mono',monospace;font-weight:500;flex-shrink:0;transition:background .15s,color .15s}
+.tip-btn:hover{background:var(--ink);color:white;border-color:var(--ink)}
+.act-sub{font-size:11px;color:var(--ink3);margin-bottom:10px;line-height:1.4}
+.tip-panel{display:none;background:var(--ink);color:white;border-radius:8px;padding:12px 14px;font-size:11px;line-height:1.6;margin-bottom:10px}
+.tip-panel.open{display:block;animation:fadein .15s ease}
+.tip-analogy{margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.15);font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.65)}
+.tip-ef{margin-top:4px;font-size:10px;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace}
+
+/* FUEL TYPE SELECTOR TABS */
+.fuel-tabs{display:flex;gap:3px;background:var(--bg);border:1px solid var(--b1);border-radius:8px;padding:3px;margin-bottom:12px;flex-wrap:wrap}
+.ftab{font-size:11px;padding:5px 11px;border-radius:6px;border:none;background:transparent;color:var(--ink3);cursor:pointer;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.ftab:hover{background:var(--card);color:var(--ink2)}
+.ftab.active{background:var(--card);color:var(--ink);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.ftab-icon{font-size:13px}
+
+/* INPUT MODES */
+.mode-tabs{display:flex;gap:3px;background:var(--bg);border:1px solid var(--b1);border-radius:8px;padding:3px;width:fit-content;margin-bottom:10px}
+.mtab{font-size:11px;padding:5px 11px;border-radius:6px;border:none;background:transparent;color:var(--ink3);cursor:pointer;transition:all .15s;white-space:nowrap}
+.mtab.active{background:var(--card);color:var(--ink);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.mode-panel{display:none}
+.mode-panel.active{display:block}
+
+/* MONTHLY GRID */
+.month-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px}
+.mcell label{display:block;font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);margin-bottom:3px}
+.minp{width:100%;height:32px;border:.5px solid var(--b1);border-radius:6px;background:var(--card);padding:0 7px;font-size:12px;color:var(--ink);outline:none;transition:border-color .15s}
+.minp:focus{border-color:var(--gc)}
+.minp.filled{background:var(--gb);border-color:var(--gd)}
+.month-summary{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:7px 10px;background:var(--bg);border-radius:7px;font-size:11px;color:var(--ink2);margin-bottom:6px}
+.ms-val{font-family:'DM Mono',monospace;font-weight:500;color:var(--ink)}
+.comp-wrap{display:flex;align-items:center;gap:5px;margin-left:auto}
+.comp-bar{width:50px;height:3px;background:var(--b2);border-radius:2px;overflow:hidden}
+.comp-fill{height:100%;background:var(--gc);border-radius:2px;transition:width .3s}
+.comp-lbl{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3)}
+
+/* FIELDS */
+.field-row{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:8px}
+.fwrap{flex:1;min-width:90px}
+.fwrap label{display:block;font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.inp{width:100%;height:36px;border:.5px solid var(--b1);border-radius:7px;background:var(--card);padding:0 10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .15s}
+.inp:focus{border-color:var(--gc)}
+.sel{width:100%;height:36px;border:.5px solid var(--b1);border-radius:7px;background:var(--card);padding:0 10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;cursor:pointer;transition:border-color .15s}
+.sel:focus{border-color:var(--gc)}
+.unit-box{height:36px;padding:0 10px;background:var(--bg);border:.5px solid var(--b2);border-radius:7px;font-size:11px;color:var(--ink3);display:flex;align-items:center;white-space:nowrap;font-family:'DM Mono',monospace}
+
+/* CYLINDER SELECTOR */
+.cylinder-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.cyl-btn{padding:10px;border:1px solid var(--b1);border-radius:var(--r);cursor:pointer;background:var(--card);text-align:center;transition:all .15s}
+.cyl-btn:hover{border-color:var(--ink3)}
+.cyl-btn.active{border-color:var(--s1c);background:var(--s1b)}
+.cyl-size{font-size:13px;font-weight:500;color:var(--ink)}
+.cyl-kg{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);margin-top:2px}
+.cyl-co2{font-size:10px;color:var(--gc);margin-top:2px;font-family:'DM Mono',monospace}
+.cyl-use{font-size:10px;color:var(--ink3);font-style:italic;margin-top:1px}
+
+/* NA */
+.na-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.na-cb{width:14px;height:14px;cursor:pointer;accent-color:var(--ink3)}
+.na-lbl{font-size:11px;color:var(--ink3);cursor:pointer}
+
+/* RESULT PILLS */
+.result-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:.5px solid var(--b2);align-items:center}
+.rpill{display:flex;align-items:center;gap:4px;font-size:11px;padding:3px 9px;border-radius:16px;border:.5px solid;white-space:nowrap}
+.rpill.co2{background:var(--gb);color:var(--gc);border-color:var(--gd)}
+.rpill.cost{background:var(--ab);color:var(--ac);border-color:var(--ad)}
+.rpill.empty{background:var(--bg);color:var(--ink4);border-color:var(--b2)}
+.rpill-val{font-family:'DM Mono',monospace;font-weight:500}
+.acc-tag{font-size:9px;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:6px}
+.acc-h{background:var(--gb);color:var(--gc)}
+.acc-m{background:var(--ab);color:var(--ac)}
+.acc-l{background:var(--wb);color:var(--wc)}
+
+/* COST CONTEXT */
+.cost-context{display:none;margin-top:6px;font-size:11px;color:var(--ac);line-height:1.5;padding:7px 10px;background:var(--ab);border:.5px solid var(--ad);border-radius:7px}
+.cost-context.show{display:block}
+
+/* ATTACH */
+.attach-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.attach-btn{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3);background:transparent;border:.5px solid var(--b1);padding:4px 10px;border-radius:6px;cursor:pointer;transition:all .15s}
+.attach-btn:hover{color:var(--ink);border-color:var(--ink3)}
+.attach-btn svg{width:12px;height:12px}
+.attach-info{font-size:10px;color:var(--ink3);font-style:italic}
+
+/* SUMMARY PANEL */
+.summary-col{position:sticky;top:72px}
+.sum-card{background:var(--ink);border-radius:var(--rl);overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.12)}
+.sum-hdr{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-hdr-title{font-family:'Fraunces',serif;font-size:15px;font-weight:300;color:white;margin-bottom:2px}
+.sum-hdr-sub{font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.35)}
+.sum-breakdown{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;gap:8px}
+.sum-break-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.3);margin-bottom:4px}
+.break-row{display:flex;justify-content:space-between;font-size:11px}
+.break-name{color:rgba(255,255,255,.55)}
+.break-val{font-family:'DM Mono',monospace;font-weight:500;color:white}
+.sum-total{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-est-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.3);margin-bottom:5px}
+.sum-total-val{font-family:'Fraunces',serif;font-size:26px;font-weight:300;color:white;line-height:1;letter-spacing:-.5px;transition:all .3s}
+.sum-total-unit{font-size:11px;color:rgba(255,255,255,.4);margin-top:2px}
+.sum-cost-block{margin-top:10px;padding:10px 12px;background:rgba(255,255,255,.06);border-radius:8px;border:.5px solid rgba(255,255,255,.1)}
+.sum-cost-label{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.3);margin-bottom:4px}
+.sum-cost-val{font-family:'Fraunces',serif;font-size:18px;font-weight:300;color:#f0d090;line-height:1;transition:all .3s}
+.sum-cost-desc{font-size:10px;color:rgba(255,255,255,.4);margin-top:3px;line-height:1.4}
+.sum-saving{margin-top:6px;padding:7px 10px;background:rgba(26,107,74,.25);border-radius:6px;font-size:11px;color:#a8e4c4;line-height:1.4}
+.sum-analogy{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-anal-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.25);margin-bottom:5px}
+.sum-anal-text{font-size:11px;color:rgba(255,255,255,.6);line-height:1.55;font-style:italic;transition:all .3s}
+.sum-ef{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-ef-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.25);margin-bottom:6px}
+.ef-row{display:flex;justify-content:space-between;font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.4);margin-bottom:3px}
+.ef-row span:last-child{color:rgba(255,255,255,.6)}
+.sum-actions{padding:14px 18px;display:flex;flex-direction:column;gap:8px}
+.btn-next{width:100%;height:40px;background:white;color:var(--ink);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
+.btn-next:hover{background:#f0ede6}
+.btn-next svg{width:13px;height:13px;transition:transform .15s}
+.btn-next:hover svg{transform:translateX(2px)}
+.btn-save-draft{width:100%;height:36px;background:transparent;color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.12);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s}
+.btn-save-draft:hover{color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.3)}
+
+/* N/A BANNER */
+.na-industry-note{background:var(--gb);border:.5px solid var(--gd);border-radius:var(--r);padding:12px 14px;margin-bottom:16px;font-size:11px;color:var(--gc);line-height:1.5}
+
+@keyframes fadein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:768px){.layout{grid-template-columns:1fr}.summary-col{position:static}.nav-steps{display:none}.cylinder-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">ZYT.ESG <span class="logo-tag">ESG</span></div>
+  <div class="nav-steps">
+    <div class="ns done">Profile</div><div class="ns-sep">›</div>
+    <div class="ns active">Data entry</div><div class="ns-sep">›</div>
+    <div class="ns">Results</div><div class="ns-sep">›</div>
+    <div class="ns">Targets</div><div class="ns-sep">›</div>
+    <div class="ns">Report</div>
+  </div>
+  <button class="btn-back">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 2L4 6l4 4"/></svg>
+    Back to hub
+  </button>
+</nav>
+
+<div class="layout">
+<div class="form-col">
+
+<!-- CLUSTER HEADER -->
+<div class="cluster-hdr">
+  <div class="hdr-icon">🔥</div>
+  <div class="hdr-body">
+    <div class="hdr-name">Cooking & process heat</div>
+    <div class="hdr-sub">Town gas, LPG cylinders, diesel boilers, and other fuels burned on-premises for cooking, heating, or industrial processes. All Scope 1 stationary combustion.</div>
+    <div class="hdr-roles">
+      <div class="hdr-role">
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="6" cy="4" r="2.5"/><path d="M2 11c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>
+        Kitchen supervisor
+      </div>
+      <div class="hdr-role">
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="6" cy="4" r="2.5"/><path d="M2 11c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>
+        Production / facilities manager
+      </div>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="prog-label" id="prog-label">0 of 4 sections completed</div>
+  </div>
+</div>
+
+<!-- INDUSTRY NOTE -->
+<div class="na-industry-note">
+  <strong>Primarily relevant for F&B, manufacturing, hospitality, and healthcare.</strong>
+  If your business is in professional services, retail, or ICT and doesn't use gas or process heat, mark all sections as Not applicable below.
+</div>
+
+<!-- ══ SECTION 1: TOWN GAS (City Gas) ══ -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('gas')">
+    <svg class="sec-chev open" id="chev-gas" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s1-pill">Scope 1</span>
+    <span class="sec-title">Piped gas (metered supply)</span>
+    <span class="sec-total" id="st-gas">—</span>
+  </div>
+  <div class="sec-body open" id="body-gas">
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">Piped gas consumption</div>
+        <span class="tip-btn" onclick="toggleTip('tip-gas')">?</span>
+      </div>
+      <div class="act-sub">Natural gas distributed through Singapore's piped network by your gas supplier (SembCorp Gas, Keppel Gas, Union Energy, or others). Used for cooking, water heating, steam generation, and industrial processes. Your gas bill shows consumption in kWh.</div>
+      <div class="tip-panel" id="tip-gas">
+        Piped gas in Singapore is primarily natural gas (methane) distributed by various licensed suppliers. Combustion releases CO₂ directly — this is a Scope 1 emission because you own the combustion appliance. Natural gas is the cleanest-burning fossil fuel per unit of energy, but it still generates significant emissions at commercial cooking scale.
+        <div class="tip-analogy">🔥 1 kWh of gas ≈ 0.202 kgCO₂e · A commercial kitchen burning 5,000 kWh/month = 1.01 tCO₂e/month from gas alone</div>
+        <div class="tip-ef">SEFR: Fuel → Combustion → Natural Gas → 2,695.416 kgCO₂e/metric ton · Per kWh: ~0.202 kgCO₂e/kWh (using calorific value conversion) · City Gas bills in kWh — use directly</div>
+      </div>
+
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="gas-na" onchange="toggleNA('gas-inputs',this,'gas')">
+        <label class="na-lbl" for="gas-na">We are not connected to piped gas</label>
+      </div>
+      <div id="gas-inputs">
+        <div class="mode-tabs" id="gas-mode-tabs">
+          <button class="mtab active" onclick="switchMode('gas',['gas-monthly','gas-annual','gas-single'],'gas-monthly',this)">Month by month ★</button>
+          <button class="mtab" onclick="switchMode('gas',['gas-monthly','gas-annual','gas-single'],'gas-annual',this)">Annual total</button>
+          <button class="mtab" onclick="switchMode('gas',['gas-monthly','gas-annual','gas-single'],'gas-single',this)">One bill (quick start)</button>
+        </div>
+
+        <!-- MONTHLY -->
+        <div class="mode-panel active" id="gas-monthly">
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:8px">Enter kWh from each City Gas bill. Your bill arrives every 2 months — enter the bimonthly reading split evenly, or leave alternate months blank.</div>
+          <div class="month-grid" id="gas-month-grid"></div>
+          <div class="month-summary">
+            Total: <span class="ms-val" id="gm-total">0</span> kWh &nbsp;·&nbsp;
+            Avg: <span class="ms-val" id="gm-avg">—</span>/mo &nbsp;·&nbsp;
+            ~ <span class="ms-val" id="gm-co2">0</span> tCO₂e/yr
+            <div class="comp-wrap"><div class="comp-bar"><div class="comp-fill" id="gm-comp" style="width:0%"></div></div><span class="comp-lbl" id="gm-comp-lbl">0/12</span></div>
+          </div>
+        </div>
+
+        <!-- ANNUAL -->
+        <div class="mode-panel" id="gas-annual">
+          <div class="field-row">
+            <div class="fwrap"><label>Annual gas consumption</label><input class="inp" type="number" id="ga-kwh" placeholder="e.g. 18,000" oninput="calcGasAnnual()"></div>
+            <div class="unit-box">kWh / yr</div>
+            <div style="display:flex;align-items:center;padding-bottom:2px;font-size:11px;color:var(--ink3)">or</div>
+            <div class="fwrap"><label>Annual bill (SGD)</label><input class="inp" type="number" id="ga-sgd" placeholder="SGD / yr" oninput="calcGasAnnualBill()"></div>
+          </div>
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">Gas rates vary by supplier and contract type. Check your gas bill for the exact rate per kWh. Commercial rates are typically negotiated and differ from household tariffs.</div>
+        </div>
+
+        <!-- SINGLE BILL -->
+        <div class="mode-panel" id="gas-single">
+          <div class="field-row">
+            <div class="fwrap" style="flex:.5;min-width:80px"><label>Period</label>
+              <select class="sel" id="gs-period">
+                <option value="1">Monthly</option>
+                <option value="2" selected>Bimonthly (City Gas default)</option>
+                <option value="3">Quarterly</option>
+              </select>
+            </div>
+            <div class="fwrap"><label>Consumption (kWh)</label><input class="inp" type="number" id="gs-kwh" placeholder="e.g. 1,200" oninput="calcGasSingle()"></div>
+            <div class="unit-box">kWh</div>
+            <div style="display:flex;align-items:center;padding-bottom:2px;font-size:11px;color:var(--ink3)">or</div>
+            <div class="fwrap"><label>Bill amount (SGD)</label><input class="inp" type="number" id="gs-bill" placeholder="SGD" oninput="calcGasSingleBill()"></div>
+          </div>
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">Note: Many Singapore piped gas suppliers issue bills every 2 months. Select the correct period to match your billing cycle.</div>
+        </div>
+      </div>
+
+      <div class="result-row" id="result-gas">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual gas spend</span></div>
+        <span class="acc-tag" id="gas-acc" style="display:none"></span>
+      </div>
+      <div class="cost-context" id="cost-ctx-gas">
+        💡 This is your annual piped gas spend. Efficient burners, heat recovery systems, and cooking schedule optimisation can reduce gas use by 10–25% in commercial kitchens.
+      </div>
+      <div class="attach-row">
+        <button class="attach-btn" onclick="attachFile('gas')">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 1H3a1 1 0 00-1 1v8a1 1 0 001 1h6a1 1 0 001-1V4L8 1z"/><path d="M8 1v3h3"/></svg>
+          Attach gas bills
+        </button>
+        <span class="attach-info">For audit reference</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 2: LPG CYLINDERS ══ -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('lpg')">
+    <svg class="sec-chev" id="chev-lpg" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s1-pill">Scope 1</span>
+    <span class="sec-title">LPG cylinders & bulk LPG</span>
+    <span class="sec-total" id="st-lpg">—</span>
+  </div>
+  <div class="sec-body" id="body-lpg">
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">LPG (Liquefied Petroleum Gas) consumption</div>
+        <span class="tip-btn" onclick="toggleTip('tip-lpg')">?</span>
+      </div>
+      <div class="act-sub">LPG cylinders used for cooking, heating, or industrial processes. Common in hawker centres, food courts, catering, and areas without piped gas connections.</div>
+      <div class="tip-panel" id="tip-lpg">
+        LPG (propane/butane mix) is stored in cylinders and delivered to premises. It's slightly more carbon-intensive than natural gas per unit of energy, but the difference is small. The key is knowing how many cylinders you use — often tracked by the number of deliveries.
+        <div class="tip-analogy">🧴 One standard 12kg cylinder ≈ 35.8 kgCO₂e · One commercial 48kg cylinder ≈ 143.4 kgCO₂e · A hawker stall using 4 cylinders/month = 143 kgCO₂e/month</div>
+        <div class="tip-ef">SEFR: Fuel → Combustion → Liquefied Petroleum Gas → 2,987.208 kgCO₂e/metric ton · Per kg: 2.987 kgCO₂e/kg · Per litre: 2.987 × 0.55 kg/L = 1.643 kgCO₂e/L</div>
+      </div>
+
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="lpg-na" onchange="toggleNA('lpg-inputs',this,'lpg')">
+        <label class="na-lbl" for="lpg-na">We don't use LPG cylinders</label>
+      </div>
+      <div id="lpg-inputs">
+        <!-- Cylinder size selector -->
+        <div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Select your cylinder size(s)</div>
+        <div class="cylinder-grid">
+          <button class="cyl-btn active" data-kg="12" data-co2="35.85" onclick="selectCylinder(this,'lpg')" id="cyl-12">
+            <div class="cyl-size">12 kg</div>
+            <div class="cyl-kg">Domestic / small</div>
+            <div class="cyl-co2">35.8 kgCO₂e each</div>
+            <div class="cyl-use">Hawker, café, home</div>
+          </button>
+          <button class="cyl-btn" data-kg="48" data-co2="143.39" onclick="selectCylinder(this,'lpg')" id="cyl-48">
+            <div class="cyl-size">48 kg</div>
+            <div class="cyl-kg">Commercial</div>
+            <div class="cyl-co2">143.4 kgCO₂e each</div>
+            <div class="cyl-use">Restaurant, canteen</div>
+          </button>
+          <button class="cyl-btn" data-kg="0" data-co2="0" onclick="selectCylinder(this,'lpg')" id="cyl-bulk">
+            <div class="cyl-size">Bulk delivery</div>
+            <div class="cyl-kg">By kg or litres</div>
+            <div class="cyl-co2">2.987 kgCO₂e/kg</div>
+            <div class="cyl-use">Industrial / large users</div>
+          </button>
+        </div>
+
+        <!-- Cylinder count input -->
+        <div id="lpg-cylinder-inputs">
+          <div class="mode-tabs" id="lpg-mode-tabs">
+            <button class="mtab active" onclick="switchMode('lpg',['lpg-monthly-cyl','lpg-annual-cyl'],'lpg-monthly-cyl',this)">Month by month</button>
+            <button class="mtab" onclick="switchMode('lpg',['lpg-monthly-cyl','lpg-annual-cyl'],'lpg-annual-cyl',this)">Annual total</button>
+          </div>
+          <div class="mode-panel active" id="lpg-monthly-cyl">
+            <div class="month-grid" id="lpg-month-grid"></div>
+            <div class="month-summary">
+              Total: <span class="ms-val" id="lm-total">0</span> cylinders &nbsp;·&nbsp;
+              ~ <span class="ms-val" id="lm-co2">0</span> tCO₂e/yr
+              <div class="comp-wrap"><div class="comp-bar"><div class="comp-fill" id="lm-comp" style="width:0%"></div></div><span class="comp-lbl" id="lm-comp-lbl">0/12</span></div>
+            </div>
+          </div>
+          <div class="mode-panel" id="lpg-annual-cyl">
+            <div class="field-row">
+              <div class="fwrap"><label>Annual cylinders used</label><input class="inp" type="number" id="la-cyls" placeholder="e.g. 48" oninput="calcLPGAnnual()"></div>
+              <div class="unit-box" id="lpg-annual-unit">12kg cylinders / yr</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bulk input (shown when bulk is selected) -->
+        <div id="lpg-bulk-inputs" style="display:none">
+          <div class="field-row">
+            <div class="fwrap"><label>Monthly delivery</label><input class="inp" type="number" id="lpg-bulk-qty" placeholder="e.g. 200" oninput="calcLPGBulk()"></div>
+            <div style="display:flex;gap:4px;padding-bottom:2px">
+              <button class="mtab active" id="lpg-bulk-kg-btn" onclick="switchBulkUnit('kg',this)" style="padding:4px 8px">kg</button>
+              <button class="mtab" id="lpg-bulk-L-btn" onclick="switchBulkUnit('L',this)" style="padding:4px 8px">litres</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-row" id="result-lpg">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual LPG cost</span></div>
+      </div>
+      <div class="cost-context" id="cost-ctx-lpg">
+        💡 This is your annual LPG spend. If piped gas is available in your area, switching reduces cylinder handling costs and is slightly lower-carbon. Check your landlord or NEA on gas connection options.
+      </div>
+      <div class="attach-row">
+        <button class="attach-btn" onclick="attachFile('lpg')">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 1H3a1 1 0 00-1 1v8a1 1 0 001 1h6a1 1 0 001-1V4L8 1z"/><path d="M8 1v3h3"/></svg>
+          Attach LPG delivery records
+        </button>
+        <span class="attach-info">Delivery notes, purchase receipts</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 3: DIESEL / FUEL OIL BOILER ══ -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('boiler')">
+    <svg class="sec-chev" id="chev-boiler" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s1-pill">Scope 1</span>
+    <span class="sec-title">Industrial boiler / process heat (diesel, fuel oil)</span>
+    <span class="sec-total" id="st-boiler">—</span>
+  </div>
+  <div class="sec-body" id="body-boiler">
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">Boiler or industrial process heat <span class="opt-tag">optional</span></div>
+        <span class="tip-btn" onclick="toggleTip('tip-boiler')">?</span>
+      </div>
+      <div class="act-sub">Diesel or fuel oil burned in an industrial boiler for steam generation, hot water, laundry, or industrial process heat. Common in food manufacturing, hotels, laundry services, and hospitals.</div>
+      <div class="tip-panel" id="tip-boiler">
+        Industrial boilers burn diesel or fuel oil to generate steam or hot water for manufacturing processes, commercial laundry, kitchen steamers, and space heating. These are high-volume fuel consumers — a medium boiler can burn 200–500 litres of diesel per day. Check with your engineering or facilities team for fuel consumption data.
+        <div class="tip-analogy">⚙️ A medium commercial boiler burning 10 litres/hr × 8 hrs/day × 22 days = 1,760 L/month ≈ 4.7 tCO₂e/month</div>
+        <div class="tip-ef">SEFR: Fuel → Combustion · Diesel: 3,196.749 kgCO₂e/t × 0.832 kg/L ÷ 1,000 = 2.660 kgCO₂/L · Residual Fuel Oil: 3,136.777 kgCO₂e/t</div>
+      </div>
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="boiler-na" checked onchange="toggleNA('boiler-inputs',this,'boiler')">
+        <label class="na-lbl" for="boiler-na">We don't have an industrial boiler or process heat system</label>
+      </div>
+      <div id="boiler-inputs" style="opacity:.3;pointer-events:none">
+        <div class="field-row">
+          <div class="fwrap" style="flex:.5;min-width:100px">
+            <label>Fuel type</label>
+            <select class="sel" id="boiler-fuel" onchange="calcBoiler()">
+              <option value="2.660">Diesel (2.660 kgCO₂/L)</option>
+              <option value="2.609">Residual fuel oil (2.609 kgCO₂/L)</option>
+              <option value="0.202">Natural gas (0.202 kgCO₂/kWh)</option>
+            </select>
+          </div>
+          <div class="fwrap">
+            <label>Average monthly consumption</label>
+            <input class="inp" type="number" id="boiler-qty" placeholder="e.g. 1,760" oninput="calcBoiler()">
+          </div>
+          <div class="unit-box" id="boiler-unit">litres / month</div>
+        </div>
+        <div class="field-row">
+          <div class="fwrap" style="flex:.5">
+            <label>Or annual total</label>
+            <input class="inp" type="number" id="boiler-annual" placeholder="litres or kWh / yr" oninput="calcBoilerAnnual()">
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">Check with your facilities or engineering team. Boiler fuel is often tracked separately from vehicle diesel.</div>
+      </div>
+      <div class="result-row" id="result-boiler">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual fuel cost</span></div>
+      </div>
+      <div class="cost-context" id="cost-ctx-boiler">
+        💡 Boilers are typically one of the largest Scope 1 sources in manufacturing. Insulation, condensate return, and burner optimisation can reduce fuel use by 10–20%.
+      </div>
+      <div class="attach-row">
+        <button class="attach-btn" onclick="attachFile('boiler')">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 1H3a1 1 0 00-1 1v8a1 1 0 001 1h6a1 1 0 001-1V4L8 1z"/><path d="M8 1v3h3"/></svg>
+          Attach fuel delivery records
+        </button>
+        <span class="attach-info">Diesel delivery notes, fuel invoices</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 4: CHARCOAL / OTHER SOLID FUEL ══ -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('charcoal')">
+    <svg class="sec-chev" id="chev-charcoal" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s1-pill">Scope 1</span>
+    <span class="sec-title">Charcoal & other solid fuels</span>
+    <span class="sec-total" id="st-charcoal">—</span>
+  </div>
+  <div class="sec-body" id="body-charcoal">
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">Charcoal, wood, or other solid fuels <span class="opt-tag">optional</span></div>
+        <span class="tip-btn" onclick="toggleTip('tip-charcoal')">?</span>
+      </div>
+      <div class="act-sub">Charcoal or wood burning for BBQ restaurants, traditional cooking, satay, or steamboat. Less common but relevant for specific F&B formats.</div>
+      <div class="tip-panel" id="tip-charcoal">
+        Charcoal has a relatively low GHG emission factor per kg compared to fossil fuels — but the quantities used in commercial settings can add up. SEFR classifies charcoal under the fossil fuel category, so emissions are counted. If you use certified sustainable wood/biomass, the IPCC allows a near-zero emissions factor (biogenic carbon) — but this requires documentation.
+        <div class="tip-analogy">🍢 A satay stall using 20 kg of charcoal per day × 25 days = 500 kg/month ≈ 98 kgCO₂e/month (relatively low compared to gas)</div>
+        <div class="tip-ef">SEFR: Fuel → Combustion → Charcoal: 196.47 kgCO₂e/metric ton = 0.196 kgCO₂e/kg · Wood/wood waste: 29.64 kgCO₂e/metric ton = 0.030 kgCO₂e/kg</div>
+      </div>
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="charcoal-na" checked onchange="toggleNA('charcoal-inputs',this,'charcoal')">
+        <label class="na-lbl" for="charcoal-na">We don't use charcoal or solid fuels</label>
+      </div>
+      <div id="charcoal-inputs" style="opacity:.3;pointer-events:none">
+        <div class="field-row">
+          <div class="fwrap" style="flex:.5">
+            <label>Fuel type</label>
+            <select class="sel" id="charcoal-type" onchange="updateCharcoalEF()">
+              <option value="0.196">Charcoal (0.196 kgCO₂/kg)</option>
+              <option value="0.030">Wood / wood waste (0.030 kgCO₂/kg)</option>
+            </select>
+          </div>
+          <div class="fwrap">
+            <label>Average monthly consumption</label>
+            <input class="inp" type="number" id="charcoal-kg" placeholder="e.g. 500" oninput="calcCharcoal()">
+          </div>
+          <div class="unit-box">kg / month</div>
+        </div>
+      </div>
+      <div class="result-row" id="result-charcoal">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual fuel cost</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /form-col -->
+
+<!-- ══ SUMMARY PANEL ══ -->
+<div class="summary-col">
+<div class="sum-card">
+  <div class="sum-hdr">
+    <div class="sum-hdr-title">Estimated cluster total</div>
+    <div class="sum-hdr-sub">Cooking & process heat · 2024</div>
+  </div>
+  <div class="sum-breakdown">
+    <div class="sum-break-lbl">Breakdown by fuel</div>
+    <div class="break-row"><span class="break-name">Piped gas (metered)</span><span class="break-val" id="sum-gas">—</span></div>
+    <div class="break-row"><span class="break-name">LPG cylinders</span><span class="break-val" id="sum-lpg">—</span></div>
+    <div class="break-row"><span class="break-name">Boiler / process heat</span><span class="break-val" id="sum-boiler">—</span></div>
+    <div class="break-row"><span class="break-name">Charcoal / solid fuel</span><span class="break-val" id="sum-charcoal">—</span></div>
+  </div>
+  <div class="sum-total">
+    <div class="sum-est-lbl">Estimated total</div>
+    <div class="sum-total-val" id="sum-total">0</div>
+    <div class="sum-total-unit">tCO₂e / year</div>
+    <div class="sum-cost-block">
+      <div class="sum-cost-label">Annual fuel spend</div>
+      <div class="sum-cost-val" id="sum-cost">—</div>
+      <div class="sum-cost-desc">Your actual annual spend on gas, LPG, and boiler fuel. Reducing consumption reduces these costs directly.</div>
+      <div class="sum-saving" id="sum-saving" style="display:none">
+        💡 A 15% reduction saves approximately <strong id="sum-saving-val">—</strong>/year
+      </div>
+    </div>
+  </div>
+  <div class="sum-analogy">
+    <div class="sum-anal-lbl">What this means</div>
+    <div class="sum-anal-text" id="sum-analogy">Enter your gas or LPG data to see your cooking emissions.</div>
+  </div>
+  <div class="sum-ef">
+    <div class="sum-ef-lbl">Emission factors (SEFR / NEA Singapore)</div>
+    <div class="ef-row"><span>Natural gas / piped gas</span><span>~0.202 kgCO₂/kWh</span></div>
+    <div class="ef-row"><span>LPG (per kg)</span><span>2.987 kgCO₂/kg</span></div>
+    <div class="ef-row"><span>LPG (per litre)</span><span>1.643 kgCO₂/L</span></div>
+    <div class="ef-row"><span>Diesel boiler</span><span>2.660 kgCO₂/L</span></div>
+    <div class="ef-row"><span>Charcoal</span><span>0.196 kgCO₂/kg</span></div>
+    <div class="ef-row"><span>Source</span><span>SEFR Jan 2026 · NEA SG</span></div>
+  </div>
+  <div class="sum-actions">
+    <button class="btn-next" onclick="saveAndNext()">
+      Save & go to Waste & water
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg>
+    </button>
+    <button class="btn-save-draft">Save & exit</button>
+  </div>
+</div>
+</div>
+
+</div><!-- /layout -->
+
+<script>
+// ── EMISSION FACTORS ──
+const EF = {
+  gas_kwh: 0.2023,    // kgCO₂/kWh (natural gas, derived from SEFR 2,695.416 kgCO₂e/t using calorific value ~39.4 MJ/m³)
+  lpg_kg: 2.9872,     // kgCO₂/kg (SEFR 2,987.208 kgCO₂e/t ÷ 1000)
+  lpg_litre: 1.6430,  // kgCO₂/L (× 0.55 kg/L density)
+  diesel: 2.6597,     // kgCO₂/L
+  fuel_oil: 2.6086,   // kgCO₂/L (SEFR Residual Fuel Oil 3,136.777 × 0.832 ÷ 1000)
+  charcoal: 0.19647,  // kgCO₂/kg (SEFR 196.47 ÷ 1000)
+  wood: 0.02964,      // kgCO₂/kg (SEFR 29.64 ÷ 1000)
+};
+
+const PRICE = {
+  gas_kwh: 0.2192,    // SGD/kWh — reference rate, use actual bill for accuracy
+  lpg_12kg: 26.00,    // SGD per 12kg cylinder (approx)
+  lpg_48kg: 88.00,    // SGD per 48kg cylinder (approx)
+  lpg_kg: 2.00,       // SGD/kg bulk
+  diesel: 2.80,       // SGD/L
+  charcoal_kg: 1.50,  // SGD/kg
+};
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ── STATE ──
+const S = {
+  gas: { kwh_yr:0, sgd_yr:0, acc:null },
+  lpg: { co2:0, sgd:0, cylKg:12, cylCo2:35.85, mode:'cylinder' },
+  boiler: { co2:0, sgd:0 },
+  charcoal: { co2:0, sgd:0 },
+};
+
+// ── BUILD MONTH GRIDS ──
+function buildGrid(id, unit, calcFn) {
+  const g = document.getElementById(id);
+  if (!g) return;
+  MONTHS.forEach((m, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'mcell';
+    cell.innerHTML = `<label>${m}</label><input class="minp empty" type="number" id="${id}-${i}" placeholder="${unit}" oninput="${calcFn}()">`;
+    g.appendChild(cell);
+  });
+}
+buildGrid('gas-month-grid', 'kWh', 'calcGasMonthly');
+buildGrid('lpg-month-grid', 'cyl', 'calcLPGMonthly');
+
+// ── SECTION TOGGLE ──
+function toggleSec(id) {
+  const body = document.getElementById('body-' + id);
+  const chev = document.getElementById('chev-' + id);
+  const open = body.classList.contains('open');
+  body.classList.toggle('open', !open);
+  chev.classList.toggle('open', !open);
+}
+
+// ── TOOLTIP ──
+function toggleTip(id) { document.getElementById(id).classList.toggle('open'); }
+
+// ── MODE SWITCH ──
+function switchMode(group, panels, activeId, btn) {
+  btn.parentElement.querySelectorAll('.mtab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  panels.forEach(p => document.getElementById(p).classList.toggle('active', p === activeId));
+}
+
+// ── NA TOGGLE ──
+function toggleNA(inputId, cb, key) {
+  const el = document.getElementById(inputId);
+  el.style.opacity = cb.checked ? '0.3' : '1';
+  el.style.pointerEvents = cb.checked ? 'none' : '';
+  if (cb.checked && S[key]) { S[key].co2 = 0; S[key].sgd = 0; }
+  if (cb.checked && key === 'gas') { S.gas.kwh_yr = 0; S.gas.sgd_yr = 0; }
+  updateProgress(); updateSummary();
+}
+
+// ── GAS CALCULATIONS ──
+function calcGasMonthly() {
+  let total = 0, filled = 0;
+  MONTHS.forEach((_, i) => {
+    const inp = document.getElementById(`gas-month-grid-${i}`);
+    const v = parseFloat(inp.value) || 0;
+    if (v > 0) { total += v; filled++; inp.className = 'minp filled'; }
+    else inp.className = 'minp empty';
+  });
+  const annual = filled > 0 ? (total / filled) * 12 : 0;
+  S.gas.kwh_yr = annual;
+  S.gas.sgd_yr = annual * PRICE.gas_kwh;
+  S.gas.acc = filled === 12 ? 'h' : filled >= 6 ? 'm' : filled > 0 ? 'l' : null;
+  const pct = Math.round(filled / 12 * 100);
+  document.getElementById('gm-total').textContent = total.toLocaleString();
+  document.getElementById('gm-avg').textContent = filled > 0 ? Math.round(total / filled).toLocaleString() : '—';
+  document.getElementById('gm-co2').textContent = (annual * EF.gas_kwh / 1000).toFixed(2);
+  document.getElementById('gm-comp').style.width = pct + '%';
+  document.getElementById('gm-comp-lbl').textContent = filled + '/12';
+  if (filled > 0) {
+    const label = filled === 12 ? 'Accuracy: high — all months' : filled >= 6 ? `Accuracy: medium — ${filled} months` : `Accuracy: low — ${filled} month${filled > 1 ? 's' : ''}`;
+    showGasResult(annual * EF.gas_kwh / 1000, annual * PRICE.gas_kwh, label);
+  } else clearGasResult();
+  updateSummary();
+}
+
+function calcGasAnnual() {
+  const kwh = parseFloat(document.getElementById('ga-kwh').value) || 0;
+  S.gas.kwh_yr = kwh; S.gas.sgd_yr = kwh * PRICE.gas_kwh; S.gas.acc = 'm';
+  document.getElementById('ga-sgd').value = '';
+  if (kwh) showGasResult(kwh * EF.gas_kwh / 1000, kwh * PRICE.gas_kwh, 'Accuracy: medium — annual total');
+  else clearGasResult();
+  updateSummary();
+}
+
+function calcGasAnnualBill() {
+  const sgd = parseFloat(document.getElementById('ga-sgd').value) || 0;
+  const kwh = sgd / PRICE.gas_kwh;
+  S.gas.kwh_yr = kwh; S.gas.sgd_yr = sgd; S.gas.acc = 'm';
+  document.getElementById('ga-kwh').value = Math.round(kwh);
+  if (sgd) showGasResult(kwh * EF.gas_kwh / 1000, sgd, 'Accuracy: medium — from annual bill');
+  else clearGasResult();
+  updateSummary();
+}
+
+function calcGasSingle() {
+  const kwh = parseFloat(document.getElementById('gs-kwh').value) || 0;
+  const period = parseFloat(document.getElementById('gs-period').value) || 2;
+  const annual = kwh * (12 / period);
+  S.gas.kwh_yr = annual; S.gas.sgd_yr = annual * PRICE.gas_kwh; S.gas.acc = 'l';
+  document.getElementById('gs-bill').value = '';
+  const label = period === 2 ? 'Accuracy: low — bimonthly bill extrapolated' : 'Accuracy: low — 1 bill extrapolated';
+  if (kwh) showGasResult(annual * EF.gas_kwh / 1000, annual * PRICE.gas_kwh, label);
+  else clearGasResult();
+  updateSummary();
+}
+
+function calcGasSingleBill() {
+  const bill = parseFloat(document.getElementById('gs-bill').value) || 0;
+  const period = parseFloat(document.getElementById('gs-period').value) || 2;
+  const annualSgd = bill * (12 / period);
+  const annual = annualSgd / PRICE.gas_kwh;
+  S.gas.kwh_yr = annual; S.gas.sgd_yr = annualSgd; S.gas.acc = 'l';
+  document.getElementById('gs-kwh').value = Math.round(bill / PRICE.gas_kwh);
+  if (bill) showGasResult(annual * EF.gas_kwh / 1000, annualSgd, 'Accuracy: low — 1 bill extrapolated');
+  else clearGasResult();
+  updateSummary();
+}
+
+function showGasResult(co2, sgd, accLabel) {
+  const r = document.getElementById('result-gas').querySelectorAll('.rpill');
+  const acc = S.gas.acc || 'l';
+  const pre = acc === 'h' ? '' : '~';
+  r[0].className = 'rpill co2';
+  r[0].innerHTML = `<span class="rpill-val">${pre}${co2.toFixed(2)}</span><span>tCO₂e / yr</span>`;
+  r[1].className = 'rpill cost';
+  r[1].innerHTML = `<span class="rpill-val">≈ SGD ${Math.round(sgd).toLocaleString()}</span><span>annual gas spend</span>`;
+  const accEl = document.getElementById('gas-acc');
+  accEl.style.display = 'inline-block';
+  accEl.className = 'acc-tag ' + { h: 'acc-h', m: 'acc-m', l: 'acc-l' }[acc];
+  accEl.textContent = accLabel;
+  document.getElementById('cost-ctx-gas').className = 'cost-context show';
+  document.getElementById('st-gas').textContent = `~ ${co2.toFixed(1)} tCO₂e`;
+  document.getElementById('st-gas').className = 'sec-total live';
+}
+
+function clearGasResult() {
+  const r = document.getElementById('result-gas').querySelectorAll('.rpill');
+  r[0].className = 'rpill empty'; r[0].innerHTML = '<span class="rpill-val">—</span><span>tCO₂e / yr</span>';
+  r[1].className = 'rpill empty'; r[1].innerHTML = '<span class="rpill-val">—</span><span>annual gas spend</span>';
+  document.getElementById('gas-acc').style.display = 'none';
+  document.getElementById('st-gas').textContent = '—';
+  document.getElementById('st-gas').className = 'sec-total';
+}
+
+// ── LPG CALCULATIONS ──
+function selectCylinder(btn, group) {
+  document.querySelectorAll('.cyl-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const kg = parseFloat(btn.dataset.kg) || 0;
+  const co2 = parseFloat(btn.dataset.co2) || 0;
+  const isBulk = kg === 0;
+  S.lpg.cylKg = kg; S.lpg.cylCo2 = co2; S.lpg.mode = isBulk ? 'bulk' : 'cylinder';
+  document.getElementById('lpg-cylinder-inputs').style.display = isBulk ? 'none' : 'block';
+  document.getElementById('lpg-bulk-inputs').style.display = isBulk ? 'block' : 'none';
+  if (!isBulk) {
+    document.getElementById('lpg-annual-unit').textContent = `${kg}kg cylinders / yr`;
+    // Update month grid placeholder
+    document.querySelectorAll('#lpg-month-grid .minp').forEach(inp => inp.placeholder = 'cyls');
+  }
+  calcLPGMonthly();
+}
+
+function calcLPGMonthly() {
+  let total = 0, filled = 0;
+  MONTHS.forEach((_, i) => {
+    const inp = document.getElementById(`lpg-month-grid-${i}`);
+    const v = parseFloat(inp.value) || 0;
+    if (v > 0) { total += v; filled++; inp.className = 'minp filled'; }
+    else inp.className = 'minp empty';
+  });
+  const annualCyls = filled > 0 ? (total / filled) * 12 : 0;
+  const co2 = annualCyls * S.lpg.cylCo2 / 1000;
+  const sgd = annualCyls * (S.lpg.cylKg === 12 ? PRICE.lpg_12kg : PRICE.lpg_48kg);
+  S.lpg.co2 = co2; S.lpg.sgd = sgd;
+  const pct = Math.round(filled / 12 * 100);
+  document.getElementById('lm-total').textContent = total;
+  document.getElementById('lm-co2').textContent = co2.toFixed(2);
+  document.getElementById('lm-comp').style.width = pct + '%';
+  document.getElementById('lm-comp-lbl').textContent = filled + '/12';
+  if (co2 > 0) showLPGResult(co2, sgd);
+  updateSummary();
+}
+
+function calcLPGAnnual() {
+  const cyls = parseFloat(document.getElementById('la-cyls').value) || 0;
+  const co2 = cyls * S.lpg.cylCo2 / 1000;
+  const sgd = cyls * (S.lpg.cylKg === 12 ? PRICE.lpg_12kg : PRICE.lpg_48kg);
+  S.lpg.co2 = co2; S.lpg.sgd = sgd;
+  if (co2 > 0) showLPGResult(co2, sgd);
+  updateSummary();
+}
+
+let lpgBulkUnit = 'kg';
+function switchBulkUnit(unit, btn) {
+  lpgBulkUnit = unit;
+  document.getElementById('lpg-bulk-kg-btn').classList.toggle('active', unit === 'kg');
+  document.getElementById('lpg-bulk-L-btn').classList.toggle('active', unit === 'L');
+  calcLPGBulk();
+}
+
+function calcLPGBulk() {
+  const qty = parseFloat(document.getElementById('lpg-bulk-qty').value) || 0;
+  const ef = lpgBulkUnit === 'kg' ? EF.lpg_kg : EF.lpg_litre;
+  const pricePerUnit = lpgBulkUnit === 'kg' ? PRICE.lpg_kg : PRICE.lpg_kg * 0.55;
+  const annual = qty * 12;
+  S.lpg.co2 = annual * ef / 1000; S.lpg.sgd = annual * pricePerUnit;
+  if (S.lpg.co2 > 0) showLPGResult(S.lpg.co2, S.lpg.sgd);
+  updateSummary();
+}
+
+function showLPGResult(co2, sgd) {
+  const r = document.getElementById('result-lpg').querySelectorAll('.rpill');
+  r[0].className = 'rpill co2'; r[0].innerHTML = `<span class="rpill-val">~ ${co2.toFixed(2)}</span><span>tCO₂e / yr</span>`;
+  r[1].className = 'rpill cost'; r[1].innerHTML = `<span class="rpill-val">≈ SGD ${Math.round(sgd).toLocaleString()}</span><span>annual LPG cost</span>`;
+  document.getElementById('cost-ctx-lpg').className = 'cost-context show';
+  document.getElementById('st-lpg').textContent = `~ ${co2.toFixed(1)} tCO₂e`;
+  document.getElementById('st-lpg').className = 'sec-total live';
+}
+
+// ── BOILER ──
+function calcBoiler() {
+  const ef = parseFloat(document.getElementById('boiler-fuel').value) || 2.660;
+  const qty = parseFloat(document.getElementById('boiler-qty').value) || 0;
+  const annual = qty * 12;
+  S.boiler.co2 = annual * ef / 1000;
+  S.boiler.sgd = ef === 0.202 ? annual * PRICE.gas_kwh : annual * PRICE.diesel;
+  if (S.boiler.co2 > 0) showBoilerResult();
+  updateSummary();
+}
+
+function calcBoilerAnnual() {
+  const ef = parseFloat(document.getElementById('boiler-fuel').value) || 2.660;
+  const qty = parseFloat(document.getElementById('boiler-annual').value) || 0;
+  S.boiler.co2 = qty * ef / 1000;
+  S.boiler.sgd = ef === 0.202 ? qty * PRICE.gas_kwh : qty * PRICE.diesel;
+  if (S.boiler.co2 > 0) showBoilerResult();
+  updateSummary();
+}
+
+// Update unit label when boiler fuel changes
+document.getElementById('boiler-fuel').addEventListener('change', function() {
+  const unitEl = document.getElementById('boiler-unit');
+  unitEl.textContent = this.value === '0.202' ? 'kWh / month' : 'litres / month';
+  calcBoiler();
+});
+
+function showBoilerResult() {
+  const r = document.getElementById('result-boiler').querySelectorAll('.rpill');
+  r[0].className = 'rpill co2'; r[0].innerHTML = `<span class="rpill-val">~ ${S.boiler.co2.toFixed(2)}</span><span>tCO₂e / yr</span>`;
+  r[1].className = 'rpill cost'; r[1].innerHTML = `<span class="rpill-val">≈ SGD ${Math.round(S.boiler.sgd).toLocaleString()}</span><span>annual fuel cost</span>`;
+  document.getElementById('cost-ctx-boiler').className = 'cost-context show';
+  document.getElementById('st-boiler').textContent = `~ ${S.boiler.co2.toFixed(1)} tCO₂e`;
+  document.getElementById('st-boiler').className = 'sec-total live';
+}
+
+// ── CHARCOAL ──
+function updateCharcoalEF() { calcCharcoal(); }
+
+function calcCharcoal() {
+  const ef = parseFloat(document.getElementById('charcoal-type').value) || EF.charcoal;
+  const kg = parseFloat(document.getElementById('charcoal-kg').value) || 0;
+  const annual = kg * 12;
+  S.charcoal.co2 = annual * ef / 1000;
+  S.charcoal.sgd = annual * PRICE.charcoal_kg;
+  const r = document.getElementById('result-charcoal').querySelectorAll('.rpill');
+  if (S.charcoal.co2 > 0) {
+    r[0].className = 'rpill co2'; r[0].innerHTML = `<span class="rpill-val">~ ${S.charcoal.co2.toFixed(3)}</span><span>tCO₂e / yr</span>`;
+    r[1].className = 'rpill cost'; r[1].innerHTML = `<span class="rpill-val">≈ SGD ${Math.round(S.charcoal.sgd).toLocaleString()}</span><span>annual charcoal cost</span>`;
+    document.getElementById('st-charcoal').textContent = `~ ${S.charcoal.co2.toFixed(2)} tCO₂e`;
+    document.getElementById('st-charcoal').className = 'sec-total live';
+  }
+  updateSummary();
+}
+
+// ── SUMMARY ──
+function updateSummary() {
+  const gasCo2 = S.gas.kwh_yr * EF.gas_kwh / 1000;
+  const total = gasCo2 + S.lpg.co2 + S.boiler.co2 + S.charcoal.co2;
+  const totalSgd = S.gas.sgd_yr + S.lpg.sgd + S.boiler.sgd + S.charcoal.sgd;
+
+  document.getElementById('sum-gas').textContent = gasCo2 > 0 ? `~ ${gasCo2.toFixed(2)} tCO₂e` : '—';
+  document.getElementById('sum-lpg').textContent = S.lpg.co2 > 0 ? `~ ${S.lpg.co2.toFixed(2)} tCO₂e` : '—';
+  document.getElementById('sum-boiler').textContent = S.boiler.co2 > 0 ? `~ ${S.boiler.co2.toFixed(2)} tCO₂e` : '—';
+  document.getElementById('sum-charcoal').textContent = S.charcoal.co2 > 0 ? `~ ${S.charcoal.co2.toFixed(3)} tCO₂e` : '—';
+  document.getElementById('sum-total').textContent = total.toFixed(2);
+
+  if (totalSgd > 0) {
+    document.getElementById('sum-cost').textContent = '≈ SGD ' + Math.round(totalSgd).toLocaleString() + ' / yr';
+    document.getElementById('sum-saving').style.display = 'block';
+    document.getElementById('sum-saving-val').textContent = 'SGD ' + Math.round(totalSgd * 0.15).toLocaleString();
+  } else {
+    document.getElementById('sum-cost').textContent = '—';
+    document.getElementById('sum-saving').style.display = 'none';
+  }
+
+  if (total > 0) {
+    const carKm = Math.round(total * 1000 / 0.173);
+    document.getElementById('sum-analogy').textContent =
+      `${total.toFixed(2)} tCO₂e from cooking fuel is equivalent to a petrol car driving ${carKm.toLocaleString()} km.`;
+  } else {
+    document.getElementById('sum-analogy').textContent = 'Enter your gas or LPG data to see your cooking emissions.';
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  let done = 0;
+  if (S.gas.kwh_yr > 0 || document.getElementById('gas-na')?.checked) done++;
+  if (S.lpg.co2 > 0 || document.getElementById('lpg-na')?.checked) done++;
+  if (S.boiler.co2 > 0 || document.getElementById('boiler-na')?.checked) done++;
+  if (S.charcoal.co2 > 0 || document.getElementById('charcoal-na')?.checked) done++;
+  document.getElementById('prog-fill').style.width = Math.round(done / 4 * 100) + '%';
+  document.getElementById('prog-label').textContent = done + ' of 4 sections completed';
+}
+
+function attachFile(section) {
+  alert(`Attaching documentation for ${section}.\n\nIn production → Supabase Storage → report appendix.`);
+}
+
+function saveAndNext() {
+localStorage.setItem('zyt_s13_cooking_process_heat_data', JSON.stringify({saved:true}));
+  window.location.href = '/S-14-waste-water.html';
+}
+
+// ── INIT ──
+window.addEventListener('load', () => {
+  // Pre-demo: enter 1,200 kWh on one City Gas bill (bimonthly)
+  document.getElementById('gs-kwh').value = 1200;
+  document.getElementById('gs-period').value = '2';
+  calcGasSingle();
+  updateProgress();
+});
+</script>
+
+</body>
+</html>

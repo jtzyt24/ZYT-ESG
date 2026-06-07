@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waste & Water — ZYT.ESG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#15140d;--ink2:#42403a;--ink3:#84827a;--ink4:#c2bfb6;
+  --bg:#f3f0e9;--card:#ffffff;--b1:#e0dbd2;--b2:#eae6de;
+  --s3c:#27500a;--s3b:#eaf4ee;--s3d:#b4d9c4;
+  --gc:#1a6b4a;--gb:#eaf4ee;--gd:#b4d9c4;
+  --ac:#7a5a0a;--ab:#fdf3e0;--ad:#e8c87a;
+  --wc:#7a1a1a;--wb:#fdf0ec;--wd:#f0b4b4;
+  --bc:#1a3a7a;--bb:#edf0fc;--bd:#b4bef0;
+  --r:10px;--rl:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:14px}
+
+nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30}
+.logo{font-family:'Fraunces',serif;font-size:17px;font-weight:300;display:flex;align-items:center;gap:8px}
+.logo-tag{font-family:'DM Mono',monospace;font-size:10px;color:var(--gc);background:var(--gb);border:1px solid var(--gd);padding:2px 7px;border-radius:20px;letter-spacing:.5px}
+.nav-steps{display:flex;align-items:center;gap:4px;font-size:12px}
+.ns{padding:3px 10px;border-radius:20px;color:var(--ink3)}
+.ns.done{color:var(--gc)}.ns.done::before{content:'✓ ';font-size:10px}
+.ns.active{background:var(--ink);color:white;font-weight:500}
+.ns-sep{color:var(--ink4);font-size:10px}
+.btn-back{font-size:12px;color:var(--ink3);background:transparent;border:.5px solid var(--b1);padding:5px 12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px}
+.btn-back:hover{color:var(--ink);border-color:var(--ink3)}
+
+.layout{display:grid;grid-template-columns:1fr 300px;gap:20px;max-width:1060px;margin:0 auto;padding:28px 24px 100px;align-items:start}
+
+.cluster-hdr{background:var(--card);border:1px solid var(--b1);border-radius:var(--rl);padding:20px 22px;margin-bottom:16px;display:flex;align-items:flex-start;gap:14px}
+.hdr-icon{font-size:26px;width:50px;height:50px;background:var(--bg);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hdr-body{flex:1}
+.hdr-name{font-family:'Fraunces',serif;font-size:22px;font-weight:300;letter-spacing:-.3px;margin-bottom:3px}
+.hdr-sub{font-size:12px;color:var(--ink3);line-height:1.5;margin-bottom:8px}
+.hdr-roles{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.hdr-role{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3);background:var(--bg);border:1px solid var(--b2);padding:3px 9px;border-radius:20px}
+.prog-bar{height:3px;background:var(--b2);border-radius:2px;overflow:hidden;margin-top:10px}
+.prog-fill{height:100%;background:var(--gc);border-radius:2px;transition:width .5s ease}
+.prog-label{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);margin-top:4px}
+
+/* SCOPE CAT BANNER */
+.scope-banner{display:flex;gap:10px;margin-bottom:16px}
+.scope-badge{flex:1;padding:10px 14px;border-radius:var(--r);font-size:11px;line-height:1.5}
+.scope-badge.cat1{background:var(--bb);border:.5px solid var(--bd);color:var(--bc)}
+.scope-badge.cat5{background:var(--s3b);border:.5px solid var(--s3d);color:var(--s3c)}
+.scope-badge-label{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;margin-bottom:3px;display:block}
+
+/* SECTION */
+.section{margin-bottom:12px}
+.sec-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card);border:1px solid var(--b1);border-radius:10px 10px 0 0;cursor:pointer;user-select:none}
+.sec-hdr:hover{background:var(--bg)}
+.scope-pill{font-size:10px;font-family:'DM Mono',monospace;font-weight:500;padding:2px 8px;border-radius:8px;white-space:nowrap}
+.s3-pill{background:var(--s3b);color:var(--s3c);border:1px solid var(--s3d)}
+.s3-cat1{background:var(--bb);color:var(--bc);border:1px solid var(--bd)}
+.sec-title{font-size:13px;font-weight:500;color:var(--ink);flex:1}
+.sec-total{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);transition:color .3s}
+.sec-total.live{color:var(--gc);font-weight:500}
+.sec-chev{width:12px;height:12px;color:var(--ink3);transition:transform .2s;flex-shrink:0}
+.sec-chev.open{transform:rotate(90deg)}
+.sec-body{display:none;background:var(--card);border:1px solid var(--b1);border-top:none;border-radius:0 0 10px 10px;overflow:hidden}
+.sec-body.open{display:block}
+
+/* ACTIVITY */
+.activity{padding:16px;border-bottom:1px solid var(--b2)}
+.activity:last-child{border-bottom:none}
+.act-name-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.act-name{font-size:13px;font-weight:500;color:var(--ink)}
+.opt-tag{font-size:9px;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:6px;background:var(--ab);color:var(--ac);border:1px solid var(--ad)}
+.tip-btn{width:16px;height:16px;border-radius:50%;background:var(--bg);border:1px solid var(--b1);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;color:var(--ink3);font-family:'DM Mono',monospace;font-weight:500;flex-shrink:0;transition:background .15s,color .15s}
+.tip-btn:hover{background:var(--ink);color:white;border-color:var(--ink)}
+.act-sub{font-size:11px;color:var(--ink3);margin-bottom:10px;line-height:1.4}
+.tip-panel{display:none;background:var(--ink);color:white;border-radius:8px;padding:12px 14px;font-size:11px;line-height:1.6;margin-bottom:10px}
+.tip-panel.open{display:block;animation:fadein .15s ease}
+.tip-analogy{margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.15);font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.65)}
+.tip-ef{margin-top:4px;font-size:10px;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace}
+
+/* WASTE INPUT MODES */
+.mode-tabs{display:flex;gap:3px;background:var(--bg);border:1px solid var(--b1);border-radius:8px;padding:3px;width:fit-content;margin-bottom:10px;flex-wrap:wrap}
+.mtab{font-size:11px;padding:5px 11px;border-radius:6px;border:none;background:transparent;color:var(--ink3);cursor:pointer;transition:all .15s;white-space:nowrap}
+.mtab.active{background:var(--card);color:var(--ink);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.mode-panel{display:none}
+.mode-panel.active{display:block}
+
+/* BIN BAG HELPER */
+.bag-helper{background:var(--bg);border:.5px solid var(--b2);border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.bag-helper-title{font-size:11px;font-weight:500;color:var(--ink2);margin-bottom:8px}
+.bag-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:8px}
+.bag-btn{padding:8px 10px;border:1px solid var(--b1);border-radius:var(--r);cursor:pointer;background:var(--card);text-align:center;transition:all .15s}
+.bag-btn:hover{border-color:var(--ink3)}
+.bag-btn.active{border-color:var(--gc);background:var(--gb)}
+.bag-name{font-size:12px;font-weight:500;color:var(--ink)}
+.bag-capacity{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);margin-top:2px}
+.bag-weight{font-size:10px;color:var(--gc);font-family:'DM Mono',monospace;margin-top:1px}
+
+/* BIN COLLECTION HELPER */
+.bin-helper{background:var(--bg);border:.5px solid var(--b2);border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.bin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px;margin-bottom:10px}
+.bin-btn{padding:8px 10px;border:1px solid var(--b1);border-radius:var(--r);cursor:pointer;background:var(--card);text-align:center;transition:all .15s}
+.bin-btn:hover{border-color:var(--ink3)}
+.bin-btn.active{border-color:var(--gc);background:var(--gb)}
+.bin-size{font-size:12px;font-weight:500;color:var(--ink)}
+.bin-vol{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);margin-top:2px}
+.bin-kg{font-size:10px;color:var(--gc);font-family:'DM Mono',monospace;margin-top:1px}
+
+/* RECYCLING NOTE */
+.recycling-note{padding:8px 10px;background:var(--gb);border:.5px solid var(--gd);border-radius:7px;font-size:11px;color:var(--gc);line-height:1.5;margin-bottom:8px}
+
+/* MONTHLY GRID */
+.month-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px}
+.mcell label{display:block;font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);margin-bottom:3px}
+.minp{width:100%;height:32px;border:.5px solid var(--b1);border-radius:6px;background:var(--card);padding:0 7px;font-size:12px;color:var(--ink);outline:none;transition:border-color .15s}
+.minp:focus{border-color:var(--gc)}
+.minp.filled{background:var(--gb);border-color:var(--gd)}
+.month-summary{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:7px 10px;background:var(--bg);border-radius:7px;font-size:11px;color:var(--ink2);margin-bottom:6px}
+.ms-val{font-family:'DM Mono',monospace;font-weight:500;color:var(--ink)}
+.comp-wrap{display:flex;align-items:center;gap:5px;margin-left:auto}
+.comp-bar{width:50px;height:3px;background:var(--b2);border-radius:2px;overflow:hidden}
+.comp-fill{height:100%;background:var(--gc);border-radius:2px;transition:width .3s}
+.comp-lbl{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3)}
+
+/* FIELDS */
+.field-row{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:8px}
+.fwrap{flex:1;min-width:90px}
+.fwrap label{display:block;font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.inp{width:100%;height:36px;border:.5px solid var(--b1);border-radius:7px;background:var(--card);padding:0 10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .15s}
+.inp:focus{border-color:var(--gc)}
+.sel{width:100%;height:36px;border:.5px solid var(--b1);border-radius:7px;background:var(--card);padding:0 10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;cursor:pointer;transition:border-color .15s}
+.sel:focus{border-color:var(--gc)}
+.unit-box{height:36px;padding:0 10px;background:var(--bg);border:.5px solid var(--b2);border-radius:7px;font-size:11px;color:var(--ink3);display:flex;align-items:center;white-space:nowrap;font-family:'DM Mono',monospace}
+
+/* NA */
+.na-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.na-cb{width:14px;height:14px;cursor:pointer;accent-color:var(--ink3)}
+.na-lbl{font-size:11px;color:var(--ink3);cursor:pointer}
+
+/* RESULT PILLS */
+.result-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:.5px solid var(--b2);align-items:center}
+.rpill{display:flex;align-items:center;gap:4px;font-size:11px;padding:3px 9px;border-radius:16px;border:.5px solid;white-space:nowrap}
+.rpill.co2{background:var(--gb);color:var(--gc);border-color:var(--gd)}
+.rpill.cost{background:var(--ab);color:var(--ac);border-color:var(--ad)}
+.rpill.empty{background:var(--bg);color:var(--ink4);border-color:var(--b2)}
+.rpill-val{font-family:'DM Mono',monospace;font-weight:500}
+.acc-tag{font-size:9px;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:6px}
+.acc-h{background:var(--gb);color:var(--gc)}
+.acc-m{background:var(--ab);color:var(--ac)}
+.acc-l{background:var(--wb);color:var(--wc)}
+
+/* COST CONTEXT */
+.cost-context{display:none;margin-top:6px;font-size:11px;color:var(--ac);line-height:1.5;padding:7px 10px;background:var(--ab);border:.5px solid var(--ad);border-radius:7px}
+.cost-context.show{display:block}
+
+/* ATTACH */
+.attach-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.attach-btn{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3);background:transparent;border:.5px solid var(--b1);padding:4px 10px;border-radius:6px;cursor:pointer;transition:all .15s}
+.attach-btn:hover{color:var(--ink);border-color:var(--ink3)}
+.attach-btn svg{width:12px;height:12px}
+.attach-info{font-size:10px;color:var(--ink3);font-style:italic}
+
+/* SUMMARY */
+.summary-col{position:sticky;top:72px}
+.sum-card{background:var(--ink);border-radius:var(--rl);overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.12)}
+.sum-hdr{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-hdr-title{font-family:'Fraunces',serif;font-size:15px;font-weight:300;color:white;margin-bottom:2px}
+.sum-hdr-sub{font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.35)}
+.sum-breakdown{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-break-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.3);margin-bottom:8px}
+.break-row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px}
+.break-name{color:rgba(255,255,255,.55)}
+.break-val{font-family:'DM Mono',monospace;font-weight:500;color:white}
+.sum-total{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-est-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.3);margin-bottom:5px}
+.sum-total-val{font-family:'Fraunces',serif;font-size:26px;font-weight:300;color:white;line-height:1;letter-spacing:-.5px;transition:all .3s}
+.sum-total-unit{font-size:11px;color:rgba(255,255,255,.4);margin-top:2px}
+.sum-cost-block{margin-top:10px;padding:10px 12px;background:rgba(255,255,255,.06);border-radius:8px;border:.5px solid rgba(255,255,255,.1)}
+.sum-cost-label{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.3);margin-bottom:4px}
+.sum-cost-val{font-family:'Fraunces',serif;font-size:18px;font-weight:300;color:#f0d090;line-height:1;transition:all .3s}
+.sum-cost-desc{font-size:10px;color:rgba(255,255,255,.4);margin-top:3px;line-height:1.4}
+.sum-saving{margin-top:6px;padding:7px 10px;background:rgba(26,107,74,.25);border-radius:6px;font-size:11px;color:#a8e4c4;line-height:1.4}
+.sum-analogy{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-anal-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.25);margin-bottom:5px}
+.sum-anal-text{font-size:11px;color:rgba(255,255,255,.6);line-height:1.55;font-style:italic;transition:all .3s}
+.sum-ef{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-ef-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.25);margin-bottom:6px}
+.ef-row{display:flex;justify-content:space-between;font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.4);margin-bottom:3px}
+.ef-row span:last-child{color:rgba(255,255,255,.6)}
+.sum-actions{padding:14px 18px;display:flex;flex-direction:column;gap:8px}
+.btn-next{width:100%;height:40px;background:white;color:var(--ink);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
+.btn-next:hover{background:#f0ede6}
+.btn-next svg{width:13px;height:13px;transition:transform .15s}
+.btn-next:hover svg{transform:translateX(2px)}
+.btn-save-draft{width:100%;height:36px;background:transparent;color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.12);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s}
+.btn-save-draft:hover{color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.3)}
+
+@keyframes fadein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:768px){.layout{grid-template-columns:1fr}.summary-col{position:static}.nav-steps{display:none}.scope-banner{flex-direction:column}.bag-grid,.bin-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">ZYT.ESG <span class="logo-tag">ESG</span></div>
+  <div class="nav-steps">
+    <div class="ns done">Profile</div><div class="ns-sep">›</div>
+    <div class="ns active">Data entry</div><div class="ns-sep">›</div>
+    <div class="ns">Results</div><div class="ns-sep">›</div>
+    <div class="ns">Targets</div><div class="ns-sep">›</div>
+    <div class="ns">Report</div>
+  </div>
+  <button class="btn-back">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 2L4 6l4 4"/></svg>
+    Back to hub
+  </button>
+</nav>
+
+<div class="layout">
+<div class="form-col">
+
+<!-- CLUSTER HEADER -->
+<div class="cluster-hdr">
+  <div class="hdr-icon">♻</div>
+  <div class="hdr-body">
+    <div class="hdr-name">Waste & water</div>
+    <div class="hdr-sub">Waste generated from operations and water consumed from the public supply. Both are Scope 3 — emissions occur at the treatment facility (NEA incineration, PUB water treatment), not on your premises.</div>
+    <div class="hdr-roles">
+      <div class="hdr-role">
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="6" cy="4" r="2.5"/><path d="M2 11c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>
+        Operations / kitchen supervisor
+      </div>
+      <div class="hdr-role">
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="6" cy="4" r="2.5"/><path d="M2 11c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>
+        Facilities manager
+      </div>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="prog-label" id="prog-label">0 of 5 sections completed</div>
+  </div>
+</div>
+
+<!-- SCOPE CATEGORY BANNER -->
+<div class="scope-banner">
+  <div class="scope-badge cat5">
+    <span class="scope-badge-label">Scope 3 — Category 5</span>
+    Waste generated in operations — emissions from incineration of your business waste at NEA facilities
+  </div>
+  <div class="scope-badge cat1">
+    <span class="scope-badge-label">Scope 3 — Category 1</span>
+    Purchased goods & services — emissions from PUB water treatment and distribution
+  </div>
+</div>
+
+<!-- ══ SECTION 1: GENERAL WASTE ══ -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('general')">
+    <svg class="sec-chev open" id="chev-general" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s3-pill">Cat 5</span>
+    <span class="sec-title">General / mixed waste</span>
+    <span class="sec-total" id="st-general">—</span>
+  </div>
+  <div class="sec-body open" id="body-general">
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">General waste to incineration</div>
+        <span class="tip-btn" onclick="toggleTip('tip-general')">?</span>
+      </div>
+      <div class="act-sub">Mixed solid waste from office, operations, or manufacturing — collected by your waste contractor and sent to NEA incineration. Excludes food waste and recyclables (entered separately below).</div>
+      <div class="tip-panel" id="tip-general">
+        Singapore incinerates over 90% of its waste. When your general waste is burned, it releases CO₂. The emission factor covers all gases released during incineration of mixed waste. Reducing general waste means less incineration — and lower waste contractor costs.
+        <div class="tip-analogy">🗑 1 large bin bag (65L, ~10 kg) of general waste ≈ 10 kgCO₂e · A small office generating 5 bags/day = 50 kgCO₂e/day ≈ 18 tCO₂e/year</div>
+        <div class="tip-ef">SEFR: Waste → Other Waste → Incineration → 1.0017 kgCO₂e/kg · Source: NEA Singapore</div>
+      </div>
+
+      <div class="mode-tabs" id="gen-waste-tabs">
+        <button class="mtab active" onclick="switchMode('genwaste',['gw-bags','gw-bins','gw-kg','gw-spend'],'gw-bags',this)">By bin bags</button>
+        <button class="mtab" onclick="switchMode('genwaste',['gw-bags','gw-bins','gw-kg','gw-spend'],'gw-bins',this)">By bin collection</button>
+        <button class="mtab" onclick="switchMode('genwaste',['gw-bags','gw-bins','gw-kg','gw-spend'],'gw-kg',this)">By weight (kg)</button>
+        <button class="mtab" onclick="switchMode('genwaste',['gw-bags','gw-bins','gw-kg','gw-spend'],'gw-spend',this)">By contractor spend</button>
+      </div>
+
+      <!-- BY BIN BAGS -->
+      <div class="mode-panel active" id="gw-bags">
+        <div class="bag-helper">
+          <div class="bag-helper-title">Select your bag size</div>
+          <div class="bag-grid">
+            <button class="bag-btn" data-L="35" data-kg="5" onclick="selectBag(this,'genwaste')">
+              <div class="bag-name">Small</div>
+              <div class="bag-capacity">35L bag</div>
+              <div class="bag-weight">~5 kg each</div>
+            </button>
+            <button class="bag-btn active" data-L="65" data-kg="10" onclick="selectBag(this,'genwaste')">
+              <div class="bag-name">Large</div>
+              <div class="bag-capacity">65L bag</div>
+              <div class="bag-weight">~10 kg each</div>
+            </button>
+            <button class="bag-btn" data-L="110" data-kg="18" onclick="selectBag(this,'genwaste')">
+              <div class="bag-name">Extra large</div>
+              <div class="bag-capacity">110L bag</div>
+              <div class="bag-weight">~18 kg each</div>
+            </button>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="fwrap"><label>Bags per day (estimate)</label><input class="inp" type="number" id="gw-bags-day" placeholder="e.g. 3" step="0.5" oninput="calcGenWaste()"></div>
+          <div class="fwrap" style="flex:.5"><label>Working days / month</label><input class="inp" type="number" id="gw-days" value="26" oninput="calcGenWaste()"></div>
+        </div>
+        <div id="gw-bags-derived" style="font-size:11px;color:var(--ink3);margin-bottom:6px"></div>
+      </div>
+
+      <!-- BY BIN COLLECTION -->
+      <div class="mode-panel" id="gw-bins">
+        <div class="bin-helper">
+          <div class="bag-helper-title" style="margin-bottom:8px">Select your bin size</div>
+          <div class="bin-grid">
+            <button class="bin-btn active" data-vol="120" data-kg="40" onclick="selectBin(this,'genwaste')">
+              <div class="bin-size">120 L</div>
+              <div class="bin-vol">Small wheeled bin</div>
+              <div class="bin-kg">~40 kg/collection</div>
+            </button>
+            <button class="bin-btn" data-vol="240" data-kg="80" onclick="selectBin(this,'genwaste')">
+              <div class="bin-size">240 L</div>
+              <div class="bin-vol">Standard bin</div>
+              <div class="bin-kg">~80 kg/collection</div>
+            </button>
+            <button class="bin-btn" data-vol="660" data-kg="200" onclick="selectBin(this,'genwaste')">
+              <div class="bin-size">660 L</div>
+              <div class="bin-vol">Large bin</div>
+              <div class="bin-kg">~200 kg/collection</div>
+            </button>
+            <button class="bin-btn" data-vol="1100" data-kg="330" onclick="selectBin(this,'genwaste')">
+              <div class="bin-size">1,100 L</div>
+              <div class="bin-vol">Jumbo bin</div>
+              <div class="bin-kg">~330 kg/collection</div>
+            </button>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="fwrap"><label>Collections per week</label><input class="inp" type="number" id="gw-collections-pw" placeholder="e.g. 3" step="0.5" oninput="calcGenWasteBin()"></div>
+          <div class="fwrap" style="flex:.5"><label>Number of bins</label><input class="inp" type="number" id="gw-bin-count" value="1" min="1" oninput="calcGenWasteBin()"></div>
+        </div>
+        <div id="gw-bins-derived" style="font-size:11px;color:var(--ink3);margin-bottom:6px"></div>
+      </div>
+
+      <!-- BY WEIGHT -->
+      <div class="mode-panel" id="gw-kg">
+        <div class="field-row">
+          <div class="fwrap"><label>Average monthly weight</label><input class="inp" type="number" id="gw-kg-month" placeholder="e.g. 300" oninput="calcGenWasteKg()"></div>
+          <div class="unit-box">kg / month</div>
+          <div style="display:flex;align-items:center;padding-bottom:2px;font-size:11px;color:var(--ink3)">or</div>
+          <div class="fwrap"><label>Annual weight</label><input class="inp" type="number" id="gw-kg-year" placeholder="kg / year" oninput="calcGenWasteKgYear()"></div>
+        </div>
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">Check with your waste contractor — many provide monthly weight reports. Alternatively, weigh a sample bag and multiply by daily bag count.</div>
+      </div>
+
+      <!-- BY SPEND -->
+      <div class="mode-panel" id="gw-spend">
+        <div class="field-row">
+          <div class="fwrap"><label>Monthly waste contractor fee</label><input class="inp" type="number" id="gw-spend-month" placeholder="e.g. 200" oninput="calcGenWasteSpend()"></div>
+          <div class="unit-box">SGD / month</div>
+        </div>
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">Spend-based estimate — least accurate but widely available from accounts. Uses a rough conversion factor. Switch to weight or bag count for better accuracy.</div>
+      </div>
+
+      <div class="result-row" id="result-general">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual contractor cost</span></div>
+        <span class="acc-tag" id="gen-acc" style="display:none"></span>
+      </div>
+      <div class="cost-context" id="cost-ctx-general">
+        💡 This is what you pay your waste contractor. Reducing general waste through better sorting and packaging reduction lowers both the carbon footprint and the waste disposal cost.
+      </div>
+      <div class="attach-row">
+        <button class="attach-btn" onclick="attachFile('general')">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 1H3a1 1 0 00-1 1v8a1 1 0 001 1h6a1 1 0 001-1V4L8 1z"/><path d="M8 1v3h3"/></svg>
+          Attach waste contractor invoices
+        </button>
+        <span class="attach-info">For audit reference</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 2: FOOD WASTE ══ -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('food')">
+    <svg class="sec-chev" id="chev-food" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s3-pill">Cat 5</span>
+    <span class="sec-title">Food waste</span>
+    <span class="sec-total" id="st-food">—</span>
+  </div>
+  <div class="sec-body" id="body-food">
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">Food waste to incineration <span class="opt-tag">F&B / hospitality</span></div>
+        <span class="tip-btn" onclick="toggleTip('tip-food')">?</span>
+      </div>
+      <div class="act-sub">Food scraps, spoilage, and kitchen waste sent to incineration. Food waste has a lower emission factor than general waste at the incinerator — but it represents wasted food cost on top of the disposal cost.</div>
+      <div class="tip-panel" id="tip-food">
+        Food waste is Singapore's second largest waste stream. When incinerated, organic matter releases CO₂. The emission factor is lower than general waste because food has a lower carbon content by mass. However, reducing food waste saves both the incineration emissions and the cost of the food itself — making it one of the highest-ROI sustainability actions for F&B businesses.
+        <div class="tip-analogy">🍱 A restaurant wasting 20 kg of food per day × 26 days = 520 kg/month ≈ 3.6 tCO₂e/year from disposal alone — not counting the food cost</div>
+        <div class="tip-ef">SEFR: Waste → Food Waste → Incineration → 0.5698 kgCO₂e/kg · Source: NEA Singapore</div>
+      </div>
+
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="food-na" onchange="toggleNA('food-inputs',this,'food')">
+        <label class="na-lbl" for="food-na">We don't generate significant food waste (non-F&B business)</label>
+      </div>
+      <div id="food-inputs">
+        <div class="mode-tabs" id="food-tabs">
+          <button class="mtab active" onclick="switchMode('food',['food-bags','food-kg'],'food-bags',this)">By bin bags</button>
+          <button class="mtab" onclick="switchMode('food',['food-bags','food-kg'],'food-kg',this)">By weight (kg)</button>
+        </div>
+        <div class="mode-panel active" id="food-bags">
+          <div class="field-row">
+            <div class="fwrap"><label>Food waste bags per day</label><input class="inp" type="number" id="fw-bags-day" placeholder="e.g. 2" step="0.5" oninput="calcFoodWaste()"></div>
+            <div class="fwrap" style="flex:.5"><label>Working days / month</label><input class="inp" type="number" id="fw-days" value="26" oninput="calcFoodWaste()"></div>
+          </div>
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">Food waste is denser than general waste — a 65L bag holds ~25 kg. Estimate by how full your food waste bin is each day.</div>
+        </div>
+        <div class="mode-panel" id="food-kg">
+          <div class="field-row">
+            <div class="fwrap"><label>Average monthly food waste</label><input class="inp" type="number" id="fw-kg-month" placeholder="e.g. 650" oninput="calcFoodWasteKg()"></div>
+            <div class="unit-box">kg / month</div>
+          </div>
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">NEA's food waste calculator or your waste contractor may have this data. Some commercial kitchens weigh daily food waste as part of operations.</div>
+        </div>
+      </div>
+      <div class="result-row" id="result-food">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>est. food cost wasted</span></div>
+      </div>
+      <div class="cost-context" id="cost-ctx-food">
+        💡 Reducing food waste saves both the disposal cost and the food cost itself. Portion control and FIFO stock rotation typically cut food waste by 20–40% with no capital investment.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 3: PLASTICS ══ -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('plastics')">
+    <svg class="sec-chev" id="chev-plastics" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s3-pill">Cat 5</span>
+    <span class="sec-title">Plastics & packaging waste</span>
+    <span class="sec-total" id="st-plastics">—</span>
+  </div>
+  <div class="sec-body" id="body-plastics">
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">Plastic packaging & single-use plastics <span class="opt-tag">optional</span></div>
+        <span class="tip-btn" onclick="toggleTip('tip-plastics')">?</span>
+      </div>
+      <div class="act-sub">Single-use plastic packaging, bags, films, and containers discarded after use. Plastic has the highest emission factor of all waste types due to its petroleum origin.</div>
+      <div class="tip-panel" id="tip-plastics">
+        Plastic is derived from petroleum — when incinerated, it releases more CO₂ per kg than most other waste types. Even small amounts of plastic waste have a disproportionate carbon impact. Switching to compostable or paper packaging is one of the most impactful packaging decisions for F&B businesses.
+        <div class="tip-analogy">🛍 1 kg of plastic packaging waste ≈ 2.89 kgCO₂e — nearly 3× more than the same weight of general mixed waste</div>
+        <div class="tip-ef">SEFR: Waste → Plastic Waste → Incineration → 2.8933 kgCO₂e/kg · Source: NEA Singapore</div>
+      </div>
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="plastics-na" onchange="toggleNA('plastics-inputs',this,'plastics')">
+        <label class="na-lbl" for="plastics-na">We generate no significant plastic waste</label>
+      </div>
+      <div id="plastics-inputs">
+        <div class="field-row">
+          <div class="fwrap"><label>Monthly plastic waste</label><input class="inp" type="number" id="pw-kg-month" placeholder="e.g. 30" oninput="calcPlastics()"></div>
+          <div class="unit-box">kg / month</div>
+        </div>
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">Estimate by weighing a typical day's plastic waste × working days. For retail: count packaging materials discarded per week. 1 standard plastic bag ≈ 7g.</div>
+      </div>
+      <div class="result-row" id="result-plastics">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+      </div>
+      <div class="cost-context" id="cost-ctx-plastics">
+        💡 Plastic has the highest emission factor of all waste types. Switching to paper or compostable alternatives reduces both carbon and disposal costs — and is increasingly required by corporate buyers.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 4: RECYCLABLES ══ -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('recycling')">
+    <svg class="sec-chev" id="chev-recycling" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s3-pill">Cat 5</span>
+    <span class="sec-title">Recyclables — paper, cardboard, metal, glass</span>
+    <span class="sec-total" id="st-recycling">—</span>
+  </div>
+  <div class="sec-body" id="body-recycling">
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">Verified recyclable waste <span class="opt-tag">optional</span></div>
+        <span class="tip-btn" onclick="toggleTip('tip-recycling')">?</span>
+      </div>
+      <div class="act-sub">Waste separated for recycling and collected by a licensed recycler. Only enter waste that is actually recycled — not what goes into blue bins (most blue bin content ends up incinerated in Singapore).</div>
+      <div class="tip-panel" id="tip-recycling">
+        GHG Protocol allows a near-zero emission factor for verified recycled waste (compared to incineration). However, Singapore's actual recycling rates are low — most material placed in blue bins still ends up at the incinerator after contamination sorting. Only claim the recycling factor if you have a verified collection contract with a licensed recycler (e.g. cardboard baled and collected by a scrap dealer, e-waste through NEA-licensed collectors).
+        <div class="tip-analogy">📦 Verified recycled cardboard ≈ near-zero kgCO₂e · Same cardboard incinerated ≈ 1.29 kgCO₂e/kg — recycling makes a significant difference when actually verified</div>
+        <div class="tip-ef">GHG Protocol: verified recycling ≈ 0–0.1 kgCO₂e/kg depending on type · Contrast: incineration 1.29 kgCO₂e/kg (paper), 0.0005 (glass), 0.0005 (metal)</div>
+      </div>
+
+      <div class="recycling-note">
+        ⚠️ <strong>Singapore recycling caveat:</strong> Only claim the recycling emission factor if you have a verified collection contract with a licensed recycler. Blue bin recycling should not be claimed — contamination rates mean most blue bin content is incinerated. When in doubt, use the incineration factor and note it as conservative.
+      </div>
+
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="recycling-na" checked onchange="toggleNA('recycling-inputs',this,'recycling')">
+        <label class="na-lbl" for="recycling-na">We don't have verified recycling contracts (use incineration factor above)</label>
+      </div>
+      <div id="recycling-inputs" style="opacity:.3;pointer-events:none">
+        <div class="field-row">
+          <div class="fwrap"><label>Material type</label>
+            <select class="sel" id="rec-type" onchange="calcRecycling()">
+              <option value="0.05">Cardboard / paper (verified recycled)</option>
+              <option value="0.05">Metal (verified recycled)</option>
+              <option value="0.02">Glass (verified recycled)</option>
+              <option value="0.10">Mixed recyclables (conservative)</option>
+            </select>
+          </div>
+          <div class="fwrap"><label>Monthly quantity</label><input class="inp" type="number" id="rec-kg-month" placeholder="e.g. 100" oninput="calcRecycling()"></div>
+          <div class="unit-box">kg / month</div>
+        </div>
+      </div>
+      <div class="result-row" id="result-recycling">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 5: PUB WATER ══ -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('water')">
+    <svg class="sec-chev" id="chev-water" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s3-cat1">Cat 1</span>
+    <span class="sec-title">PUB water consumption</span>
+    <span class="sec-total" id="st-water">—</span>
+  </div>
+  <div class="sec-body" id="body-water">
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">Potable water from PUB supply</div>
+        <span class="tip-btn" onclick="toggleTip('tip-water')">?</span>
+      </div>
+      <div class="act-sub">Water consumed from Singapore's public supply. Emissions come from the energy used to treat, pump, and distribute water across the island. Your PUB bill (through SP Group) shows consumption in cubic metres.</div>
+      <div class="tip-panel" id="tip-water">
+        Every cubic metre of water you use requires energy to pump from reservoirs, treat to drinking standard, and distribute to your premises. PUB has published the emission factor for this process. Water reduction also reduces waterborne tax and water conservation tax — which add significantly to your water bill.
+        <div class="tip-analogy">💧 1 m³ = 1,000 litres of water ≈ 0.57 kgCO₂e · Your April 2026 SP bill: 11.8 m³ ≈ 6.7 kgCO₂e for that billing period</div>
+        <div class="tip-ef">SEFR: Water → Potable Water and NEWater → 0.5662 kgCO₂e/m³ · Source: PUB, Singapore · Includes treatment + distribution energy</div>
+      </div>
+
+      <div class="mode-tabs" id="water-tabs">
+        <button class="mtab active" onclick="switchMode('water',['water-monthly','water-annual','water-single'],'water-monthly',this)">Month by month ★</button>
+        <button class="mtab" onclick="switchMode('water',['water-monthly','water-annual','water-single'],'water-annual',this)">Annual total</button>
+        <button class="mtab" onclick="switchMode('water',['water-monthly','water-annual','water-single'],'water-single',this)">One bill (quick start)</button>
+      </div>
+
+      <!-- MONTHLY -->
+      <div class="mode-panel active" id="water-monthly">
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:8px">Enter m³ from your monthly water bill (shown on your SP utilities statement). PUB bills arrive monthly.</div>
+        <div class="month-grid" id="water-month-grid"></div>
+        <div class="month-summary">
+          Total: <span class="ms-val" id="wm-total">0</span> m³ &nbsp;·&nbsp;
+          Avg: <span class="ms-val" id="wm-avg">—</span>/mo &nbsp;·&nbsp;
+          ~ <span class="ms-val" id="wm-co2">0</span> tCO₂e/yr
+          <div class="comp-wrap"><div class="comp-bar"><div class="comp-fill" id="wm-comp" style="width:0%"></div></div><span class="comp-lbl" id="wm-comp-lbl">0/12</span></div>
+        </div>
+      </div>
+
+      <!-- ANNUAL -->
+      <div class="mode-panel" id="water-annual">
+        <div class="field-row">
+          <div class="fwrap"><label>Annual water consumption</label><input class="inp" type="number" id="wa-m3" placeholder="e.g. 142" oninput="calcWaterAnnual()"></div>
+          <div class="unit-box">m³ / yr</div>
+          <div style="display:flex;align-items:center;padding-bottom:2px;font-size:11px;color:var(--ink3)">or</div>
+          <div class="fwrap"><label>Annual water bill (SGD)</label><input class="inp" type="number" id="wa-sgd" placeholder="SGD / yr" oninput="calcWaterAnnualBill()"></div>
+        </div>
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">PUB water tariff (Q2 2026): SGD 1.43/m³ (first 40m³ domestic) to SGD 3.84/m³ (non-domestic above 40m³). Use actual bill for accuracy.</div>
+      </div>
+
+      <!-- SINGLE BILL -->
+      <div class="mode-panel" id="water-single">
+        <div class="field-row">
+          <div class="fwrap"><label>Monthly consumption (m³)</label><input class="inp" type="number" id="ws-m3" placeholder="e.g. 11.8" step="0.1" oninput="calcWaterSingle()"></div>
+          <div class="unit-box">m³ / month</div>
+          <div style="display:flex;align-items:center;padding-bottom:2px;font-size:11px;color:var(--ink3)">or</div>
+          <div class="fwrap"><label>Monthly bill amount (SGD)</label><input class="inp" type="number" id="ws-sgd" placeholder="SGD" oninput="calcWaterSingleBill()"></div>
+        </div>
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">From your SP utilities bill — water consumption shown in m³. Your April 2026 bill showed 11.8 m³ as a reference point.</div>
+      </div>
+
+      <div class="result-row" id="result-water">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual water bill</span></div>
+        <span class="acc-tag" id="water-acc" style="display:none"></span>
+      </div>
+      <div class="cost-context" id="cost-ctx-water">
+        💡 This is your annual water bill. Singapore water includes waterborne tax and water conservation tax — reducing consumption reduces all three components. Water-efficient fittings and leak detection are typically low-cost, high-return actions.
+      </div>
+      <div class="attach-row">
+        <button class="attach-btn" onclick="attachFile('water')">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 1H3a1 1 0 00-1 1v8a1 1 0 001 1h6a1 1 0 001-1V4L8 1z"/><path d="M8 1v3h3"/></svg>
+          Attach water bills
+        </button>
+        <span class="attach-info">SP utilities statements showing m³ consumption</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /form-col -->
+
+<!-- ══ SUMMARY PANEL ══ -->
+<div class="summary-col">
+<div class="sum-card">
+  <div class="sum-hdr">
+    <div class="sum-hdr-title">Estimated cluster total</div>
+    <div class="sum-hdr-sub">Waste & water · 2024</div>
+  </div>
+  <div class="sum-breakdown">
+    <div class="sum-break-lbl">Breakdown</div>
+    <div class="break-row"><span class="break-name">General waste</span><span class="break-val" id="sum-general">—</span></div>
+    <div class="break-row"><span class="break-name">Food waste</span><span class="break-val" id="sum-food">—</span></div>
+    <div class="break-row"><span class="break-name">Plastics</span><span class="break-val" id="sum-plastics">—</span></div>
+    <div class="break-row"><span class="break-name">Recyclables (verified)</span><span class="break-val" id="sum-recycling">—</span></div>
+    <div class="break-row" style="border-top:.5px solid rgba(255,255,255,.1);padding-top:6px;margin-top:2px">
+      <span class="break-name">PUB water</span><span class="break-val" id="sum-water">—</span>
+    </div>
+  </div>
+  <div class="sum-total">
+    <div class="sum-est-lbl">Estimated total</div>
+    <div class="sum-total-val" id="sum-total">0</div>
+    <div class="sum-total-unit">tCO₂e / year</div>
+    <div class="sum-cost-block">
+      <div class="sum-cost-label">Annual waste & water spend</div>
+      <div class="sum-cost-val" id="sum-cost">—</div>
+      <div class="sum-cost-desc">Waste contractor fees + water bills. Reducing waste and water consumption reduces both costs directly.</div>
+      <div class="sum-saving" id="sum-saving" style="display:none">
+        💡 A 20% reduction could save approximately <strong id="sum-saving-val">—</strong>/year
+      </div>
+    </div>
+  </div>
+  <div class="sum-analogy">
+    <div class="sum-anal-lbl">What this means</div>
+    <div class="sum-anal-text" id="sum-analogy">Enter your waste or water data to see your value chain emissions.</div>
+  </div>
+  <div class="sum-ef">
+    <div class="sum-ef-lbl">Emission factors (SEFR / NEA / PUB)</div>
+    <div class="ef-row"><span>General waste (incineration)</span><span>1.002 kgCO₂/kg</span></div>
+    <div class="ef-row"><span>Food waste (incineration)</span><span>0.570 kgCO₂/kg</span></div>
+    <div class="ef-row"><span>Plastics (incineration)</span><span>2.893 kgCO₂/kg</span></div>
+    <div class="ef-row"><span>PUB water</span><span>0.566 kgCO₂/m³</span></div>
+    <div class="ef-row"><span>Source</span><span>SEFR Jan 2026 · NEA · PUB</span></div>
+  </div>
+  <div class="sum-actions">
+    <button class="btn-next" onclick="saveAndNext()">
+      Save & go to People & commuting
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg>
+    </button>
+    <button class="btn-save-draft">Save & exit</button>
+  </div>
+</div>
+</div>
+
+</div><!-- /layout -->
+
+<script>
+// ── EMISSION FACTORS ──
+const EF = {
+  general: 1.0017,   // kgCO₂/kg — SEFR incineration mixed waste
+  food: 0.5698,      // kgCO₂/kg — SEFR incineration food waste
+  plastics: 2.8933,  // kgCO₂/kg — SEFR incineration plastics
+  recycling: 0.05,   // kgCO₂/kg — verified recycling (near-zero)
+  water: 0.5662,     // kgCO₂/m³ — PUB/SEFR
+};
+
+// PUB tariff for bill → m³ conversion (non-domestic, approx blended rate)
+const PRICE = {
+  water_m3: 3.10,         // SGD/m³ non-domestic blended (approx incl waterborne + conservation tax)
+  waste_per_kg: 0.50,     // SGD/kg rough waste contractor cost
+  food_per_kg: 8.00,      // SGD/kg food cost of wasted food (conservative)
+  plastics_per_kg: 0.40,  // SGD/kg rough disposal cost
+};
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ── STATE ──
+const S = {
+  general: { co2:0, sgd:0, kg_yr:0 },
+  food:    { co2:0, sgd:0, kg_yr:0 },
+  plastics:{ co2:0, sgd:0 },
+  recycling:{ co2:0 },
+  water:   { co2:0, sgd:0, m3_yr:0, acc:null },
+  // Bag/bin state for general waste
+  gw_bag_kg: 10,    // default large bag
+  gw_bin_kg: 40,    // default 120L bin
+};
+
+// ── BUILD MONTH GRID ──
+function buildGrid(id, unit, calcFn) {
+  const g = document.getElementById(id);
+  if (!g) return;
+  MONTHS.forEach((m, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'mcell';
+    cell.innerHTML = `<label>${m}</label><input class="minp empty" type="number" id="${id}-${i}" placeholder="${unit}" oninput="${calcFn}()" step="0.1">`;
+    g.appendChild(cell);
+  });
+}
+buildGrid('water-month-grid', 'm³', 'calcWaterMonthly');
+
+// ── SECTION / TIP TOGGLES ──
+function toggleSec(id) {
+  const body = document.getElementById('body-' + id);
+  const chev = document.getElementById('chev-' + id);
+  const open = body.classList.contains('open');
+  body.classList.toggle('open', !open);
+  chev.classList.toggle('open', !open);
+}
+function toggleTip(id) { document.getElementById(id).classList.toggle('open'); }
+
+// ── MODE SWITCH ──
+function switchMode(group, panels, activeId, btn) {
+  btn.parentElement.querySelectorAll('.mtab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  panels.forEach(p => document.getElementById(p).classList.toggle('active', p === activeId));
+}
+
+// ── NA TOGGLE ──
+function toggleNA(inputId, cb, key) {
+  const el = document.getElementById(inputId);
+  el.style.opacity = cb.checked ? '0.3' : '1';
+  el.style.pointerEvents = cb.checked ? 'none' : '';
+  if (cb.checked && S[key]) { S[key].co2 = 0; if(S[key].sgd !== undefined) S[key].sgd = 0; }
+  updateProgress(); updateSummary();
+}
+
+// ── BAG SELECTOR ──
+function selectBag(btn, group) {
+  btn.parentElement.querySelectorAll('.bag-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  S.gw_bag_kg = parseFloat(btn.dataset.kg) || 10;
+  calcGenWaste();
+}
+
+// ── BIN SELECTOR ──
+function selectBin(btn, group) {
+  btn.parentElement.querySelectorAll('.bin-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  S.gw_bin_kg = parseFloat(btn.dataset.kg) || 40;
+  calcGenWasteBin();
+}
+
+// ── GENERAL WASTE CALCULATIONS ──
+function calcGenWaste() {
+  const bags = parseFloat(document.getElementById('gw-bags-day').value) || 0;
+  const days = parseFloat(document.getElementById('gw-days').value) || 26;
+  const kg_month = bags * S.gw_bag_kg * days;
+  const kg_yr = kg_month * 12;
+  document.getElementById('gw-bags-derived').textContent =
+    bags > 0 ? `≈ ${kg_month.toFixed(0)} kg/month · ${kg_yr.toFixed(0)} kg/year` : '';
+  setGenWaste(kg_yr, 'medium');
+}
+
+function calcGenWasteBin() {
+  const collections = parseFloat(document.getElementById('gw-collections-pw').value) || 0;
+  const binCount = parseFloat(document.getElementById('gw-bin-count').value) || 1;
+  const kg_month = collections * binCount * S.gw_bin_kg * 4.33; // 4.33 weeks/month
+  const kg_yr = kg_month * 12;
+  document.getElementById('gw-bins-derived').textContent =
+    collections > 0 ? `≈ ${kg_month.toFixed(0)} kg/month · ${kg_yr.toFixed(0)} kg/year` : '';
+  setGenWaste(kg_yr, 'medium');
+}
+
+function calcGenWasteKg() {
+  const kg_month = parseFloat(document.getElementById('gw-kg-month').value) || 0;
+  setGenWaste(kg_month * 12, 'high');
+}
+
+function calcGenWasteKgYear() {
+  const kg_yr = parseFloat(document.getElementById('gw-kg-year').value) || 0;
+  setGenWaste(kg_yr, 'high');
+}
+
+function calcGenWasteSpend() {
+  const sgd_month = parseFloat(document.getElementById('gw-spend-month').value) || 0;
+  // Rough: SGD 200/month ≈ 240L bin × 3/week = ~400kg/month (SGD 0.50/kg)
+  const kg_yr = sgd_month * 12 / PRICE.waste_per_kg;
+  S.general.sgd = sgd_month * 12;
+  setGenWaste(kg_yr, 'low');
+  S.general.sgd = sgd_month * 12; // preserve actual spend
+}
+
+function setGenWaste(kg_yr, acc) {
+  const co2 = kg_yr * EF.general / 1000;
+  const sgd = S.general.sgd > 0 ? S.general.sgd : kg_yr * PRICE.waste_per_kg;
+  S.general.co2 = co2; S.general.kg_yr = kg_yr;
+  if (!S.general.sgd || acc !== 'low') S.general.sgd = sgd;
+  const r = document.getElementById('result-general').querySelectorAll('.rpill');
+  const accEl = document.getElementById('gen-acc');
+  if (co2 > 0) {
+    r[0].className = 'rpill co2';
+    r[0].innerHTML = `<span class="rpill-val">~ ${co2.toFixed(2)}</span><span>tCO₂e / yr</span>`;
+    r[1].className = 'rpill cost';
+    r[1].innerHTML = `<span class="rpill-val">≈ SGD ${Math.round(S.general.sgd).toLocaleString()}</span><span>annual contractor cost</span>`;
+    accEl.style.display = 'inline-block';
+    accEl.className = 'acc-tag ' + { high:'acc-h', medium:'acc-m', low:'acc-l' }[acc];
+    accEl.textContent = { high:'Accuracy: high — weighed', medium:'Accuracy: medium — estimated', low:'Accuracy: low — spend-based' }[acc];
+    document.getElementById('cost-ctx-general').className = 'cost-context show';
+    document.getElementById('st-general').textContent = `~ ${co2.toFixed(1)} tCO₂e`;
+    document.getElementById('st-general').className = 'sec-total live';
+  }
+  updateSummary();
+}
+
+// ── FOOD WASTE ──
+function calcFoodWaste() {
+  const bags = parseFloat(document.getElementById('fw-bags-day').value) || 0;
+  const days = parseFloat(document.getElementById('fw-days').value) || 26;
+  const kg_yr = bags * 25 * days * 12; // 65L food bag ≈ 25kg
+  setFoodWaste(kg_yr);
+}
+
+function calcFoodWasteKg() {
+  const kg_month = parseFloat(document.getElementById('fw-kg-month').value) || 0;
+  setFoodWaste(kg_month * 12);
+}
+
+function setFoodWaste(kg_yr) {
+  const co2 = kg_yr * EF.food / 1000;
+  const foodCost = kg_yr * PRICE.food_per_kg; // cost of wasted food
+  S.food.co2 = co2; S.food.kg_yr = kg_yr; S.food.sgd = foodCost;
+  const r = document.getElementById('result-food').querySelectorAll('.rpill');
+  if (co2 > 0) {
+    r[0].className = 'rpill co2'; r[0].innerHTML = `<span class="rpill-val">~ ${co2.toFixed(2)}</span><span>tCO₂e / yr</span>`;
+    r[1].className = 'rpill cost'; r[1].innerHTML = `<span class="rpill-val">≈ SGD ${Math.round(foodCost).toLocaleString()}</span><span>est. food cost wasted</span>`;
+    document.getElementById('cost-ctx-food').className = 'cost-context show';
+    document.getElementById('st-food').textContent = `~ ${co2.toFixed(2)} tCO₂e`;
+    document.getElementById('st-food').className = 'sec-total live';
+  }
+  updateSummary();
+}
+
+// ── PLASTICS ──
+function calcPlastics() {
+  const kg_month = parseFloat(document.getElementById('pw-kg-month').value) || 0;
+  const co2 = kg_month * 12 * EF.plastics / 1000;
+  S.plastics.co2 = co2;
+  const r = document.getElementById('result-plastics').querySelectorAll('.rpill');
+  if (co2 > 0) {
+    r[0].className = 'rpill co2'; r[0].innerHTML = `<span class="rpill-val">~ ${co2.toFixed(2)}</span><span>tCO₂e / yr</span>`;
+    document.getElementById('cost-ctx-plastics').className = 'cost-context show';
+    document.getElementById('st-plastics').textContent = `~ ${co2.toFixed(2)} tCO₂e`;
+    document.getElementById('st-plastics').className = 'sec-total live';
+  }
+  updateSummary();
+}
+
+// ── RECYCLING ──
+function calcRecycling() {
+  const ef = parseFloat(document.getElementById('rec-type').value) || 0.05;
+  const kg_month = parseFloat(document.getElementById('rec-kg-month').value) || 0;
+  S.recycling.co2 = kg_month * 12 * ef / 1000;
+  const r = document.getElementById('result-recycling').querySelectorAll('.rpill');
+  if (S.recycling.co2 > 0) {
+    r[0].className = 'rpill co2'; r[0].innerHTML = `<span class="rpill-val">~ ${S.recycling.co2.toFixed(3)}</span><span>tCO₂e / yr (verified recycled)</span>`;
+    document.getElementById('st-recycling').textContent = `~ ${S.recycling.co2.toFixed(3)} tCO₂e`;
+    document.getElementById('st-recycling').className = 'sec-total live';
+  }
+  updateSummary();
+}
+
+// ── WATER CALCULATIONS ──
+function calcWaterMonthly() {
+  let total = 0, filled = 0;
+  MONTHS.forEach((_, i) => {
+    const inp = document.getElementById(`water-month-grid-${i}`);
+    const v = parseFloat(inp.value) || 0;
+    if (v > 0) { total += v; filled++; inp.className = 'minp filled'; }
+    else inp.className = 'minp empty';
+  });
+  const annual = filled > 0 ? (total / filled) * 12 : 0;
+  S.water.m3_yr = annual; S.water.sgd = annual * PRICE.water_m3;
+  S.water.acc = filled === 12 ? 'h' : filled >= 6 ? 'm' : filled > 0 ? 'l' : null;
+  const pct = Math.round(filled / 12 * 100);
+  document.getElementById('wm-total').textContent = total.toFixed(1);
+  document.getElementById('wm-avg').textContent = filled > 0 ? (total/filled).toFixed(1) : '—';
+  document.getElementById('wm-co2').textContent = (annual * EF.water / 1000).toFixed(3);
+  document.getElementById('wm-comp').style.width = pct + '%';
+  document.getElementById('wm-comp-lbl').textContent = filled + '/12';
+  if (filled > 0) showWaterResult(annual);
+  else clearWaterResult();
+  updateSummary();
+}
+
+function calcWaterAnnual() {
+  const m3 = parseFloat(document.getElementById('wa-m3').value) || 0;
+  S.water.m3_yr = m3; S.water.sgd = m3 * PRICE.water_m3; S.water.acc = 'm';
+  document.getElementById('wa-sgd').value = '';
+  if (m3) showWaterResult(m3); else clearWaterResult();
+  updateSummary();
+}
+
+function calcWaterAnnualBill() {
+  const sgd = parseFloat(document.getElementById('wa-sgd').value) || 0;
+  const m3 = sgd / PRICE.water_m3;
+  S.water.m3_yr = m3; S.water.sgd = sgd; S.water.acc = 'm';
+  document.getElementById('wa-m3').value = m3.toFixed(1);
+  if (sgd) showWaterResult(m3); else clearWaterResult();
+  updateSummary();
+}
+
+function calcWaterSingle() {
+  const m3 = parseFloat(document.getElementById('ws-m3').value) || 0;
+  S.water.m3_yr = m3 * 12; S.water.sgd = m3 * 12 * PRICE.water_m3; S.water.acc = 'l';
+  document.getElementById('ws-sgd').value = '';
+  if (m3) showWaterResult(m3 * 12); else clearWaterResult();
+  updateSummary();
+}
+
+function calcWaterSingleBill() {
+  const sgd = parseFloat(document.getElementById('ws-sgd').value) || 0;
+  const m3 = sgd / PRICE.water_m3;
+  S.water.m3_yr = m3 * 12; S.water.sgd = sgd * 12; S.water.acc = 'l';
+  document.getElementById('ws-m3').value = m3.toFixed(1);
+  if (sgd) showWaterResult(m3 * 12); else clearWaterResult();
+  updateSummary();
+}
+
+function showWaterResult(m3_yr) {
+  const co2 = m3_yr * EF.water / 1000;
+  S.water.co2 = co2;
+  const acc = S.water.acc || 'l';
+  const pre = acc === 'h' ? '' : '~';
+  const r = document.getElementById('result-water').querySelectorAll('.rpill');
+  r[0].className = 'rpill co2';
+  r[0].innerHTML = `<span class="rpill-val">${pre}${co2.toFixed(3)}</span><span>tCO₂e / yr</span>`;
+  r[1].className = 'rpill cost';
+  r[1].innerHTML = `<span class="rpill-val">≈ SGD ${Math.round(S.water.sgd).toLocaleString()}</span><span>annual water bill</span>`;
+  const accEl = document.getElementById('water-acc');
+  accEl.style.display = 'inline-block';
+  accEl.className = 'acc-tag ' + { h:'acc-h', m:'acc-m', l:'acc-l' }[acc];
+  accEl.textContent = { h:'Accuracy: high — all months', m:'Accuracy: medium', l:'Accuracy: low — extrapolated' }[acc];
+  document.getElementById('cost-ctx-water').className = 'cost-context show';
+  document.getElementById('st-water').textContent = `~ ${co2.toFixed(3)} tCO₂e`;
+  document.getElementById('st-water').className = 'sec-total live';
+}
+
+function clearWaterResult() {
+  S.water.co2 = 0;
+  const r = document.getElementById('result-water').querySelectorAll('.rpill');
+  r[0].className = 'rpill empty'; r[0].innerHTML = '<span class="rpill-val">—</span><span>tCO₂e / yr</span>';
+  r[1].className = 'rpill empty'; r[1].innerHTML = '<span class="rpill-val">—</span><span>annual water bill</span>';
+  document.getElementById('water-acc').style.display = 'none';
+  document.getElementById('st-water').textContent = '—';
+  document.getElementById('st-water').className = 'sec-total';
+}
+
+// ── SUMMARY ──
+function updateSummary() {
+  const total = S.general.co2 + S.food.co2 + S.plastics.co2 + S.recycling.co2 + S.water.co2;
+  const totalSgd = S.general.sgd + S.food.sgd + S.water.sgd;
+
+  document.getElementById('sum-general').textContent = S.general.co2 > 0 ? `~ ${S.general.co2.toFixed(2)} tCO₂e` : '—';
+  document.getElementById('sum-food').textContent = S.food.co2 > 0 ? `~ ${S.food.co2.toFixed(2)} tCO₂e` : '—';
+  document.getElementById('sum-plastics').textContent = S.plastics.co2 > 0 ? `~ ${S.plastics.co2.toFixed(2)} tCO₂e` : '—';
+  document.getElementById('sum-recycling').textContent = S.recycling.co2 > 0 ? `~ ${S.recycling.co2.toFixed(3)} tCO₂e` : '—';
+  document.getElementById('sum-water').textContent = S.water.co2 > 0 ? `~ ${S.water.co2.toFixed(3)} tCO₂e` : '—';
+  document.getElementById('sum-total').textContent = total.toFixed(3);
+
+  if (totalSgd > 0) {
+    document.getElementById('sum-cost').textContent = '≈ SGD ' + Math.round(totalSgd).toLocaleString() + ' / yr';
+    document.getElementById('sum-saving').style.display = 'block';
+    document.getElementById('sum-saving-val').textContent = 'SGD ' + Math.round(totalSgd * 0.2).toLocaleString();
+  } else {
+    document.getElementById('sum-cost').textContent = '—';
+    document.getElementById('sum-saving').style.display = 'none';
+  }
+
+  if (total > 0) {
+    const kg_waste = (S.general.kg_yr || 0) + (S.food.kg_yr || 0);
+    document.getElementById('sum-analogy').textContent =
+      `${total.toFixed(2)} tCO₂e from waste and water — equivalent to ${Math.round(total * 1000 / 0.412).toLocaleString()} kWh of electricity from the Singapore grid.`;
+  } else {
+    document.getElementById('sum-analogy').textContent = 'Enter your waste or water data to see your value chain emissions.';
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  let done = 0;
+  if (S.general.co2 > 0) done++;
+  if (S.food.co2 > 0 || document.getElementById('food-na')?.checked) done++;
+  if (S.plastics.co2 > 0 || document.getElementById('plastics-na')?.checked) done++;
+  if (S.recycling.co2 >= 0 || document.getElementById('recycling-na')?.checked) done++;
+  if (S.water.co2 > 0) done++;
+  document.getElementById('prog-fill').style.width = Math.round(done / 5 * 100) + '%';
+  document.getElementById('prog-label').textContent = done + ' of 5 sections completed';
+}
+
+function attachFile(section) {
+  alert(`Attaching documentation for ${section}.\n\nIn production → Supabase Storage → report appendix.`);
+}
+function saveAndNext() {
+localStorage.setItem('zyt_s14_waste_water_data', JSON.stringify({saved:true}));
+  window.location.href = '/S-15-people-commuting.html';
+}
+
+// ── INIT ──
+window.addEventListener('load', () => {
+  // Pre-fill with demo: 3 large bags/day general waste, 11.8 m³/month water
+  document.getElementById('gw-bags-day').value = 3;
+  calcGenWaste();
+  document.getElementById('ws-m3').value = 11.8;
+  // Switch to single bill mode for water demo
+  const waterSingleBtn = document.querySelector('#water-tabs .mtab:nth-child(3)');
+  if (waterSingleBtn) {
+    waterSingleBtn.click();
+    calcWaterSingle();
+  }
+  updateProgress();
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZYT.ESG — Report Preview</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #F0EFE9;
+    --surface: #FFFFFF;
+    --border: #E2E0D8;
+    --text: #1A1917;
+    --text-muted: #6B6860;
+    --text-light: #9B9890;
+    --accent: #2D5F3F;
+    --accent-light: #E6F0EA;
+    --s1: #C75B2E; --s1-light: #FDF0EB;
+    --s2: #1D6FA4; --s2-light: #EBF4FB;
+    --s3: #4A8C3F; --s3-light: #ECF5EB;
+    --green: #1A7A4A; --green-light: #E6F5ED;
+    --radius: 8px;
+    --report-width: 760px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── CHROME NAV ── */
+  .chrome-nav {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 24px; height: 52px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 200;
+  }
+  .cn-left { display: flex; align-items: center; gap: 12px; }
+  .logo { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+  .logo span { color: var(--accent); }
+  .nav-divider { width: 1px; height: 20px; background: var(--border); }
+  .nav-crumb { font-size: 13px; color: var(--text-muted); }
+  .nav-crumb strong { color: var(--text); font-weight: 500; }
+  .cn-right { display: flex; gap: 8px; align-items: center; }
+  .btn {
+    height: 34px; padding: 0 14px; border-radius: 6px;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+    cursor: pointer; border: none; transition: all 0.15s;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .btn-primary { background: var(--accent); color: #fff; height: 36px; padding: 0 16px; font-size: 14px; }
+  .btn-primary:hover { filter: brightness(1.1); }
+  .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--bg); color: var(--text); }
+  .btn-edit { background: var(--accent-light); color: var(--accent); border: 1px solid #B8D5C4; font-size: 11.5px; height: 26px; padding: 0 10px; border-radius: 4px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500; }
+  .btn-edit:hover { background: #D0E8D8; }
+
+  /* ── SIDEBAR TOC ── */
+  .layout { display: flex; min-height: calc(100vh - 52px); }
+  .sidebar {
+    width: 220px; flex-shrink: 0;
+    background: var(--surface); border-right: 1px solid var(--border);
+    padding: 20px 0;
+    position: sticky; top: 52px; height: calc(100vh - 52px);
+    overflow-y: auto;
+  }
+  @media (max-width: 900px) { .sidebar { display: none; } }
+  .toc-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-light); padding: 0 16px; margin-bottom: 8px; }
+  .toc-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 16px; font-size: 12.5px; color: var(--text-muted);
+    cursor: pointer; transition: all 0.12s; border-left: 2px solid transparent;
+  }
+  .toc-item:hover { color: var(--text); background: var(--bg); }
+  .toc-item.active { color: var(--accent); border-left-color: var(--accent); background: var(--accent-light); font-weight: 500; }
+  .toc-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-light); width: 18px; flex-shrink: 0; }
+
+  /* ── REPORT CANVAS ── */
+  .report-canvas {
+    flex: 1; padding: 32px 24px 80px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+
+  .report-page {
+    background: var(--surface);
+    width: 100%; max-width: var(--report-width);
+    box-shadow: 0 2px 24px rgba(0,0,0,0.1);
+    border-radius: 4px;
+    margin-bottom: 32px;
+    overflow: hidden;
+  }
+
+  /* ── COVER PAGE ── */
+  .cover {
+    background: linear-gradient(160deg, #1A2F23 0%, #2D5F3F 55%, #1A4A6B 100%);
+    padding: 64px 56px 48px;
+    color: white;
+    min-height: 320px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    position: relative; overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute; top: -60px; right: -60px;
+    width: 300px; height: 300px; border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+  }
+  .cover-top { position: relative; z-index: 1; }
+  .cover-report-type { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.55; margin-bottom: 12px; }
+  .cover-company { font-size: 28px; font-weight: 700; letter-spacing: -0.6px; margin-bottom: 6px; font-family: 'Lora', serif; }
+  .cover-title { font-size: 17px; opacity: 0.75; margin-bottom: 4px; }
+  .cover-year { font-size: 14px; opacity: 0.5; }
+  .cover-bottom { display: flex; justify-content: space-between; align-items: flex-end; position: relative; z-index: 1; margin-top: 32px; }
+  .cover-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+  .cover-badge {
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px; padding: 4px 10px; font-size: 11px; font-weight: 500;
+  }
+  .cover-zyt { font-size: 11px; opacity: 0.4; text-align: right; }
+
+  /* ── REPORT SECTION ── */
+  .report-section { padding: 40px 48px; border-bottom: 1px solid var(--border); position: relative; }
+  .report-section:last-child { border-bottom: none; }
+  .report-section:hover .section-edit-btn { opacity: 1; }
+
+  .section-edit-btn {
+    position: absolute; top: 16px; right: 16px;
+    opacity: 0; transition: opacity 0.15s;
+  }
+
+  .rs-eyebrow { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); margin-bottom: 6px; }
+  .rs-eyebrow.e { color: var(--s3); }
+  .rs-eyebrow.s { color: var(--s2); }
+  .rs-eyebrow.g { color: #4A3F8C; }
+
+  .rs-title { font-family: 'Lora', Georgia, serif; font-size: 20px; font-weight: 600; margin-bottom: 14px; letter-spacing: -0.3px; color: var(--text); line-height: 1.3; }
+  .rs-body { font-family: 'Lora', Georgia, serif; font-size: 14.5px; line-height: 1.8; color: #2A2826; margin-bottom: 16px; }
+  .rs-body p { margin-bottom: 12px; }
+  .rs-body p:last-child { margin-bottom: 0; }
+
+  /* ── META TABLE ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+  .meta-table td { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; vertical-align: top; }
+  .meta-table td:first-child { color: var(--text-muted); width: 40%; padding-right: 16px; font-size: 12.5px; font-weight: 500; }
+  .meta-table tr:last-child td { border-bottom: none; }
+
+  /* ── SCOPE SUMMARY TABLE ── */
+  .scope-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+  .scope-table th {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--text-muted); padding: 10px 12px; background: #F8F7F3;
+    border-bottom: 2px solid var(--border); text-align: left;
+  }
+  .scope-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 13.5px; vertical-align: middle; }
+  .scope-table tr:last-child td { border-bottom: none; }
+  .scope-table .total-row td { font-weight: 600; background: #F8F7F3; border-top: 2px solid var(--border); }
+  .scope-label {
+    display: inline-block; font-size: 10.5px; font-weight: 600; padding: 2px 8px;
+    border-radius: 3px; margin-right: 6px; vertical-align: middle;
+  }
+  .sl-1 { background: var(--s1-light); color: var(--s1); }
+  .sl-2 { background: var(--s2-light); color: var(--s2); }
+  .sl-3 { background: var(--s3-light); color: var(--s3); }
+  .scope-table .mono { font-family: 'DM Mono', monospace; font-size: 13px; }
+
+  /* ── INLINE CHART (CSS only) ── */
+  .bar-chart { margin: 16px 0; }
+  .bc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .bc-label { font-size: 12px; color: var(--text-muted); width: 160px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bc-track { flex: 1; height: 10px; background: #F0EFE9; border-radius: 5px; overflow: hidden; }
+  .bc-fill { height: 100%; border-radius: 5px; transition: width 1s ease; }
+  .bc-val { font-size: 11.5px; font-family: 'DM Mono', monospace; color: var(--text-muted); width: 80px; text-align: right; flex-shrink: 0; }
+
+  /* ── SOCIAL TABLE ── */
+  .social-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 600px) { .social-metrics { grid-template-columns: 1fr; } }
+  .sm-item { background: #F8F7F3; border-radius: 6px; padding: 12px 14px; }
+  .sm-label { font-size: 11.5px; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; }
+  .sm-val { font-size: 18px; font-weight: 700; font-family: 'DM Mono', monospace; color: var(--text); line-height: 1.2; }
+  .sm-unit { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ── TARGET TABLE ── */
+  .target-row {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .target-row:last-child { border-bottom: none; }
+  .target-bullet { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 6px; }
+  .target-text { font-size: 13.5px; font-family: 'Lora', serif; line-height: 1.6; color: var(--text); flex: 1; }
+  .target-meta { font-size: 11.5px; color: var(--text-light); margin-top: 3px; }
+
+  /* ── CERT TAGS ── */
+  .cert-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .cert-tag {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 4px 10px; font-size: 12.5px; color: var(--text-muted);
+  }
+
+  /* ── APPENDIX TABLE ── */
+  .appendix-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .appendix-table th {
+    font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;
+    color: var(--text-muted); padding: 8px 10px; background: #F8F7F3;
+    border-bottom: 1px solid var(--border); text-align: left;
+  }
+  .appendix-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: top; }
+  .appendix-table tr:last-child td { border-bottom: none; }
+  .appendix-table .mono { font-family: 'DM Mono', monospace; font-size: 11px; }
+
+  /* ── PAGE FOOTER ── */
+  .report-footer {
+    padding: 12px 48px;
+    background: #F8F7F3; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .rf-left { font-size: 11px; color: var(--text-light); }
+  .rf-right { font-size: 11px; color: var(--text-light); }
+
+  /* ── ACTION BAR ── */
+  .action-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    padding: 14px 24px; display: flex; justify-content: space-between; align-items: center;
+    z-index: 90;
+  }
+  .action-bar-left { font-size: 13px; color: var(--text-muted); }
+  .action-bar-right { display: flex; gap: 10px; }
+
+  /* ── UNGC TABLE (appendix) ── */
+  .ungc-app-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 16px; }
+  .ungc-app-table th {
+    font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;
+    color: var(--text-muted); padding: 7px 10px; background: #F8F7F3;
+    border-bottom: 1px solid var(--border); text-align: left;
+  }
+  .ungc-app-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: top; }
+  .ungc-app-table tr:last-child td { border-bottom: none; }
+  .ungc-tag { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 3px; }
+  .ungc-ok { background: var(--green-light); color: var(--green); }
+  .ungc-partial { background: #FEF3C7; color: #92400E; }
+
+  @media print {
+    .chrome-nav, .sidebar, .action-bar, .section-edit-btn { display: none !important; }
+    body { background: white; }
+    .report-canvas { padding: 0; }
+    .report-page { box-shadow: none; max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Chrome nav -->
+<div class="chrome-nav">
+  <div class="cn-left">
+    <div class="logo">ZYT<span>.ESG</span></div>
+    <div class="nav-divider"></div>
+    <div class="nav-crumb">Report → <strong>Preview</strong></div>
+  </div>
+  <div class="cn-right">
+    <button class="btn btn-ghost" onclick="window.history.back()">← Back</button>
+    <button class="btn btn-ghost" onclick="window.print()">🖨 Print</button>
+    <button class="btn btn-primary" onclick="window.location.href='S-25-generate.html'">Generate PDF →</button>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- Sidebar TOC -->
+  <div class="sidebar">
+    <div class="toc-label">Report sections</div>
+    <div class="toc-item active" onclick="scrollTo('sec-cover')"><span class="toc-num">—</span> Cover</div>
+    <div class="toc-item" onclick="scrollTo('sec-1')"><span class="toc-num">1</span> Company overview</div>
+    <div class="toc-item" onclick="scrollTo('sec-2')"><span class="toc-num">2</span> About this report</div>
+    <div class="toc-item" onclick="scrollTo('sec-3')"><span class="toc-num">3</span> Sustainability context</div>
+    <div class="toc-item" onclick="scrollTo('sec-4')"><span class="toc-num">4</span> Scope 1 emissions</div>
+    <div class="toc-item" onclick="scrollTo('sec-5')"><span class="toc-num">5</span> Scope 2 emissions</div>
+    <div class="toc-item" onclick="scrollTo('sec-6')"><span class="toc-num">6</span> Scope 3 emissions</div>
+    <div class="toc-item" onclick="scrollTo('sec-7')"><span class="toc-num">7</span> Total emissions</div>
+    <div class="toc-item" onclick="scrollTo('sec-8')"><span class="toc-num">8</span> Targets</div>
+    <div class="toc-item" onclick="scrollTo('sec-9')"><span class="toc-num">9</span> Actions taken</div>
+    <div class="toc-item" onclick="scrollTo('sec-10')"><span class="toc-num">10</span> Our people</div>
+    <div class="toc-item" onclick="scrollTo('sec-11')"><span class="toc-num">11</span> ESG governance</div>
+    <div class="toc-item" onclick="scrollTo('sec-12')"><span class="toc-num">A</span> Appendix</div>
+  </div>
+
+  <!-- Report canvas -->
+  <div class="report-canvas">
+
+    <!-- ══ REPORT PAGE ══ -->
+    <div class="report-page">
+
+      <!-- Cover -->
+      <div class="cover" id="sec-cover">
+        <div class="cover-top">
+          <div class="cover-report-type">Sustainability Report</div>
+          <div class="cover-company" id="cover-company">ZYT Solutions Pte Ltd</div>
+          <div class="cover-title">Environmental, Social &amp; Governance Performance</div>
+          <div class="cover-year" id="cover-year">Reporting year: 2024</div>
+        </div>
+        <div class="cover-bottom">
+          <div class="cover-badges">
+            <span class="cover-badge">GHG Protocol</span>
+            <span class="cover-badge">SGX Core ESG Metrics</span>
+            <span class="cover-badge" id="cover-ungc-badge" style="display:none">UNGC CoP</span>
+            <span class="cover-badge">SEFR Jan 2026</span>
+          </div>
+          <div class="cover-zyt">Prepared using ZYT.ESG<br>zyt.one/esg</div>
+        </div>
+      </div>
+
+      <!-- SECTION 1: Company overview -->
+      <div class="report-section" id="sec-1">
+        <button class="btn-edit section-edit-btn" onclick="window.location.href='S-06-company-profile.html'">Edit</button>
+        <div class="rs-eyebrow">Section 1</div>
+        <div class="rs-title">Company overview</div>
+        <table class="meta-table">
+          <tr><td>Company name</td><td id="r-company">ZYT Solutions Pte Ltd</td></tr>
+          <tr><td>UEN</td><td id="r-uen">202312345A</td></tr>
+          <tr><td>Industry</td><td id="r-industry">ICT &amp; professional services</td></tr>
+          <tr><td>Company size</td><td id="r-size">11–50 employees</td></tr>
+          <tr><td>Reporting period</td><td id="r-period">1 January 2024 – 31 December 2024</td></tr>
+          <tr><td>ESG responsible person</td><td id="r-person">—</td></tr>
+        </table>
+      </div>
+
+      <!-- SECTION 2: About this report -->
+      <div class="report-section" id="sec-2">
+        <div class="rs-eyebrow">Section 2</div>
+        <div class="rs-title">About this report</div>
+        <div class="rs-body">
+          <p>This report covers <span id="a-company">ZYT Solutions Pte Ltd</span>'s Environmental, Social and Governance (ESG) performance for the calendar year ending 31 December <span id="a-year">2024</span>. It has been prepared with reference to SGX Core ESG Metrics (April 2023) and the GHG Protocol Corporate Standard.</p>
+          <p>Greenhouse gas emissions have been measured using the operational control method as defined by the GHG Protocol. All emission factors are sourced from Singapore's official Emission Factors Registry (SEFR), published by the National Environment Agency (NEA), January 2026 edition. The Singapore grid emission factor of 0.412 kgCO₂/kWh (EMA, 2023) is applied to all purchased electricity.</p>
+          <p>This report has not been externally assured. It constitutes a self-declaration of ESG performance in accordance with the stated frameworks.</p>
+        </div>
+      </div>
+
+      <!-- SECTION 3: Sustainability context -->
+      <div class="report-section" id="sec-3">
+        <button class="btn-edit section-edit-btn" onclick="window.location.href='S-23-sustainability-context.html'">Edit</button>
+        <div class="rs-eyebrow">Section 3</div>
+        <div class="rs-title">Our sustainability context</div>
+        <div class="rs-body" id="r-narrative">
+          <p><em>Opening narrative will appear here after completing Sustainability Context (S-23).</em></p>
+        </div>
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;font-weight:500">Material topics identified for this reporting period:</div>
+          <div id="r-material-topics" style="font-size:13.5px;color:var(--text)"></div>
+        </div>
+        <div style="margin-top:16px;font-size:13px;color:var(--text-muted)">
+          <em id="r-signatory-line">— <span id="r-signatory-name">Director</span>, <span id="r-company-short">ZYT Solutions Pte Ltd</span></em>
+        </div>
+      </div>
+
+      <!-- SECTION 4: Scope 1 -->
+      <div class="report-section" id="sec-4">
+        <button class="btn-edit section-edit-btn" onclick="window.location.href='S-11-transport-fleet.html'">Edit</button>
+        <div class="rs-eyebrow e">Section 4 — Environmental</div>
+        <div class="rs-title">Emissions baseline — Scope 1</div>
+        <div class="rs-body">
+          <p>Scope 1 emissions are direct greenhouse gas emissions from sources owned or controlled by the company. These include fuel combustion in company vehicles, stationary combustion (diesel generators), and fugitive refrigerant releases.</p>
+        </div>
+        <table class="scope-table">
+          <thead><tr><th>Source</th><th>Cluster</th><th>Scope</th><th class="mono">tCO₂e</th></tr></thead>
+          <tbody id="s1-table-body">
+            <tr><td>Company vehicles (petrol)</td><td>Transport & fleet</td><td><span class="scope-label sl-1">S1</span></td><td class="mono">3.10</td></tr>
+            <tr><td>Diesel generator (backup power)</td><td>Power & energy</td><td><span class="scope-label sl-1">S1</span></td><td class="mono">1.72</td></tr>
+            <tr class="total-row"><td colspan="3"><strong>Total Scope 1</strong></td><td class="mono" id="s1-total-row"><strong>4.82</strong></td></tr>
+          </tbody>
+        </table>
+        <div class="bar-chart" id="s1-bar-chart"></div>
+      </div>
+
+      <!-- SECTION 5: Scope 2 -->
+      <div class="report-section" id="sec-5">
+        <button class="btn-edit section-edit-btn" onclick="window.location.href='S-10-power-energy-v3.html'">Edit</button>
+        <div class="rs-eyebrow e">Section 5 — Environmental</div>
+        <div class="rs-title">Emissions baseline — Scope 2</div>
+        <div class="rs-body">
+          <p>Scope 2 emissions arise from the consumption of purchased electricity. The location-based method is used, applying EMA's 2023 Singapore Grid Emission Factor of <strong>0.412 kgCO₂/kWh</strong>.</p>
+        </div>
+        <table class="scope-table">
+          <thead><tr><th>Source</th><th>Cluster</th><th>Scope</th><th class="mono">tCO₂e</th></tr></thead>
+          <tbody id="s2-table-body">
+            <tr><td>Office electricity (SP metered)</td><td>Power & energy</td><td><span class="scope-label sl-2">S2</span></td><td class="mono">28.40</td></tr>
+            <tr><td>WFH electricity (staff at home)</td><td>People & commuting</td><td><span class="scope-label sl-2">S2</span></td><td class="mono">2.80</td></tr>
+            <tr class="total-row"><td colspan="3"><strong>Total Scope 2</strong></td><td class="mono" id="s2-total-row"><strong>31.20</strong></td></tr>
+          </tbody>
+        </table>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:8px">EMA Grid Emission Factor 2023: 0.412 kgCO₂/kWh. Market-based figure not applicable (SP regulated tariff, no RECs purchased).</div>
+      </div>
+
+      <!-- SECTION 6: Scope 3 -->
+      <div class="report-section" id="sec-6">
+        <button class="btn-edit section-edit-btn" onclick="window.location.href='S-15-people-commuting.html'">Edit</button>
+        <div class="rs-eyebrow e">Section 6 — Environmental</div>
+        <div class="rs-title">Emissions baseline — Scope 3</div>
+        <div class="rs-body">
+          <p>Scope 3 emissions are all indirect emissions that occur in the value chain. ZYT.ESG covers categories 1–9 where applicable. Categories 10–15 are excluded as not material to our operations (see Appendix).</p>
+        </div>
+        <table class="scope-table">
+          <thead><tr><th>Category</th><th>Source</th><th>Scope</th><th class="mono">tCO₂e</th></tr></thead>
+          <tbody id="s3-table-body">
+            <tr><td>Cat 7</td><td>Employee commuting (all modes)</td><td><span class="scope-label sl-3">S3</span></td><td class="mono">8.20</td></tr>
+            <tr><td>Cat 6</td><td>Business travel (flights, Grab, hotels)</td><td><span class="scope-label sl-3">S3</span></td><td class="mono">4.10</td></tr>
+            <tr><td>Cat 1/2</td><td>Cloud computing & IT hardware</td><td><span class="scope-label sl-3">S3</span></td><td class="mono">3.84</td></tr>
+            <tr><td>Cat 5</td><td>Waste generated in operations</td><td><span class="scope-label sl-3">S3</span></td><td class="mono">1.60</td></tr>
+            <tr><td>Cat 3</td><td>Upstream fuel & energy (auto-calc)</td><td><span class="scope-label sl-3">S3</span></td><td class="mono">1.20</td></tr>
+            <tr class="total-row"><td colspan="3"><strong>Total Scope 3</strong></td><td class="mono" id="s3-total-row"><strong>18.94</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SECTION 7: Total emissions -->
+      <div class="report-section" id="sec-7">
+        <div class="rs-eyebrow e">Section 7 — Environmental</div>
+        <div class="rs-title">Total emissions summary</div>
+        <div class="rs-body">
+          <p>In <span id="r-year-s7">2024</span>, <span id="r-company-s7">ZYT Solutions Pte Ltd</span> produced a total greenhouse gas footprint of <strong id="r-total-t">55.0</strong> tCO₂e — equivalent to approximately <strong>216 return flights</strong> from Singapore to London, or the annual carbon absorption of <strong>2,527 trees</strong>.</p>
+        </div>
+        <table class="scope-table">
+          <thead><tr><th>Scope</th><th>Description</th><th class="mono">tCO₂e</th><th>% of total</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="scope-label sl-1">Scope 1</span></td>
+              <td>Direct — vehicles, generators, refrigerants</td>
+              <td class="mono" id="s7-s1">4.82</td>
+              <td id="s7-s1-pct">8.8%</td>
+            </tr>
+            <tr>
+              <td><span class="scope-label sl-2">Scope 2</span></td>
+              <td>Purchased electricity (location-based)</td>
+              <td class="mono" id="s7-s2">31.20</td>
+              <td id="s7-s2-pct">56.7%</td>
+            </tr>
+            <tr>
+              <td><span class="scope-label sl-3">Scope 3</span></td>
+              <td>Value chain (Cat 1–9)</td>
+              <td class="mono" id="s7-s3">18.94</td>
+              <td id="s7-s3-pct">34.4%</td>
+            </tr>
+            <tr class="total-row">
+              <td colspan="2"><strong>Total (Scope 1+2+3)</strong></td>
+              <td class="mono" id="s7-total"><strong>54.96</strong></td>
+              <td><strong>100%</strong></td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="meta-table" style="margin-top:16px">
+          <tr><td>Intensity — per employee</td><td id="r-int-emp"><strong>1.31</strong> tCO₂e / FTE</td></tr>
+          <tr><td>Intensity — per SGD 1,000 revenue</td><td id="r-int-rev"><strong>17.2</strong> kgCO₂e / SGD 1,000</td></tr>
+          <tr><td>Annual energy spend</td><td id="r-sgd-total"><strong>SGD 52,700</strong></td></tr>
+        </table>
+      </div>
+
+      <!-- SECTION 8: Targets -->
+      <div class="report-section" id="sec-8">
+        <button class="btn-edit section-edit-btn" onclick="window.location.href='/S-21-target-setting.html'">Edit</button>
+        <div class="rs-eyebrow e">Section 8 — Environmental</div>
+        <div class="rs-title">Targets and commitments</div>
+        <div class="rs-body">
+          <p>Based on our <span id="r-year-s8">2024</span> baseline, we have committed to the following emissions reduction targets:</p>
+        </div>
+        <div id="r-targets-list">
+          <div class="target-row">
+            <div class="target-bullet"></div>
+            <div>
+              <div class="target-text">We commit to reducing our total Scope 1 and 2 greenhouse gas emissions by <strong>25%</strong> by <strong>2027</strong>, from our 2024 baseline of 36.0 tCO₂e to 27.0 tCO₂e.</div>
+              <div class="target-meta">Scope 1+2 · 3-year target · Annual saving: est. SGD 9,675</div>
+            </div>
+          </div>
+          <div class="target-row">
+            <div class="target-bullet"></div>
+            <div>
+              <div class="target-text">We commit to reducing our Scope 2 electricity emissions by <strong>20%</strong> by <strong>2026</strong> through energy efficiency measures and lighting upgrades.</div>
+              <div class="target-meta">Scope 2 · 2-year target · Annual saving: est. SGD 7,700</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:14px">Targets set in S-21. <a href="/S-21-target-setting.html" style="color:var(--accent)">Edit targets →</a></div>
+      </div>
+
+      <!-- SECTION 9: Actions -->
+      <div class="report-section" id="sec-9">
+        <div class="rs-eyebrow e">Section 9 — Environmental</div>
+        <div class="rs-title">Actions taken</div>
+        <div class="rs-body">
+          <p>This is our first reporting year (<span id="r-year-s9">2024</span>). The establishment of our emissions baseline is itself a significant operational step — it enables evidence-based decision-making on energy, transport, and waste that was not previously possible.</p>
+          <p>In the coming reporting period, we will use this baseline to identify and implement targeted reduction actions across our highest-emission clusters. Progress against our committed targets will be reported in our 2025 Sustainability Report.</p>
+        </div>
+      </div>
+
+      <!-- SECTION 10: People (Social) -->
+      <div class="report-section" id="sec-10">
+        <button class="btn-edit section-edit-btn" onclick="window.location.href='S-31-32-social.html'">Edit</button>
+        <div class="rs-eyebrow s">Section 10 — Social</div>
+        <div class="rs-title">Our people</div>
+        <div class="social-metrics" id="r-social-metrics">
+          <div class="sm-item"><div class="sm-label">Total employees</div><div class="sm-val" id="rs-emp">42</div><div class="sm-unit">headcount, 31 Dec 2024</div></div>
+          <div class="sm-item"><div class="sm-label">Gender split</div><div class="sm-val" id="rs-gender">57% M · 43% F</div><div class="sm-unit">GRI 405-1</div></div>
+          <div class="sm-item"><div class="sm-label">Total training hours</div><div class="sm-val" id="rs-train-hrs">420</div><div class="sm-unit">all staff, reporting year</div></div>
+          <div class="sm-item"><div class="sm-label">Avg training hours / employee</div><div class="sm-val" id="rs-train-avg">10.0</div><div class="sm-unit">GRI 404-1</div></div>
+          <div class="sm-item"><div class="sm-label">Work-related fatalities</div><div class="sm-val" id="rs-fatal">0</div><div class="sm-unit">GRI 403-9</div></div>
+          <div class="sm-item"><div class="sm-label">Recordable injuries</div><div class="sm-val" id="rs-inj">0</div><div class="sm-unit">GRI 403-9</div></div>
+        </div>
+        <div style="margin-top:4px">
+          <div style="font-size:12.5px;color:var(--text-muted);margin-bottom:4px;font-weight:500">bizSAFE status:</div>
+          <div id="rs-bizsafe" style="font-size:13.5px">—</div>
+        </div>
+      </div>
+
+      <!-- SECTION 11: Governance -->
+      <div class="report-section" id="sec-11">
+        <button class="btn-edit section-edit-btn" onclick="window.location.href='S-33-governance.html'">Edit</button>
+        <div class="rs-eyebrow g">Section 11 — Governance</div>
+        <div class="rs-title">How we manage ESG</div>
+        <table class="meta-table">
+          <tr><td>ESG responsible person</td><td id="rg-person">—</td></tr>
+          <tr><td>Management team gender</td><td id="rg-mgmt-gender">—</td></tr>
+          <tr><td>ESG review frequency</td><td id="rg-freq">—</td></tr>
+          <tr><td>Anti-corruption policy</td><td id="rg-ac-policy">—</td></tr>
+          <tr><td>Certifications held</td><td id="rg-certs">—</td></tr>
+          <tr><td>Reporting framework</td><td>SGX Core ESG Metrics (Apr 2023) · GHG Protocol Corporate Standard</td></tr>
+          <tr><td>Assurance</td><td id="rg-assurance">None (self-declared)</td></tr>
+        </table>
+      </div>
+
+      <!-- APPENDIX -->
+      <div class="report-section" id="sec-12">
+        <div class="rs-eyebrow">Appendix</div>
+        <div class="rs-title">Technical reference</div>
+
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px;margin-top:4px">Emission factors used</div>
+        <table class="appendix-table">
+          <thead><tr><th>Activity</th><th>EF value</th><th>Unit</th><th>Source</th></tr></thead>
+          <tbody>
+            <tr><td>Grid electricity (Scope 2)</td><td class="mono">0.412</td><td>kgCO₂e/kWh</td><td>EMA, Singapore 2023</td></tr>
+            <tr><td>Diesel combustion</td><td class="mono">2.660</td><td>kgCO₂e/L</td><td>NEA/SEFR Jan 2026</td></tr>
+            <tr><td>Petrol combustion</td><td class="mono">2.295</td><td>kgCO₂e/L</td><td>NEA/SEFR Jan 2026</td></tr>
+            <tr><td>LPG combustion</td><td class="mono">1.644</td><td>kgCO₂e/L</td><td>NEA/SEFR Jan 2026</td></tr>
+            <tr><td>MRT/LRT commute</td><td class="mono">0.0416</td><td>kgCO₂e/p·km</td><td>MOT, Singapore</td></tr>
+            <tr><td>Public bus commute</td><td class="mono">0.0737</td><td>kgCO₂e/p·km</td><td>MOT, Singapore</td></tr>
+            <tr><td>ICE private car</td><td class="mono">0.1732</td><td>kgCO₂e/p·km</td><td>MOT, Singapore</td></tr>
+            <tr><td>PUB water</td><td class="mono">0.5662</td><td>kgCO₂e/m³</td><td>PUB, Singapore</td></tr>
+          </tbody>
+        </table>
+
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px;margin-top:20px">Excluded Scope 3 categories</div>
+        <table class="appendix-table">
+          <thead><tr><th>Category</th><th>Reason excluded</th></tr></thead>
+          <tbody>
+            <tr><td>Cat 10 — Processing of sold products</td><td>Not applicable — no products requiring further processing sold</td></tr>
+            <tr><td>Cat 11 — Use of sold products</td><td>Not applicable — services company; no energy-using products sold</td></tr>
+            <tr><td>Cat 12 — End-of-life treatment</td><td>Not applicable — no manufactured physical products</td></tr>
+            <tr><td>Cat 13 — Downstream leased assets</td><td>Not applicable — company does not own leased-out assets</td></tr>
+            <tr><td>Cat 14 — Franchises</td><td>Not applicable — no franchise operations</td></tr>
+            <tr><td>Cat 15 — Investments</td><td>Not applicable — non-financial institution</td></tr>
+          </tbody>
+        </table>
+
+        <div id="ungc-appendix" style="display:none">
+          <div style="font-size:13px;font-weight:600;margin-bottom:10px;margin-top:20px">UNGC Ten Principles — alignment table</div>
+          <table class="ungc-app-table">
+            <thead><tr><th style="width:60px">Principle</th><th>Topic</th><th>ZYT.ESG coverage</th><th style="width:80px">Status</th></tr></thead>
+            <tbody>
+              <tr><td>P1–2</td><td>Human Rights</td><td>Workforce data, training, OHS disclosure</td><td><span class="ungc-tag ungc-ok">Covered</span></td></tr>
+              <tr><td>P3–6</td><td>Labour</td><td>Gender split, training hours, MOM injury categories, bizSAFE</td><td><span class="ungc-tag ungc-ok">Covered</span></td></tr>
+              <tr><td>P7–9</td><td>Environment</td><td>Full Scope 1/2/3 baseline, reduction targets, SEFR-verified</td><td><span class="ungc-tag ungc-ok">Covered</span></td></tr>
+              <tr><td>P10</td><td>Anti-Corruption</td><td>Anti-corruption policy, staff training %, whistleblowing</td><td><span class="ungc-tag ungc-partial">Partial</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top:20px;font-size:12px;color:var(--text-muted);padding-top:14px;border-top:1px solid var(--border)">
+          This report was prepared using ZYT.ESG (zyt.one/esg). ZYT.ESG is a sustainability reporting platform for Singapore SMEs. Emission factors are sourced from publicly available Singapore government data and are not independently verified by ZYT.ESG.
+        </div>
+      </div>
+
+      <!-- Page footer -->
+      <div class="report-footer">
+        <div class="rf-left" id="rf-company">ZYT Solutions Pte Ltd · Sustainability Report 2024</div>
+        <div class="rf-right">Prepared using ZYT.ESG · zyt.one/esg</div>
+      </div>
+
+    </div><!-- /report-page -->
+
+  </div><!-- /report-canvas -->
+</div><!-- /layout -->
+
+<!-- Action bar -->
+<div class="action-bar">
+  <div class="action-bar-left">Review the report above — click any section's Edit button to make changes</div>
+  <div class="action-bar-right">
+    <button class="btn btn-ghost" onclick="window.history.back()">← Back</button>
+    <button class="btn btn-primary" onclick="window.location.href='S-25-generate.html'">Generate PDF →</button>
+  </div>
+</div>
+
+<script>
+// ── Populate from localStorage ──
+function load() {
+  const profile = JSON.parse(localStorage.getItem('zyt_company_profile') || '{}');
+  const social = JSON.parse(localStorage.getItem('zyt_social_data') || '{}');
+  const gov = JSON.parse(localStorage.getItem('zyt_governance_data') || '{}');
+  const ctx = JSON.parse(localStorage.getItem('zyt_context_data') || '{}');
+  const isUNGC = localStorage.getItem('zyt_intent_ungc') === 'true';
+
+  const company = profile.companyName || 'Your Company';
+  const year = profile.reportingYear || 2024;
+
+  // Cover
+  document.getElementById('cover-company').textContent = company;
+  document.getElementById('cover-year').textContent = 'Reporting year: ' + year;
+  if (isUNGC) document.getElementById('cover-ungc-badge').style.display = '';
+
+  // Section 1
+  document.getElementById('r-company').textContent = company;
+  document.getElementById('r-uen').textContent = profile.uen || '—';
+  document.getElementById('r-industry').textContent = profile.industry || '—';
+  document.getElementById('r-size').textContent = profile.size || '—';
+  document.getElementById('r-period').textContent = `1 January ${year} – 31 December ${year}`;
+  const respPerson = profile.responsiblePerson ? `${profile.responsiblePerson}${profile.responsiblePersonRole ? ', ' + profile.responsiblePersonRole : ''}` : '—';
+  document.getElementById('r-person').textContent = respPerson;
+
+  // Section 2 & 3 (About / Context)
+  document.getElementById('a-company').textContent = company;
+  document.getElementById('a-year').textContent = year;
+
+  if (ctx.narrative) {
+    const paras = ctx.narrative.split('\n').filter(p => p.trim());
+    document.getElementById('r-narrative').innerHTML = paras.map(p => `<p>${p}</p>`).join('');
+  }
+  if (ctx.materialTopics && ctx.materialTopics.length) {
+    document.getElementById('r-material-topics').textContent = ctx.materialTopics.join(' · ');
+  }
+  if (ctx.signatoryName) {
+    document.getElementById('r-signatory-name').textContent = ctx.signatoryName + (ctx.signatoryRole ? ', ' + ctx.signatoryRole : '');
+  }
+  document.getElementById('r-company-short').textContent = company;
+
+  // Sections 7 dynamic
+  document.getElementById('r-year-s7').textContent = year;
+  document.getElementById('r-company-s7').textContent = company;
+  document.getElementById('r-year-s8').textContent = year;
+  document.getElementById('r-year-s9').textContent = year;
+
+  // Footer
+  document.getElementById('rf-company').textContent = `${company} · Sustainability Report ${year}`;
+
+  // Social data
+  if (social.totalEmployees) document.getElementById('rs-emp').textContent = social.totalEmployees;
+  if (social.genderM && social.genderF && social.totalEmployees) {
+    const m = Math.round(social.genderM / social.totalEmployees * 100);
+    const f = Math.round(social.genderF / social.totalEmployees * 100);
+    document.getElementById('rs-gender').textContent = `${m}% M · ${f}% F`;
+  }
+  if (social.trainingHrsTotal) {
+    document.getElementById('rs-train-hrs').textContent = social.trainingHrsTotal;
+    if (social.trainingAvgPerEmp) document.getElementById('rs-train-avg').textContent = social.trainingAvgPerEmp;
+  }
+  if (social.injFatal !== undefined) document.getElementById('rs-fatal').textContent = social.injFatal || '0';
+  if (social.injRec !== undefined) document.getElementById('rs-inj').textContent = social.injRec || '0';
+  if (social.bizsafe) {
+    const lvl = social.bizsafe === 'none' ? 'Not certified' : 'bizSAFE ' + (social.bizsafe === 'star' ? 'Star ⭐' : 'Level ' + social.bizsafe);
+    document.getElementById('rs-bizsafe').textContent = lvl;
+  }
+
+  // Governance data
+  if (profile.responsiblePerson) document.getElementById('rg-person').textContent = respPerson;
+  if (gov.mgmtTotal && gov.mgmtFemale) {
+    const fPct = Math.round(gov.mgmtFemale / gov.mgmtTotal * 100);
+    document.getElementById('rg-mgmt-gender').textContent = `${gov.mgmtTotal} total · ${fPct}% female`;
+  }
+  if (gov.esgFrequency) document.getElementById('rg-freq').textContent = gov.esgFrequency.replace('_', ' ');
+  if (gov.acPolicy) document.getElementById('rg-ac-policy').textContent = gov.acPolicy === 'yes' ? `Yes${gov.acDesc ? ' — ' + gov.acDesc : ''}` : 'No';
+  if (gov.certifications && gov.certifications.length) {
+    document.getElementById('rg-certs').textContent = gov.certifications.join(' · ');
+  }
+  if (gov.assuranceType) {
+    const assuranceMap = { none: 'None (self-declared)', internal: 'Internal review', external: 'External (limited)', external_reasonable: 'External (reasonable)' };
+    document.getElementById('rg-assurance').textContent = assuranceMap[gov.assuranceType] || gov.assuranceType;
+  }
+
+  // UNGC appendix
+  if (isUNGC) document.getElementById('ungc-appendix').style.display = 'block';
+}
+
+function scrollTo(id) {
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.querySelectorAll('.toc-item').forEach(i => i.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+// ── Intersection observer for TOC highlight ──
+const tocMap = {
+  'sec-cover': 0, 'sec-1': 1, 'sec-2': 2, 'sec-3': 3, 'sec-4': 4,
+  'sec-5': 5, 'sec-6': 6, 'sec-7': 7, 'sec-8': 8, 'sec-9': 9,
+  'sec-10': 10, 'sec-11': 11, 'sec-12': 12
+};
+const tocItems = document.querySelectorAll('.toc-item');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting && tocMap[e.target.id] !== undefined) {
+      tocItems.forEach(t => t.classList.remove('active'));
+      tocItems[tocMap[e.target.id]]?.classList.add('active');
+    }
+  });
+}, { threshold: 0.3 });
+Object.keys(tocMap).forEach(id => {
+  const el = document.getElementById(id);
+  if (el) observer.observe(el);
+});
+
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Procurement & Supply Chain — ZYT.ESG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#15140d;--ink3:#84827a;--ink4:#c2bfb6;--bg:#f3f0e9;--card:#fff;--b1:#e0dbd2;--b2:#eae6de;--s3c:#27500a;--s3b:#eaf4ee;--s3d:#b4d9c4;--gc:#1a6b4a;--gb:#eaf4ee;--gd:#b4d9c4;--ac:#7a5a0a;--ab:#fdf3e0;--ad:#e8c87a;--r:10px;--rl:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30}
+.logo{font-family:'Fraunces',serif;font-size:17px;font-weight:300;display:flex;align-items:center;gap:8px}
+.logo-tag{font-family:'DM Mono',monospace;font-size:10px;color:var(--gc);background:var(--gb);border:1px solid var(--gd);padding:2px 7px;border-radius:20px}
+.nav-steps{display:flex;align-items:center;gap:4px;font-size:12px}
+.ns{padding:3px 10px;border-radius:20px;color:var(--ink3)}.ns.done{color:var(--gc)}.ns.done::before{content:'✓ ';font-size:10px}.ns.active{background:var(--ink);color:#fff;font-weight:500}.ns-sep{color:var(--ink4);font-size:10px}
+.btn-back{font-size:12px;color:var(--ink3);background:transparent;border:.5px solid var(--b1);padding:5px 12px;border-radius:6px;cursor:pointer}
+.layout{display:grid;grid-template-columns:1fr 300px;gap:20px;max-width:1060px;margin:0 auto;padding:28px 24px 100px;align-items:start}
+.cluster-hdr{background:var(--card);border:1px solid var(--b1);border-radius:var(--rl);padding:20px 22px;margin-bottom:16px;display:flex;align-items:flex-start;gap:14px}
+.hdr-icon{font-size:26px;width:50px;height:50px;background:var(--bg);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hdr-body{flex:1}
+.hdr-name{font-family:'Fraunces',serif;font-size:22px;font-weight:300;letter-spacing:-.3px;margin-bottom:3px}
+.hdr-sub{font-size:12px;color:var(--ink3);line-height:1.5;margin-bottom:8px}
+.hdr-role{display:inline-flex;font-size:11px;color:var(--ink3);background:var(--bg);border:1px solid var(--b2);padding:3px 9px;border-radius:20px}
+.prog-bar{height:3px;background:var(--b2);border-radius:2px;overflow:hidden;margin-top:10px}
+.prog-fill{height:100%;background:var(--gc);border-radius:2px;transition:width .5s}
+.prog-label{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);margin-top:4px}
+.note{background:var(--s3b);border:.5px solid var(--s3d);border-radius:var(--r);padding:10px 14px;margin-bottom:14px;font-size:11px;color:var(--s3c);line-height:1.5}
+.section{margin-bottom:12px}
+.sec-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card);border:1px solid var(--b1);border-radius:10px 10px 0 0;cursor:pointer;user-select:none}
+.sec-hdr:hover{background:var(--bg)}
+.scope-pill{font-size:10px;font-family:'DM Mono',monospace;font-weight:500;padding:2px 8px;border-radius:8px;white-space:nowrap;background:var(--s3b);color:var(--s3c);border:1px solid var(--s3d)}
+.sec-title{font-size:13px;font-weight:500;flex:1}
+.sec-total{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3)}
+.sec-total.live{color:var(--gc);font-weight:500}
+.sec-chev{width:12px;height:12px;color:var(--ink3);transition:transform .2s;flex-shrink:0}
+.sec-chev.open{transform:rotate(90deg)}
+.sec-body{display:none;background:var(--card);border:1px solid var(--b1);border-top:none;border-radius:0 0 10px 10px}
+.sec-body.open{display:block}
+.activity{padding:16px;border-bottom:1px solid var(--b2)}.activity:last-child{border-bottom:none}
+.act-name{font-size:13px;font-weight:500;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.act-sub{font-size:11px;color:var(--ink3);margin-bottom:10px;line-height:1.4}
+.opt-tag{font-size:9px;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:6px;background:var(--ab);color:var(--ac);border:1px solid var(--ad)}
+.tip-btn{width:16px;height:16px;border-radius:50%;background:var(--bg);border:1px solid var(--b1);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;color:var(--ink3);font-family:'DM Mono',monospace;font-weight:500;flex-shrink:0}
+.tip-btn:hover{background:var(--ink);color:#fff}
+.tip-panel{display:none;background:var(--ink);color:#fff;border-radius:8px;padding:12px 14px;font-size:11px;line-height:1.6;margin-bottom:10px}
+.tip-panel.open{display:block}
+.tip-ef{margin-top:4px;font-size:10px;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace}
+.field-row{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:8px}
+.fwrap{flex:1;min-width:90px}
+.fwrap label{display:block;font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.inp{width:100%;height:36px;border:.5px solid var(--b1);border-radius:7px;background:var(--card);padding:0 10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none}
+.inp:focus{border-color:var(--gc)}
+.sel{width:100%;height:36px;border:.5px solid var(--b1);border-radius:7px;background:var(--card);padding:0 10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;cursor:pointer}
+.unit-box{height:36px;padding:0 10px;background:var(--bg);border:.5px solid var(--b2);border-radius:7px;font-size:11px;color:var(--ink3);display:flex;align-items:center;white-space:nowrap;font-family:'DM Mono',monospace}
+.na-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.na-cb{width:14px;height:14px;cursor:pointer;accent-color:var(--ink3)}
+.na-lbl{font-size:11px;color:var(--ink3);cursor:pointer}
+.result-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:.5px solid var(--b2)}
+.rpill{display:flex;align-items:center;gap:4px;font-size:11px;padding:3px 9px;border-radius:16px;border:.5px solid;white-space:nowrap}
+.rpill.co2{background:var(--gb);color:var(--gc);border-color:var(--gd)}
+.rpill.cost{background:var(--ab);color:var(--ac);border-color:var(--ad)}
+.rpill.empty{background:var(--bg);color:var(--ink4);border-color:var(--b2)}
+.rpill-val{font-family:'DM Mono',monospace;font-weight:500}
+.summary-col{position:sticky;top:72px}
+.sum-card{background:var(--ink);border-radius:var(--rl);overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.12)}
+.sum-hdr{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-hdr-title{font-family:'Fraunces',serif;font-size:15px;font-weight:300;color:#fff;margin-bottom:2px}
+.sum-hdr-sub{font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.35)}
+.sum-breakdown{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-break-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.3);margin-bottom:8px}
+.break-row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px}
+.break-name{color:rgba(255,255,255,.55)}.break-val{font-family:'DM Mono',monospace;font-weight:500;color:#fff}
+.sum-total{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-est-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.3);margin-bottom:5px}
+.sum-total-val{font-family:'Fraunces',serif;font-size:26px;font-weight:300;color:#fff;line-height:1;letter-spacing:-.5px}
+.sum-total-unit{font-size:11px;color:rgba(255,255,255,.4);margin-top:2px}
+.sum-note{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.1);font-size:11px;color:rgba(255,255,255,.5);line-height:1.5}
+.sum-ef{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-ef-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.25);margin-bottom:6px}
+.ef-row{display:flex;justify-content:space-between;font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.4);margin-bottom:3px}
+.ef-row span:last-child{color:rgba(255,255,255,.6)}
+.sum-actions{padding:14px 18px;display:flex;flex-direction:column;gap:8px}
+.btn-next{width:100%;height:40px;background:#fff;color:var(--ink);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-next:hover{background:#f0ede6}
+.btn-save-draft{width:100%;height:36px;background:transparent;color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.12);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">ZYT.ESG <span class="logo-tag">ESG</span></div>
+  <div class="nav-steps">
+    <div class="ns done">Profile</div><div class="ns-sep">›</div>
+    <div class="ns active">Data entry</div><div class="ns-sep">›</div>
+    <div class="ns">Results</div><div class="ns-sep">›</div>
+    <div class="ns">Targets</div><div class="ns-sep">›</div>
+    <div class="ns">Report</div>
+  </div>
+  <button class="btn-back">← Back to hub</button>
+</nav>
+
+<div class="layout">
+<div class="form-col">
+
+<div class="cluster-hdr">
+  <div class="hdr-icon">📦</div>
+  <div class="hdr-body">
+    <div class="hdr-name">Procurement & supply chain</div>
+    <div class="hdr-sub">Packaging, cleaning materials, outsourced services, and other purchased goods. Scope 3 Cat 1 — emissions from producing the goods and services you buy. Spend-based approach is the standard method for SMEs without supplier-level data.</div>
+    <div class="hdr-role">👤 Procurement / operations manager</div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="prog-label" id="prog-label">0 of 4 sections completed</div>
+  </div>
+</div>
+
+<div class="note">
+  <strong>Methodology:</strong> This cluster uses spend-based emission factors (PACT-3.0 / EEIO methodology) — the standard approach when supplier-specific data is unavailable. Accuracy improves with actual spend data from your accounts. GHG Protocol permits spend-based factors for Cat 1 at SME level.
+</div>
+
+<!-- PACKAGING -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('pkg')">
+    <svg class="sec-chev open" id="chev-pkg" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill">Cat 1</span>
+    <span class="sec-title">Packaging materials</span>
+    <span class="sec-total" id="st-pkg">—</span>
+  </div>
+  <div class="sec-body open" id="body-pkg">
+    <div class="activity">
+      <div class="act-name">Packaging purchased for products / orders <span class="tip-btn" onclick="toggleTip('tip-pkg')">?</span></div>
+      <div class="act-sub">Boxes, bags, bubble wrap, tape, labels, and other packaging materials used in your operations. Emissions come from raw material extraction and manufacturing of the packaging.</div>
+      <div class="tip-panel" id="tip-pkg">
+        Packaging emissions depend heavily on material type. Cardboard/paper is the most common for Singapore retail and F&B. Plastic packaging has a higher carbon intensity. The spend-based factor converts your annual purchasing spend into an estimated emission.
+        <div class="tip-ef">EEIO spend-based: Paper/cardboard packaging ~0.45 kgCO₂/SGD · Plastic packaging ~0.60 kgCO₂/SGD · Mixed packaging ~0.50 kgCO₂/SGD · Source: PACT-3.0 SEA factors</div>
+      </div>
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="pkg-na" onchange="toggleNA('pkg-inputs',this,'pkg')">
+        <label class="na-lbl" for="pkg-na">We use no significant packaging</label>
+      </div>
+      <div id="pkg-inputs">
+        <div class="field-row">
+          <div class="fwrap"><label>Annual packaging spend (SGD)</label><input class="inp" type="number" id="pkg-sgd" placeholder="e.g. 12,000" oninput="calcPkg()"></div>
+          <div class="unit-box">SGD / yr</div>
+          <div class="fwrap" style="flex:.6"><label>Material type</label>
+            <select class="sel" id="pkg-type" onchange="calcPkg()">
+              <option value="0.45">Cardboard / paper</option>
+              <option value="0.60">Plastic</option>
+              <option value="0.50" selected>Mixed</option>
+              <option value="0.30">Compostable / recycled</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="result-row" id="result-pkg">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual packaging spend</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CLEANING & FACILITY -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('clean')">
+    <svg class="sec-chev" id="chev-clean" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill">Cat 1</span>
+    <span class="sec-title">Cleaning & facility services</span>
+    <span class="sec-total" id="st-clean">—</span>
+  </div>
+  <div class="sec-body" id="body-clean">
+    <div class="activity">
+      <div class="act-name">Outsourced cleaning, security, facility management <span class="opt-tag">optional</span></div>
+      <div class="act-sub">Third-party cleaning services, security guards, pest control, facility management contracts. The emissions from providing these services — including the cleaners' travel, chemicals, and equipment — are part of your supply chain footprint.</div>
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="clean-na" onchange="toggleNA('clean-inputs',this,'clean')">
+        <label class="na-lbl" for="clean-na">We don't use outsourced cleaning or facility services</label>
+      </div>
+      <div id="clean-inputs">
+        <div class="field-row">
+          <div class="fwrap"><label>Annual spend on cleaning / facility services (SGD)</label><input class="inp" type="number" id="clean-sgd" placeholder="e.g. 24,000" oninput="calcClean()"></div>
+          <div class="unit-box">SGD / yr</div>
+        </div>
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">Check your cleaning contractor invoices or annual contract value. EEIO factor: ~0.15 kgCO₂/SGD for cleaning services.</div>
+      </div>
+      <div class="result-row" id="result-clean">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual services spend</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFESSIONAL SERVICES -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('prof')">
+    <svg class="sec-chev" id="chev-prof" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill">Cat 1</span>
+    <span class="sec-title">Professional & business services</span>
+    <span class="sec-total" id="st-prof">—</span>
+  </div>
+  <div class="sec-body" id="body-prof">
+    <div class="activity">
+      <div class="act-name">Accounting, legal, marketing, IT services <span class="opt-tag">optional</span></div>
+      <div class="act-sub">Outsourced professional services that support your operations. These have a relatively low emission intensity per dollar spent — primarily from office electricity and staff commuting at the service provider.</div>
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="prof-na" onchange="toggleNA('prof-inputs',this,'prof')">
+        <label class="na-lbl" for="prof-na">We don't procure significant professional services</label>
+      </div>
+      <div id="prof-inputs">
+        <div class="field-row">
+          <div class="fwrap"><label>Annual spend on professional services (SGD)</label><input class="inp" type="number" id="prof-sgd" placeholder="e.g. 36,000" oninput="calcProf()"></div>
+          <div class="unit-box">SGD / yr</div>
+        </div>
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">Includes accounting fees, legal retainers, agency fees, IT support contracts. EEIO factor: ~0.08 kgCO₂/SGD for professional services.</div>
+      </div>
+      <div class="result-row" id="result-prof">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual services spend</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OTHER PURCHASED GOODS -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('other')">
+    <svg class="sec-chev" id="chev-other" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill">Cat 1</span>
+    <span class="sec-title">Other purchased goods (raw materials, consumables)</span>
+    <span class="sec-total" id="st-other">—</span>
+  </div>
+  <div class="sec-body" id="body-other">
+    <div class="activity">
+      <div class="act-name">Raw materials, ingredients, consumables <span class="opt-tag">optional</span></div>
+      <div class="act-sub">For F&B: food ingredients. For manufacturing: raw materials. For retail: merchandise stock. Use if your business has significant upstream purchased goods not covered above. For most service businesses this will be minimal.</div>
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="other-na" onchange="toggleNA('other-inputs',this,'other')">
+        <label class="na-lbl" for="other-na">Not applicable to our business type</label>
+      </div>
+      <div id="other-inputs">
+        <div class="field-row">
+          <div class="fwrap"><label>Annual spend on goods / raw materials (SGD)</label><input class="inp" type="number" id="other-sgd" placeholder="e.g. 120,000" oninput="calcOther()"></div>
+          <div class="unit-box">SGD / yr</div>
+          <div class="fwrap" style="flex:.6"><label>Category</label>
+            <select class="sel" id="other-type" onchange="calcOther()">
+              <option value="0.35">Food ingredients / F&B supplies</option>
+              <option value="0.55">Manufacturing materials</option>
+              <option value="0.40">Retail merchandise</option>
+              <option value="0.20">Office supplies / stationery</option>
+              <option value="0.45" selected>General goods (mixed)</option>
+            </select>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">These are rough spend-based estimates. For F&B with significant food purchasing, a more detailed ingredient-level analysis is possible in a ZYT advisory engagement.</div>
+      </div>
+      <div class="result-row" id="result-other">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual goods spend</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /form-col -->
+
+<!-- SUMMARY -->
+<div class="summary-col">
+<div class="sum-card">
+  <div class="sum-hdr"><div class="sum-hdr-title">Procurement & supply chain</div><div class="sum-hdr-sub">Scope 3 Cat 1 · 2024</div></div>
+  <div class="sum-breakdown">
+    <div class="sum-break-lbl">Breakdown</div>
+    <div class="break-row"><span class="break-name">Packaging</span><span class="break-val" id="sum-pkg">—</span></div>
+    <div class="break-row"><span class="break-name">Cleaning & facility</span><span class="break-val" id="sum-clean">—</span></div>
+    <div class="break-row"><span class="break-name">Professional services</span><span class="break-val" id="sum-prof">—</span></div>
+    <div class="break-row"><span class="break-name">Other goods</span><span class="break-val" id="sum-other">—</span></div>
+  </div>
+  <div class="sum-total">
+    <div class="sum-est-lbl">Estimated total</div>
+    <div class="sum-total-val" id="sum-total">0</div>
+    <div class="sum-total-unit">tCO₂e / year</div>
+  </div>
+  <div class="sum-note">All figures are spend-based estimates (PACT-3.0 / EEIO). Accuracy is lower than activity-based methods. Flagged as estimated in your report.</div>
+  <div class="sum-ef">
+    <div class="sum-ef-lbl">Spend-based factors used</div>
+    <div class="ef-row"><span>Cardboard/paper packaging</span><span>~0.45 kgCO₂/SGD</span></div>
+    <div class="ef-row"><span>Plastic packaging</span><span>~0.60 kgCO₂/SGD</span></div>
+    <div class="ef-row"><span>Cleaning services</span><span>~0.15 kgCO₂/SGD</span></div>
+    <div class="ef-row"><span>Professional services</span><span>~0.08 kgCO₂/SGD</span></div>
+    <div class="ef-row"><span>Source</span><span>PACT-3.0 · EEIO SEA</span></div>
+  </div>
+  <div class="sum-actions">
+    <button class="btn-next" onclick="localStorage.setItem('zyt_procurement_data', JSON.stringify({saved:true})); window.location.href='/S-18-review-confirm.html'">Save & Review all clusters <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg></button>
+    <button class="btn-save-draft">Save & exit</button>
+  </div>
+</div>
+</div>
+</div>
+
+<script>
+const S={pkg:{co2:0,sgd:0},clean:{co2:0,sgd:0},prof:{co2:0,sgd:0},other:{co2:0,sgd:0}};
+
+function toggleSec(id){const b=document.getElementById('body-'+id),c=document.getElementById('chev-'+id);b.classList.toggle('open',!b.classList.contains('open'));c.classList.toggle('open',!c.classList.contains('open'));}
+function toggleTip(id){document.getElementById(id).classList.toggle('open');}
+function toggleNA(el,cb,k){const e=document.getElementById(el);e.style.opacity=cb.checked?'0.3':'1';e.style.pointerEvents=cb.checked?'none':'';if(cb.checked)S[k]={co2:0,sgd:0};updateSummary();}
+
+function calcPkg(){
+  const sgd=parseFloat(document.getElementById('pkg-sgd').value)||0;
+  const ef=parseFloat(document.getElementById('pkg-type').value)||0.50;
+  S.pkg={co2:sgd*ef/1000,sgd};showResult('result-pkg',S.pkg.co2,sgd);
+  document.getElementById('st-pkg').textContent=S.pkg.co2>0?`~ ${S.pkg.co2.toFixed(3)} tCO₂e`:'—';
+  document.getElementById('st-pkg').className=S.pkg.co2>0?'sec-total live':'sec-total';
+  updateSummary();
+}
+function calcClean(){
+  const sgd=parseFloat(document.getElementById('clean-sgd').value)||0;
+  S.clean={co2:sgd*0.15/1000,sgd};showResult('result-clean',S.clean.co2,sgd);
+  document.getElementById('st-clean').textContent=S.clean.co2>0?`~ ${S.clean.co2.toFixed(3)} tCO₂e`:'—';
+  document.getElementById('st-clean').className=S.clean.co2>0?'sec-total live':'sec-total';
+  updateSummary();
+}
+function calcProf(){
+  const sgd=parseFloat(document.getElementById('prof-sgd').value)||0;
+  S.prof={co2:sgd*0.08/1000,sgd};showResult('result-prof',S.prof.co2,sgd);
+  document.getElementById('st-prof').textContent=S.prof.co2>0?`~ ${S.prof.co2.toFixed(3)} tCO₂e`:'—';
+  document.getElementById('st-prof').className=S.prof.co2>0?'sec-total live':'sec-total';
+  updateSummary();
+}
+function calcOther(){
+  const sgd=parseFloat(document.getElementById('other-sgd').value)||0;
+  const ef=parseFloat(document.getElementById('other-type').value)||0.45;
+  S.other={co2:sgd*ef/1000,sgd};showResult('result-other',S.other.co2,sgd);
+  document.getElementById('st-other').textContent=S.other.co2>0?`~ ${S.other.co2.toFixed(3)} tCO₂e`:'—';
+  document.getElementById('st-other').className=S.other.co2>0?'sec-total live':'sec-total';
+  updateSummary();
+}
+
+function showResult(id,co2,sgd){
+  const r=document.getElementById(id).querySelectorAll('.rpill');
+  if(co2>0){r[0].className='rpill co2';r[0].innerHTML=`<span class="rpill-val">~ ${co2.toFixed(3)}</span><span>tCO₂e / yr</span>`;}
+  if(sgd>0){r[1].className='rpill cost';r[1].innerHTML=`<span class="rpill-val">≈ SGD ${Math.round(sgd).toLocaleString()}</span><span>annual spend</span>`;}
+}
+
+function updateSummary(){
+  const total=S.pkg.co2+S.clean.co2+S.prof.co2+S.other.co2;
+  document.getElementById('sum-pkg').textContent=S.pkg.co2>0?`~ ${S.pkg.co2.toFixed(3)} tCO₂e`:'—';
+  document.getElementById('sum-clean').textContent=S.clean.co2>0?`~ ${S.clean.co2.toFixed(3)} tCO₂e`:'—';
+  document.getElementById('sum-prof').textContent=S.prof.co2>0?`~ ${S.prof.co2.toFixed(3)} tCO₂e`:'—';
+  document.getElementById('sum-other').textContent=S.other.co2>0?`~ ${S.other.co2.toFixed(3)} tCO₂e`:'—';
+  document.getElementById('sum-total').textContent=total.toFixed(3);
+  let done=0;
+  if(S.pkg.co2>0||document.getElementById('pkg-na')?.checked)done++;
+  if(S.clean.co2>0||document.getElementById('clean-na')?.checked)done++;
+  if(S.prof.co2>0||document.getElementById('prof-na')?.checked)done++;
+  if(S.other.co2>0||document.getElementById('other-na')?.checked)done++;
+  document.getElementById('prog-fill').style.width=Math.round(done/4*100)+'%';
+  document.getElementById('prog-label').textContent=done+' of 4 sections completed';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZYT.ESG — Log in</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#F7F6F2; --surface:#FFFFFF; --border:#E2E0D8;
+    --text:#1A1917; --text-muted:#6B6860; --text-light:#9B9890;
+    --accent:#2D5F3F; --red:#B91C1C; --red-light:#FEE2E2;
+    --radius:10px; --radius-sm:6px;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+  .topnav { background:var(--surface); border-bottom:1px solid var(--border); padding:0 24px; height:52px; display:flex; align-items:center; }
+  .logo { font-size:15px; font-weight:600; color:var(--text); text-decoration:none; }
+  .logo span { color:var(--accent); }
+  .auth-wrap { max-width:420px; margin:0 auto; padding:52px 24px 80px; }
+  .auth-title { font-size:22px; font-weight:700; letter-spacing:-0.4px; margin-bottom:6px; }
+  .auth-sub { font-size:14px; color:var(--text-muted); margin-bottom:28px; }
+  .auth-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:28px; }
+  .field { margin-bottom:16px; }
+  .field label { display:block; font-size:12.5px; font-weight:500; margin-bottom:5px; }
+  .field input {
+    width:100%; height:40px; padding:0 12px;
+    border:1px solid var(--border); border-radius:var(--radius-sm);
+    font-family:'DM Sans',sans-serif; font-size:14px; color:var(--text);
+    background:var(--surface); outline:none;
+    transition:border-color 0.15s, box-shadow 0.15s;
+  }
+  .field input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(45,95,63,0.1); }
+  .field-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; }
+  .field-row label { margin-bottom:0; font-size:12.5px; font-weight:500; }
+  .forgot { font-size:12px; color:var(--text-light); cursor:pointer; }
+  .forgot:hover { color:var(--accent); }
+  .btn-submit {
+    width:100%; height:42px; background:var(--accent); color:white;
+    border:none; border-radius:var(--radius-sm); font-family:'DM Sans',sans-serif;
+    font-size:14.5px; font-weight:500; cursor:pointer; transition:filter 0.15s; margin-top:4px;
+  }
+  .btn-submit:hover { filter:brightness(1.1); }
+  .btn-submit:disabled { opacity:0.6; cursor:not-allowed; }
+  .error-box { background:var(--red-light); border:1px solid #FCA5A5; border-radius:var(--radius-sm); padding:10px 13px; font-size:13px; color:var(--red); margin-bottom:14px; display:none; }
+  .auth-footer { text-align:center; font-size:13px; color:var(--text-muted); margin-top:18px; }
+  .auth-footer a { color:var(--accent); font-weight:500; }
+  .skip-link { display:block; text-align:center; margin-top:12px; font-size:13px; color:var(--text-light); cursor:pointer; }
+  .skip-link:hover { color:var(--text-muted); }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="/index.html" class="logo">ZYT<span>.ESG</span></a>
+</nav>
+
+<div class="auth-wrap">
+  <div class="auth-title">Welcome back</div>
+  <div class="auth-sub">Log in to continue your sustainability report.</div>
+
+  <div class="auth-card">
+    <div class="error-box" id="error-box"></div>
+
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="you@company.com.sg" autocomplete="email">
+    </div>
+    <div class="field">
+      <div class="field-row">
+        <label for="password">Password</label>
+        <span class="forgot" onclick="doForgotPassword()">Forgot password?</span>
+      </div>
+      <input type="password" id="password" placeholder="Your password"
+             autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+
+    <button class="btn-submit" id="submit-btn" onclick="doLogin()">Log in →</button>
+  </div>
+
+  <div class="auth-footer">
+    Don't have an account? <a href="/S-03-signup.html">Create one free →</a>
+  </div>
+  <div class="skip-link" onclick="window.location.href='/S-06-company-profile.html'">
+    Continue without logging in
+  </div>
+</div>
+
+<script type="module">
+  import { signIn, resetPassword } from '/js/supabase.js';
+
+  function showError(msg) {
+    const el = document.getElementById('error-box');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  window.doLogin = async () => {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    document.getElementById('error-box').style.display = 'none';
+
+    if (!email || !password) return showError('Please enter your email and password.');
+
+    const btn = document.getElementById('submit-btn');
+    btn.textContent = 'Logging in…';
+    btn.disabled = true;
+
+    const { error } = await signIn(email, password);
+    if (error) {
+      showError(error.message === 'Invalid login credentials'
+        ? 'Incorrect email or password. Please try again.'
+        : error.message);
+      btn.textContent = 'Log in →';
+      btn.disabled = false;
+      return;
+    }
+
+    window.location.href = '/S-06-company-profile.html';
+  };
+
+  window.doForgotPassword = async () => {
+    const email = document.getElementById('email').value.trim();
+    if (!email) return showError('Enter your email address first, then click Forgot password.');
+    const { error } = await resetPassword(email);
+    if (error) showError(error.message);
+    else alert(`Password reset email sent to ${email}.\nCheck your inbox and follow the link.`);
+  };
+</script>
+</body>
+</html>

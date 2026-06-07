@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Company Profile — ZYT.ESG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#15140d;--ink2:#42403a;--ink3:#84827a;--ink4:#c2bfb6;
+  --bg:#f3f0e9;--card:#ffffff;--b1:#e0dbd2;--b2:#eae6de;
+  --gc:#1a6b4a;--gb:#eaf4ee;--gd:#b4d9c4;
+  --ac:#7a5a0a;--ab:#fdf3e0;--ad:#e8c87a;
+  --wc:#7a1a1a;--wb:#fdf0ec;--wd:#f0b4b4;
+  --r:10px;--rl:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:14px}
+
+nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30}
+.logo{font-family:'Fraunces',serif;font-size:17px;font-weight:300;display:flex;align-items:center;gap:8px}
+.logo-tag{font-family:'DM Mono',monospace;font-size:10px;color:var(--gc);background:var(--gb);border:1px solid var(--gd);padding:2px 7px;border-radius:20px;letter-spacing:.5px}
+.nav-steps{display:flex;align-items:center;gap:4px;font-size:12px}
+.ns{padding:3px 10px;border-radius:20px;color:var(--ink3)}
+.ns.done{color:var(--gc)}.ns.done::before{content:'✓ ';font-size:10px}
+.ns.active{background:var(--ink);color:white;font-weight:500}
+.ns-sep{color:var(--ink4);font-size:10px}
+
+/* LAYOUT */
+.page{max-width:680px;margin:0 auto;padding:36px 24px 80px}
+
+/* PROGRESS STEPPER */
+.stepper{display:flex;align-items:center;gap:0;margin-bottom:32px}
+.step{display:flex;align-items:center;gap:8px;font-size:12px}
+.step-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;flex-shrink:0}
+.step.done .step-num{background:var(--gc);color:white}
+.step.active .step-num{background:var(--ink);color:white}
+.step.pending .step-num{background:var(--b2);color:var(--ink3)}
+.step-label{color:var(--ink3);font-size:11px}
+.step.active .step-label{color:var(--ink);font-weight:500}
+.step-line{flex:1;height:1px;background:var(--b2);margin:0 8px;min-width:20px}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--b1);border-radius:var(--rl);padding:24px;margin-bottom:16px}
+.card-title{font-family:'Fraunces',serif;font-size:16px;font-weight:300;letter-spacing:-.2px;margin-bottom:4px}
+.card-sub{font-size:11px;color:var(--ink3);margin-bottom:20px;line-height:1.5}
+.card-divider{height:.5px;background:var(--b2);margin:20px 0}
+
+/* FIELDS */
+.field-group{display:flex;flex-direction:column;gap:14px}
+.field-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:11px;font-weight:500;color:var(--ink2);display:flex;align-items:center;gap:6px}
+.opt-badge{font-size:9px;font-family:'DM Mono',monospace;padding:1px 5px;border-radius:4px;background:var(--ab);color:var(--ac);border:.5px solid var(--ad)}
+.field .hint{font-size:10px;color:var(--ink3);line-height:1.4}
+.inp{height:40px;border:1px solid var(--b1);border-radius:8px;background:var(--card);padding:0 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s;width:100%}
+.inp:focus{border-color:var(--gc);box-shadow:0 0 0 3px rgba(26,107,74,.08)}
+.inp::placeholder{color:var(--ink4)}
+.inp.error{border-color:var(--wc)}
+.sel{height:40px;border:1px solid var(--b1);border-radius:8px;background:var(--card);padding:0 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;cursor:pointer;transition:border-color .15s;width:100%;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2384827a' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.sel:focus{border-color:var(--gc)}
+textarea.inp{height:80px;padding:10px 12px;resize:vertical;line-height:1.5}
+
+/* INDUSTRY SELECTOR */
+.industry-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:6px}
+.ind-btn{padding:10px 12px;border:1px solid var(--b1);border-radius:var(--r);cursor:pointer;background:var(--card);text-align:left;transition:all .15s;display:flex;flex-direction:column;gap:3px}
+.ind-btn:hover{border-color:var(--ink3)}
+.ind-btn.active{border-color:var(--gc);background:var(--gb)}
+.ind-icon{font-size:16px}
+.ind-name{font-size:12px;font-weight:500;color:var(--ink)}
+.ind-hint{font-size:10px;color:var(--ink3);line-height:1.3}
+
+/* SUBSECTOR */
+.subsector-wrap{margin-top:10px;display:none}
+.subsector-wrap.show{display:block}
+.subsector-label{font-size:11px;font-weight:500;color:var(--ink2);margin-bottom:6px}
+
+/* INTENT TAGS */
+.intent-grid{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.intent-btn{padding:7px 12px;border:1px solid var(--b1);border-radius:20px;cursor:pointer;background:var(--card);font-size:12px;color:var(--ink2);transition:all .15s;display:flex;align-items:center;gap:5px}
+.intent-btn:hover{border-color:var(--ink3)}
+.intent-btn.active{border-color:var(--gc);background:var(--gb);color:var(--gc)}
+.intent-icon{font-size:13px}
+
+/* REPORT PREVIEW STRIP */
+.preview-strip{background:var(--ink);border-radius:var(--r);padding:14px 18px;margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.preview-filename{font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,.7);transition:all .3s}
+.preview-label{font-size:10px;color:rgba(255,255,255,.35);margin-bottom:3px}
+
+/* VALIDATION */
+.error-msg{font-size:10px;color:var(--wc);margin-top:3px;display:none}
+.error-msg.show{display:block}
+.required-mark{color:var(--wc);font-size:12px}
+
+/* ACTIONS */
+.actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px}
+.btn-primary{height:42px;padding:0 24px;background:var(--ink);color:white;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .15s}
+.btn-primary:hover{background:#2a2a1a}
+.btn-primary svg{width:14px;height:14px;transition:transform .15s}
+.btn-primary:hover svg{transform:translateX(2px)}
+.btn-secondary{height:42px;padding:0 20px;background:transparent;color:var(--ink3);border:1px solid var(--b1);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer}
+.btn-secondary:hover{border-color:var(--ink3);color:var(--ink)}
+
+@media(max-width:600px){.field-row-2,.field-row-3{grid-template-columns:1fr}.industry-grid{grid-template-columns:1fr 1fr}.nav-steps{display:none}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">ZYT.ESG <span class="logo-tag">ESG</span></div>
+  <div class="nav-steps">
+    <div class="ns done">Sign up</div><div class="ns-sep">›</div>
+    <div class="ns active">Company profile</div><div class="ns-sep">›</div>
+    <div class="ns">Data entry</div><div class="ns-sep">›</div>
+    <div class="ns">Report</div>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- STEPPER -->
+  <div class="stepper">
+    <div class="step done"><div class="step-num">✓</div><div class="step-label">Account</div></div>
+    <div class="step-line"></div>
+    <div class="step active"><div class="step-num">2</div><div class="step-label">Company profile</div></div>
+    <div class="step-line"></div>
+    <div class="step pending"><div class="step-num">3</div><div class="step-label">Data entry</div></div>
+    <div class="step-line"></div>
+    <div class="step pending"><div class="step-num">4</div><div class="step-label">Your report</div></div>
+  </div>
+
+  <!-- CARD 1: COMPANY BASICS -->
+  <div class="card">
+    <div class="card-title">Tell us about your company</div>
+    <div class="card-sub">This information appears in your Sustainability Report. You can update it at any time from Settings.</div>
+
+    <div class="field-group">
+      <div class="field">
+        <label>Company name <span class="required-mark">*</span></label>
+        <input class="inp" type="text" id="company-name" placeholder="e.g. Sunshine Bakery Pte Ltd" oninput="updatePreview()">
+        <div class="error-msg" id="err-name">Company name is required</div>
+      </div>
+
+      <div class="field-row-2">
+        <div class="field">
+          <label>UEN (Unique Entity Number) <span class="required-mark">*</span></label>
+          <input class="inp" type="text" id="uen" placeholder="e.g. 201234567A" maxlength="10" oninput="validateUEN()">
+          <div class="hint">9–10 characters · issued by ACRA</div>
+          <div class="error-msg" id="err-uen">Enter a valid UEN (9–10 characters)</div>
+        </div>
+        <div class="field">
+          <label>Year of incorporation</label>
+          <input class="inp" type="number" id="year-inc" placeholder="e.g. 2015" min="1900" max="2025">
+        </div>
+      </div>
+
+      <div class="field-row-2">
+        <div class="field">
+          <label>Company size</label>
+          <select class="sel" id="company-size">
+            <option value="">Select employee count</option>
+            <option value="1-10">1–10 employees (micro)</option>
+            <option value="11-50">11–50 employees (small)</option>
+            <option value="51-200">51–200 employees (medium)</option>
+            <option value="201-500">201–500 employees</option>
+            <option value="500+">500+ employees</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Annual revenue <span class="opt-badge">optional</span></label>
+          <select class="sel" id="revenue">
+            <option value="">Prefer not to say</option>
+            <option value="under1m">Under SGD 1M</option>
+            <option value="1-5m">SGD 1M – 5M</option>
+            <option value="5-25m">SGD 5M – 25M</option>
+            <option value="25-100m">SGD 25M – 100M</option>
+            <option value="over100m">Over SGD 100M</option>
+          </select>
+          <div class="hint">Helps benchmark against peer companies. Not shared with third parties.</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Registered business address <span class="opt-badge">optional</span></label>
+        <input class="inp" type="text" id="address" placeholder="e.g. 71 Ayer Rajah Crescent, #05-01, Singapore 139951">
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 2: INDUSTRY -->
+  <div class="card">
+    <div class="card-title">What industry are you in?</div>
+    <div class="card-sub">This sets the suggested focus areas in your data entry. You'll still see all clusters — we just highlight the most relevant ones for your sector.</div>
+
+    <div class="industry-grid" id="industry-grid">
+      <button class="ind-btn" data-ind="fnb" onclick="selectIndustry('fnb',this)">
+        <div class="ind-icon">🍜</div>
+        <div class="ind-name">Food & Beverage</div>
+        <div class="ind-hint">Restaurant, café, catering, hawker, food manufacturing</div>
+      </button>
+      <button class="ind-btn" data-ind="retail" onclick="selectIndustry('retail',this)">
+        <div class="ind-icon">🛍</div>
+        <div class="ind-name">Retail</div>
+        <div class="ind-hint">Fashion, electronics, supermarket, e-commerce</div>
+      </button>
+      <button class="ind-btn" data-ind="logistics" onclick="selectIndustry('logistics',this)">
+        <div class="ind-icon">🚚</div>
+        <div class="ind-name">Logistics & Transport</div>
+        <div class="ind-hint">Freight, cold chain, last-mile, warehousing</div>
+      </button>
+      <button class="ind-btn" data-ind="manufacturing" onclick="selectIndustry('manufacturing',this)">
+        <div class="ind-icon">⚙️</div>
+        <div class="ind-name">Manufacturing</div>
+        <div class="ind-hint">Precision engineering, food processing, printing</div>
+      </button>
+      <button class="ind-btn" data-ind="construction" onclick="selectIndustry('construction',this)">
+        <div class="ind-icon">🏗</div>
+        <div class="ind-name">Construction</div>
+        <div class="ind-hint">Contractor, M&E, interior fit-out, civil</div>
+      </button>
+      <button class="ind-btn" data-ind="ict" onclick="selectIndustry('ict',this)">
+        <div class="ind-icon">💻</div>
+        <div class="ind-name">ICT & Professional Services</div>
+        <div class="ind-hint">Software, IT, consulting, finance, legal</div>
+      </button>
+      <button class="ind-btn" data-ind="cleaning" onclick="selectIndustry('cleaning',this)">
+        <div class="ind-icon">🧹</div>
+        <div class="ind-name">Cleaning & Facility Services</div>
+        <div class="ind-hint">Commercial cleaning, pest control, security</div>
+      </button>
+      <button class="ind-btn" data-ind="healthcare" onclick="selectIndustry('healthcare',this)">
+        <div class="ind-icon">🏥</div>
+        <div class="ind-name">Healthcare & Social Services</div>
+        <div class="ind-hint">Clinic, pharmacy, eldercare, childcare</div>
+      </button>
+      <button class="ind-btn" data-ind="hospitality" onclick="selectIndustry('hospitality',this)">
+        <div class="ind-icon">🏨</div>
+        <div class="ind-name">Hospitality & Events</div>
+        <div class="ind-hint">Hotel, event management, MICE, wedding</div>
+      </button>
+      <button class="ind-btn" data-ind="other" onclick="selectIndustry('other',this)">
+        <div class="ind-icon">🏢</div>
+        <div class="ind-name">Other / General Business</div>
+        <div class="ind-hint">Any business not listed above</div>
+      </button>
+    </div>
+    <div class="error-msg" id="err-industry" style="margin-top:8px">Please select your industry</div>
+
+    <!-- SUB-SECTOR -->
+    <div class="subsector-wrap" id="subsector-wrap">
+      <div class="card-divider"></div>
+      <div class="subsector-label">Sub-sector <span class="opt-badge">optional — improves data entry presets</span></div>
+      <select class="sel" id="subsector" style="max-width:320px">
+        <option value="">Select sub-sector (optional)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- CARD 3: REPORTING PERIOD -->
+  <div class="card">
+    <div class="card-title">Reporting period</div>
+    <div class="card-sub">Your Sustainability Report will cover this 12-month period. Most companies report on the calendar year or their financial year.</div>
+
+    <div class="field-group">
+      <div class="field-row-3">
+        <div class="field">
+          <label>Reporting year <span class="required-mark">*</span></label>
+          <select class="sel" id="report-year" onchange="updatePreview()">
+            <option value="2024" selected>2024</option>
+            <option value="2023">2023</option>
+            <option value="2025">2025 (in progress)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Period start</label>
+          <select class="sel" id="period-start">
+            <option value="01-01" selected>1 January</option>
+            <option value="04-01">1 April (FY)</option>
+            <option value="07-01">1 July (FY)</option>
+            <option value="10-01">1 October (FY)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Reporting boundary</label>
+          <select class="sel" id="boundary">
+            <option value="operational_sg" selected>Operational control — Singapore</option>
+            <option value="operational_all">Operational control — all locations</option>
+            <option value="financial">Financial control</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 4: ESG RESPONSIBLE PERSON -->
+  <div class="card">
+    <div class="card-title">Who is responsible for ESG at your company?</div>
+    <div class="card-sub">This person's name and role will appear in the Governance section of your Sustainability Report as the named ESG responsible person — an SGX Core ESG Metrics requirement.</div>
+
+    <div class="field-group">
+      <div class="field-row-2">
+        <div class="field">
+          <label>Name <span class="required-mark">*</span></label>
+          <input class="inp" type="text" id="esg-name" placeholder="e.g. Sarah Tan">
+        </div>
+        <div class="field">
+          <label>Role / title <span class="required-mark">*</span></label>
+          <input class="inp" type="text" id="esg-role" placeholder="e.g. Director, Operations Manager, CEO">
+        </div>
+      </div>
+      <div class="field-row-2">
+        <div class="field">
+          <label>Email <span class="opt-badge">optional</span></label>
+          <input class="inp" type="email" id="esg-email" placeholder="e.g. sarah@company.com.sg">
+          <div class="hint">For ZYT.ESG notifications and annual report reminders</div>
+        </div>
+        <div class="field">
+          <label>This person is the account user?</label>
+          <select class="sel" id="esg-is-user">
+            <option value="yes" selected>Yes — same as my account</option>
+            <option value="no">No — different person</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 5: WHY ARE YOU HERE (intent) -->
+  <div class="card">
+    <div class="card-title">What's driving your sustainability reporting?</div>
+    <div class="card-sub">Select all that apply. This helps us highlight the most relevant parts of your data entry and report — it doesn't change what data you can enter.</div>
+
+    <div class="intent-grid" id="intent-grid">
+      <button class="intent-btn" data-intent="buyer" onclick="toggleIntent(this)">
+        <span class="intent-icon">🏭</span> A buyer or customer asked for this
+      </button>
+      <button class="intent-btn" data-intent="financing" onclick="toggleIntent(this)">
+        <span class="intent-icon">🏦</span> Applying for green financing
+      </button>
+      <button class="intent-btn" data-intent="cost" onclick="toggleIntent(this)">
+        <span class="intent-icon">💰</span> Reduce operating costs
+      </button>
+      <button class="intent-btn" data-intent="annual" onclick="toggleIntent(this)">
+        <span class="intent-icon">📋</span> Annual sustainability report
+      </button>
+      <button class="intent-btn" data-intent="cop" onclick="toggleIntent(this)">
+        <span class="intent-icon">🌐</span> UNGC Communication on Progress
+      </button>
+    </div>
+
+    <!-- CoP note — shown when UNGC is selected -->
+    <div id="cop-note" style="display:none;margin-top:12px;padding:10px 12px;background:var(--gb);border:.5px solid var(--gd);border-radius:8px;font-size:11px;color:var(--gc);line-height:1.5">
+      ✅ <strong>UNGC CoP selected.</strong> Your report will include a UNGC Ten Principles alignment table in the appendix. ZYT.ESG's E+S+G coverage maps to all 10 Principles across Human Rights, Labour, Environment, and Anti-Corruption. Your CEO statement of continued support is a separate document — we'll include a template in the report package.
+    </div>
+  </div>
+
+  <!-- REPORT PREVIEW STRIP -->
+  <div class="preview-strip">
+    <div>
+      <div class="preview-label">Your report will be named</div>
+      <div class="preview-filename" id="preview-filename">Sustainability Report — [Company Name] — 2024.pdf</div>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,.3);text-align:right;flex-shrink:0">
+      Prepared using ZYT.ESG<br>zyt.one/esg
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="actions">
+    <button class="btn-secondary" onclick="history.back()">← Back</button>
+    <button class="btn-primary" onclick="saveProfile()">
+      Save & start data entry
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg>
+    </button>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+const SUBSECTORS = {
+  fnb: ['Restaurant / dine-in','Café / bakery','Catering & events','Food manufacturing','Food retail / supermarket','Hawker / coffeeshop','Bar & nightlife'],
+  retail: ['Fashion & apparel','Electronics & appliances','Supermarket / grocery','Convenience store','E-commerce / online retail','Home & furniture'],
+  logistics: ['Land freight / trucking','Cold chain / refrigerated','Last-mile delivery','Warehousing & fulfilment','Freight forwarding'],
+  manufacturing: ['Food & beverage processing','Precision engineering','Electronics / PCB','Printing & packaging','Chemicals / plastics','Furniture & fixtures'],
+  construction: ['General contractor','Mechanical & electrical (M&E)','Interior fit-out','Civil engineering','Real estate development'],
+  ict: ['Software / SaaS','IT services & support','Management consulting','Financial services','Legal & compliance','Marketing & advertising'],
+  cleaning: ['Commercial cleaning','Security services','Pest control','Integrated facilities management'],
+  healthcare: ['General practice / polyclinic','Specialist clinic','Pharmacy','Eldercare / nursing home','Childcare / preschool'],
+  hospitality: ['Hotel','Event management','MICE / conference','Wedding & banquet','F&B events / catering'],
+  other: [],
+};
+
+let selectedIndustry = null;
+let selectedIntents = new Set();
+
+function selectIndustry(ind, btn) {
+  document.querySelectorAll('.ind-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedIndustry = ind;
+  document.getElementById('err-industry').style.display = 'none';
+  // Subsectors
+  const subs = SUBSECTORS[ind] || [];
+  const wrap = document.getElementById('subsector-wrap');
+  const sel = document.getElementById('subsector');
+  if (subs.length > 0) {
+    sel.innerHTML = '<option value="">Select sub-sector (optional)</option>' + subs.map(s => `<option>${s}</option>`).join('');
+    wrap.className = 'subsector-wrap show';
+  } else {
+    wrap.className = 'subsector-wrap';
+  }
+}
+
+function toggleIntent(btn) {
+  btn.classList.toggle('active');
+  const intent = btn.dataset.intent;
+  if (btn.classList.contains('active')) selectedIntents.add(intent);
+  else selectedIntents.delete(intent);
+  // Show CoP note
+  document.getElementById('cop-note').style.display = selectedIntents.has('cop') ? 'block' : 'none';
+}
+
+function updatePreview() {
+  const name = document.getElementById('company-name').value || '[Company Name]';
+  const year = document.getElementById('report-year').value || '2024';
+  document.getElementById('preview-filename').textContent = `Sustainability Report — ${name} — ${year}.pdf`;
+}
+
+function validateUEN() {
+  const val = document.getElementById('uen').value.trim();
+  const valid = /^[0-9A-Z]{9,10}$/.test(val.toUpperCase());
+  const err = document.getElementById('err-uen');
+  const inp = document.getElementById('uen');
+  if (val.length > 0) {
+    err.style.display = valid ? 'none' : 'block';
+    inp.className = valid || val.length < 9 ? 'inp' : 'inp error';
+  }
+}
+
+function saveProfile() {
+  let valid = true;
+  // Validate required fields
+  const name = document.getElementById('company-name').value.trim();
+  if (!name) {
+    document.getElementById('err-name').style.display = 'block';
+    document.getElementById('company-name').className = 'inp error';
+    valid = false;
+  } else {
+    document.getElementById('err-name').style.display = 'none';
+    document.getElementById('company-name').className = 'inp';
+  }
+
+  const uen = document.getElementById('uen').value.trim();
+  if (!uen || !/^[0-9A-Z]{9,10}$/.test(uen.toUpperCase())) {
+    document.getElementById('err-uen').style.display = 'block';
+    document.getElementById('uen').className = 'inp error';
+    valid = false;
+  }
+
+  if (!selectedIndustry) {
+    document.getElementById('err-industry').style.display = 'block';
+    valid = false;
+  }
+
+  const esgName = document.getElementById('esg-name').value.trim();
+  const esgRole = document.getElementById('esg-role').value.trim();
+  if (!esgName || !esgRole) {
+    valid = false;
+    alert('Please fill in the ESG responsible person name and role.');
+  }
+
+  if (!valid) {
+    document.querySelector('.inp.error')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  // In production: save to Supabase profiles table
+  // Save to localStorage
+  const profileData = {
+    companyName: name,
+    uen: document.getElementById('uen')?.value || '',
+    industry: selectedIndustry,
+    reportingYear: document.getElementById('report-year').value,
+    responsiblePerson: esgName,
+    responsiblePersonRole: esgRole,
+  };
+  localStorage.setItem('zyt_company_profile', JSON.stringify(profileData));
+  window.location.href = '/S-09-data-entry-hub.html';
+}
+
+// Pre-fill demo data
+window.addEventListener('load', () => {
+  document.getElementById('company-name').value = 'ZYT Sustainability Consultancy Pte Ltd';
+  document.getElementById('uen').value = '202312345A';
+  document.getElementById('company-size').value = '11-50';
+  document.getElementById('esg-name').value = 'Joel Tsi';
+  document.getElementById('esg-role').value = 'Director';
+  updatePreview();
+  // Pre-select ICT industry
+  const ictBtn = document.querySelector('[data-ind="ict"]');
+  if (ictBtn) selectIndustry('ict', ictBtn);
+  // Pre-select CoP intent
+  const copBtn = document.querySelector('[data-intent="cop"]');
+  if (copBtn) { copBtn.classList.add('active'); selectedIntents.add('cop'); document.getElementById('cop-note').style.display = 'block'; }
+});
+</script>
+</body>
+</html>

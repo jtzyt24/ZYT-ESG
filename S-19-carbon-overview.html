@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZYT.ESG — Carbon Overview</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #F7F6F2;
+    --surface: #FFFFFF;
+    --surface2: #F0EFE9;
+    --border: #E2E0D8;
+    --text: #1A1917;
+    --text-muted: #6B6860;
+    --text-light: #9B9890;
+
+    --s1: #C75B2E;        /* Scope 1 — warm amber-red */
+    --s1-light: #FDF0EB;
+    --s1-mid: #F5C8B4;
+    --s2: #1D6FA4;        /* Scope 2 — blue */
+    --s2-light: #EBF4FB;
+    --s2-mid: #B8D9F0;
+    --s3: #4A8C3F;        /* Scope 3 — green */
+    --s3-light: #ECF5EB;
+    --s3-mid: #B8DDB5;
+
+    --accent: #2D5F3F;
+    --accent-light: #E6F0EA;
+    --green: #1A7A4A;
+    --green-light: #E6F5ED;
+    --amber: #B45309;
+    --amber-light: #FEF3C7;
+    --red: #B91C1C;
+
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.07);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.09);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── NAV ── */
+  .topnav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px; height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+  .logo span { color: var(--accent); }
+  .nav-divider { width: 1px; height: 20px; background: var(--border); margin: 0 12px; }
+  .nav-crumb { font-size: 13px; color: var(--text-muted); }
+  .nav-crumb strong { color: var(--text); font-weight: 500; }
+  .nav-left { display: flex; align-items: center; }
+  .nav-right { display: flex; gap: 10px; }
+
+  /* ── LAYOUT ── */
+  .page-wrap { max-width: 960px; margin: 0 auto; padding: 32px 24px 80px; }
+
+  /* ── HERO BANNER ── */
+  .hero {
+    background: linear-gradient(135deg, #1A2F23 0%, #2D5F3F 50%, #1A4A6B 100%);
+    border-radius: var(--radius);
+    padding: 36px 40px;
+    color: white;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -40px; right: -40px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .hero::after {
+    content: '';
+    position: absolute; bottom: -30px; right: 140px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+  }
+  .hero-eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; opacity: 0.6; margin-bottom: 8px; }
+  .hero-company { font-size: 13px; opacity: 0.75; margin-bottom: 4px; }
+  .hero-title { font-size: 28px; font-weight: 700; letter-spacing: -0.6px; line-height: 1.2; margin-bottom: 6px; }
+  .hero-year { font-size: 14px; opacity: 0.6; }
+  .hero-total {
+    position: absolute; right: 40px; top: 50%; transform: translateY(-50%);
+    text-align: right;
+  }
+  @media (max-width: 600px) { .hero-total { position: static; transform: none; margin-top: 20px; text-align: left; } }
+  .hero-total-label { font-size: 12px; opacity: 0.6; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+  .hero-total-val { font-size: 42px; font-weight: 700; letter-spacing: -1px; line-height: 1.1; font-family: 'DM Mono', monospace; }
+  .hero-total-unit { font-size: 14px; opacity: 0.7; }
+  .hero-total-sgd { font-size: 16px; opacity: 0.65; margin-top: 4px; font-family: 'DM Mono', monospace; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px; padding: 4px 12px;
+    font-size: 12px; margin-top: 12px;
+  }
+
+  /* ── SCOPE CARDS ROW ── */
+  .scope-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+  @media (max-width: 600px) { .scope-row { grid-template-columns: 1fr; } }
+
+  .scope-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .scope-card:hover { box-shadow: var(--shadow-md); }
+  .scope-card.s1 { border-top: 3px solid var(--s1); }
+  .scope-card.s2 { border-top: 3px solid var(--s2); }
+  .scope-card.s3 { border-top: 3px solid var(--s3); }
+
+  .sc-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+  .sc-label.s1 { color: var(--s1); }
+  .sc-label.s2 { color: var(--s2); }
+  .sc-label.s3 { color: var(--s3); }
+
+  .sc-name { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+  .sc-val { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; font-family: 'DM Mono', monospace; line-height: 1.1; }
+  .sc-unit { font-size: 12px; color: var(--text-muted); font-family: 'DM Sans', monospace; }
+  .sc-sgd { font-size: 13px; color: var(--text-muted); margin-top: 4px; font-family: 'DM Mono', monospace; }
+  .sc-pct {
+    position: absolute; top: 20px; right: 20px;
+    font-size: 13px; font-weight: 600;
+    padding: 3px 9px; border-radius: 20px;
+  }
+  .sc-pct.s1 { background: var(--s1-light); color: var(--s1); }
+  .sc-pct.s2 { background: var(--s2-light); color: var(--s2); }
+  .sc-pct.s3 { background: var(--s3-light); color: var(--s3); }
+
+  .sc-bar { height: 4px; border-radius: 2px; margin-top: 12px; }
+  .sc-bar.s1 { background: var(--s1); }
+  .sc-bar.s2 { background: var(--s2); }
+  .sc-bar.s3 { background: var(--s3); }
+
+  .sc-sources { margin-top: 10px; }
+  .sc-source-item {
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: var(--text-muted);
+    padding: 3px 0; border-bottom: 1px solid var(--border);
+  }
+  .sc-source-item:last-child { border-bottom: none; }
+  .sc-source-item .val { font-family: 'DM Mono', monospace; font-size: 11.5px; color: var(--text); }
+
+  /* ── MAIN GRID ── */
+  .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 700px) { .main-grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-title { font-size: 14px; font-weight: 600; }
+  .card-sub { font-size: 12px; color: var(--text-muted); }
+  .card-body { padding: 18px; }
+
+  /* ── DONUT CHART ── */
+  .donut-wrap { display: flex; align-items: center; gap: 20px; }
+  .donut-svg-wrap { position: relative; flex-shrink: 0; }
+  .donut-center {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .donut-center-val { font-size: 18px; font-weight: 700; font-family: 'DM Mono', monospace; line-height: 1.1; }
+  .donut-center-label { font-size: 10px; color: var(--text-muted); }
+
+  .donut-legend { flex: 1; }
+  .dl-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .dl-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .dl-label { font-size: 12.5px; color: var(--text-muted); flex: 1; }
+  .dl-val { font-size: 12.5px; font-weight: 600; font-family: 'DM Mono', monospace; }
+  .dl-pct { font-size: 11px; color: var(--text-light); margin-left: 4px; }
+
+  /* ── ANALOGY CARDS ── */
+  .analogy-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 700px) { .analogy-row { grid-template-columns: 1fr; } }
+
+  .analogy-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    text-align: center;
+  }
+  .analogy-emoji { font-size: 32px; margin-bottom: 8px; }
+  .analogy-val { font-size: 20px; font-weight: 700; font-family: 'DM Mono', monospace; letter-spacing: -0.5px; color: var(--accent); }
+  .analogy-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.4; }
+
+  /* ── INTENSITY ── */
+  .intensity-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .int-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+  }
+  .int-label { font-size: 11.5px; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; }
+  .int-val { font-size: 18px; font-weight: 700; font-family: 'DM Mono', monospace; color: var(--text); }
+  .int-unit { font-size: 11px; color: var(--text-muted); }
+
+  /* ── PEER BENCHMARK ── */
+  .benchmark-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .bm-header { padding: 14px 18px 12px; border-bottom: 1px solid var(--border); }
+  .bm-body { padding: 18px; }
+  .bm-disclaimer { font-size: 11.5px; color: var(--text-light); margin-bottom: 14px; }
+
+  .bm-bar-wrap { margin-bottom: 10px; }
+  .bm-bar-label { display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 4px; }
+  .bm-bar-label .name { color: var(--text-muted); }
+  .bm-bar-label .val { font-family: 'DM Mono', monospace; color: var(--text); font-weight: 500; }
+  .bm-bar-track { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .bm-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+  .bm-bar-fill.you { background: var(--accent); }
+  .bm-bar-fill.peer { background: var(--border); border: none; background: #C5C3BB; }
+  .bm-bar-fill.median { background: #9B9890; }
+
+  .bm-verdict {
+    margin-top: 14px; padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    background: var(--green-light);
+    color: var(--green);
+    border: 1px solid #B8DDB5;
+  }
+  .bm-verdict.average { background: var(--amber-light); color: var(--amber); border-color: #FDE68A; }
+
+  /* ── SCOPE 3 COVERAGE ── */
+  .s3-coverage { padding: 16px 18px; }
+  .s3c-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+  .s3c-row:last-child { border-bottom: none; }
+  .s3c-cat { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-light); width: 40px; flex-shrink: 0; }
+  .s3c-name { flex: 1; color: var(--text-muted); }
+  .s3c-status { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 3px; white-space: nowrap; }
+  .s3c-covered { background: var(--green-light); color: var(--green); }
+  .s3c-partial { background: var(--amber-light); color: var(--amber); }
+  .s3c-na { background: var(--surface2); color: var(--text-light); }
+
+  /* ── ACTION BAR ── */
+  .action-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    padding: 14px 24px; display: flex; justify-content: space-between; align-items: center;
+    z-index: 90;
+  }
+  .action-bar-left { font-size: 13px; color: var(--text-muted); }
+  .action-bar-right { display: flex; gap: 10px; }
+  .btn {
+    height: 38px; padding: 0 18px; border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    cursor: pointer; border: none; transition: all 0.15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { filter: brightness(1.1); }
+  .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+  .btn-secondary { background: var(--accent-light); color: var(--accent); border: 1px solid #B8D5C4; }
+  .btn-secondary:hover { background: #D0E8D8; }
+
+  /* ── FULL WIDTH CARD ── */
+  .card-full {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); margin-bottom: 16px; overflow: hidden;
+  }
+
+  /* ── ZYT ADVISORY NUDGE ── */
+  .advisory-nudge {
+    background: linear-gradient(135deg, #1A2F23, #2D5F3F);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    color: white;
+    margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    flex-wrap: wrap;
+  }
+  .an-left {}
+  .an-eyebrow { font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; margin-bottom: 6px; }
+  .an-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .an-sub { font-size: 13px; opacity: 0.75; }
+  .an-right { flex-shrink: 0; }
+  .btn-white { background: white; color: var(--accent); font-weight: 600; height: 38px; padding: 0 18px; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 13.5px; cursor: pointer; border: none; transition: all 0.15s; }
+  .btn-white:hover { background: #E6F5ED; }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="nav-left">
+    <div class="logo">ZYT<span>.ESG</span></div>
+    <div class="nav-divider"></div>
+    <div class="nav-crumb">Results → <strong>Carbon Overview</strong></div>
+  </div>
+  <div class="nav-right">
+    <button class="btn btn-ghost" onclick="window.print()" style="height:32px;font-size:13px">Print</button>
+    <button class="btn btn-secondary" style="height:32px;font-size:13px" onclick="window.location.href='S-25-generate.html'">⬇ Download PDF</button>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-eyebrow">Carbon Overview · GHG Protocol</div>
+    <div class="hero-company" id="hero-company">ZYT Solutions Pte Ltd</div>
+    <div class="hero-title">Your <span id="hero-year">2024</span> carbon footprint</div>
+    <div class="hero-year">Reporting period: 1 Jan – 31 Dec <span id="hero-year2">2024</span></div>
+    <div class="hero-badge">
+      <span>✓</span> GHG Protocol · SEFR · SGX Core ESG Metrics
+    </div>
+
+    <div class="hero-total">
+      <div class="hero-total-label">Total emissions</div>
+      <div class="hero-total-val" id="hero-total-val">—</div>
+      <div class="hero-total-unit">tCO₂e</div>
+      <div class="hero-total-sgd" id="hero-total-sgd">—</div>
+    </div>
+  </div>
+
+  <!-- ── SCOPE CARDS ── -->
+  <div class="scope-row">
+    <!-- Scope 1 -->
+    <div class="scope-card s1">
+      <div class="sc-label s1">Scope 1</div>
+      <div class="sc-name">Direct emissions</div>
+      <span class="sc-pct s1" id="s1-pct">—</span>
+      <div class="sc-val" id="s1-val">—</div>
+      <div class="sc-unit">tCO₂e</div>
+      <div class="sc-sgd" id="s1-sgd">—</div>
+      <div class="sc-bar s1" id="s1-bar" style="width:60%"></div>
+      <div class="sc-sources" id="s1-sources"></div>
+    </div>
+    <!-- Scope 2 -->
+    <div class="scope-card s2">
+      <div class="sc-label s2">Scope 2</div>
+      <div class="sc-name">Purchased energy</div>
+      <span class="sc-pct s2" id="s2-pct">—</span>
+      <div class="sc-val" id="s2-val">—</div>
+      <div class="sc-unit">tCO₂e</div>
+      <div class="sc-sgd" id="s2-sgd">—</div>
+      <div class="sc-bar s2" id="s2-bar" style="width:30%"></div>
+      <div class="sc-sources" id="s2-sources"></div>
+    </div>
+    <!-- Scope 3 -->
+    <div class="scope-card s3">
+      <div class="sc-label s3">Scope 3</div>
+      <div class="sc-name">Value chain</div>
+      <span class="sc-pct s3" id="s3-pct">—</span>
+      <div class="sc-val" id="s3-val">—</div>
+      <div class="sc-unit">tCO₂e</div>
+      <div class="sc-sgd" id="s3-sgd">—</div>
+      <div class="sc-bar s3" id="s3-bar" style="width:10%"></div>
+      <div class="sc-sources" id="s3-sources"></div>
+    </div>
+  </div>
+
+  <!-- ── DONUT + BREAKDOWN ── -->
+  <div class="main-grid">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Emissions by scope</div>
+          <div class="card-sub">% contribution to total footprint</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="donut-wrap">
+          <div class="donut-svg-wrap">
+            <svg id="donut-svg" width="130" height="130" viewBox="0 0 130 130"></svg>
+            <div class="donut-center">
+              <div class="donut-center-val" id="donut-total">—</div>
+              <div class="donut-center-label">tCO₂e</div>
+            </div>
+          </div>
+          <div class="donut-legend">
+            <div class="dl-item">
+              <div class="dl-dot" style="background:var(--s1)"></div>
+              <div class="dl-label">Scope 1 — Direct</div>
+              <div class="dl-val" id="dl-s1">—</div>
+              <span class="dl-pct" id="dl-s1-pct"></span>
+            </div>
+            <div class="dl-item">
+              <div class="dl-dot" style="background:var(--s2)"></div>
+              <div class="dl-label">Scope 2 — Electricity</div>
+              <div class="dl-val" id="dl-s2">—</div>
+              <span class="dl-pct" id="dl-s2-pct"></span>
+            </div>
+            <div class="dl-item">
+              <div class="dl-dot" style="background:var(--s3)"></div>
+              <div class="dl-label">Scope 3 — Value chain</div>
+              <div class="dl-val" id="dl-s3">—</div>
+              <span class="dl-pct" id="dl-s3-pct"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Intensity metrics</div>
+          <div class="card-sub">Carbon per unit of activity</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="intensity-row">
+          <div class="int-card">
+            <div class="int-label">Per employee</div>
+            <div class="int-val" id="int-per-emp">—</div>
+            <div class="int-unit">tCO₂e / FTE</div>
+          </div>
+          <div class="int-card">
+            <div class="int-label">Per SGD revenue</div>
+            <div class="int-val" id="int-per-rev">—</div>
+            <div class="int-unit">kgCO₂e / SGD 1,000</div>
+          </div>
+        </div>
+        <div class="intensity-row" style="margin-top:10px">
+          <div class="int-card">
+            <div class="int-label">Scope 1+2 only</div>
+            <div class="int-val" id="int-s12">—</div>
+            <div class="int-unit">tCO₂e</div>
+          </div>
+          <div class="int-card">
+            <div class="int-label">Upstream energy (Cat 3)</div>
+            <div class="int-val" id="int-cat3">—</div>
+            <div class="int-unit">tCO₂e (auto-calc)</div>
+          </div>
+        </div>
+        <div style="font-size:11.5px;color:var(--text-light);margin-top:10px">* Revenue-based intensity shown only if revenue was entered in Company Profile.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ANALOGIES ── -->
+  <div class="card-full">
+    <div class="card-header">
+      <div>
+        <div class="card-title">What does your footprint mean?</div>
+        <div class="card-sub">Everyday analogies to communicate your impact</div>
+      </div>
+    </div>
+    <div style="padding:18px">
+      <div class="analogy-row" id="analogy-row">
+        <!-- Populated by JS -->
+      </div>
+      <div style="font-size:11.5px;color:var(--text-light)">Sources: Singapore EMA, Our World in Data, SIA carbon calculator.</div>
+    </div>
+  </div>
+
+  <!-- ── PEER BENCHMARK ── -->
+  <div class="benchmark-card">
+    <div class="bm-header">
+      <div class="card-title">Peer benchmark — <span id="bm-industry">your industry</span></div>
+      <div class="card-sub">How your footprint compares to similar Singapore SMEs</div>
+    </div>
+    <div class="bm-body">
+      <div class="bm-disclaimer">⚠ Benchmarks are ZYT estimates based on industry averages for Singapore SMEs of similar size. They are indicative only — not certified comparisons.</div>
+
+      <div class="bm-bar-wrap">
+        <div class="bm-bar-label">
+          <span class="name">Your company</span>
+          <span class="val" id="bm-you-val">— tCO₂e</span>
+        </div>
+        <div class="bm-bar-track">
+          <div class="bm-bar-fill you" id="bm-bar-you" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="bm-bar-wrap">
+        <div class="bm-bar-label">
+          <span class="name">Industry median (similar-size SME)</span>
+          <span class="val" id="bm-median-val">— tCO₂e</span>
+        </div>
+        <div class="bm-bar-track">
+          <div class="bm-bar-fill median" id="bm-bar-median" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="bm-bar-wrap">
+        <div class="bm-bar-label">
+          <span class="name">Best-in-class (top 25%)</span>
+          <span class="val" id="bm-best-val">— tCO₂e</span>
+        </div>
+        <div class="bm-bar-track">
+          <div class="bm-bar-fill peer" id="bm-bar-best" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="bm-verdict" id="bm-verdict"></div>
+    </div>
+  </div>
+
+  <!-- ── SCOPE 3 COVERAGE ── -->
+  <div class="card-full">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Scope 3 coverage</div>
+        <div class="card-sub">GHG Protocol requires disclosure of excluded categories</div>
+      </div>
+    </div>
+    <div class="s3-coverage">
+      <div class="s3c-row"><span class="s3c-cat">Cat 1</span><span class="s3c-name">Purchased goods & services (water, packaging, outsourced)</span><span class="s3c-status s3c-partial">Partial</span></div>
+      <div class="s3c-row"><span class="s3c-cat">Cat 2</span><span class="s3c-name">Capital goods (IT hardware, servers)</span><span class="s3c-status s3c-partial">Partial</span></div>
+      <div class="s3c-row"><span class="s3c-cat">Cat 3</span><span class="s3c-name">Fuel & energy (upstream — auto-calculated)</span><span class="s3c-status s3c-covered">Covered</span></div>
+      <div class="s3c-row"><span class="s3c-cat">Cat 4</span><span class="s3c-name">Upstream transport & distribution (3PL, inbound)</span><span class="s3c-status s3c-covered">Covered</span></div>
+      <div class="s3c-row"><span class="s3c-cat">Cat 5</span><span class="s3c-name">Waste generated in operations</span><span class="s3c-status s3c-covered">Covered</span></div>
+      <div class="s3c-row"><span class="s3c-cat">Cat 6</span><span class="s3c-name">Business travel (flights, Grab, hotels)</span><span class="s3c-status s3c-covered">Covered</span></div>
+      <div class="s3c-row"><span class="s3c-cat">Cat 7</span><span class="s3c-name">Employee commuting (all modes)</span><span class="s3c-status s3c-covered">Covered</span></div>
+      <div class="s3c-row"><span class="s3c-cat">Cat 8</span><span class="s3c-name">Upstream leased assets</span><span class="s3c-status s3c-partial">Partial</span></div>
+      <div class="s3c-row"><span class="s3c-cat">Cat 9</span><span class="s3c-name">Downstream transport (outbound delivery)</span><span class="s3c-status s3c-partial">Partial</span></div>
+      <div class="s3c-row"><span class="s3c-cat">Cat 10–12</span><span class="s3c-name">Processing/use/end-of-life of sold products</span><span class="s3c-status s3c-na">N/A for most SMEs</span></div>
+      <div class="s3c-row"><span class="s3c-cat">Cat 14–15</span><span class="s3c-name">Franchises, investments</span><span class="s3c-status s3c-na">Not applicable</span></div>
+    </div>
+  </div>
+
+  <!-- ── ZYT ADVISORY NUDGE ── -->
+  <div class="advisory-nudge" id="advisory-nudge" style="display:none">
+    <div class="an-left">
+      <div class="an-eyebrow">ZYT Advisory</div>
+      <div class="an-title" id="an-title">You're ready to reduce — and save money doing it.</div>
+      <div class="an-sub" id="an-sub">Based on your data, we've identified specific actions that could cut your footprint by 20–35% with a payback under 18 months.</div>
+    </div>
+    <div class="an-right">
+      <button class="btn-white" onclick="window.location.href='/S-19-carbon-overview.html'">See recommendations →</button>
+    </div>
+  </div>
+
+</div><!-- /page-wrap -->
+
+<!-- ACTION BAR -->
+<div class="action-bar">
+  <div class="action-bar-left">
+    Next: set reduction targets and generate your Sustainability Report
+  </div>
+  <div class="action-bar-right">
+    <button class="btn btn-ghost" onclick="window.history.back()">← Back</button>
+    <button class="btn btn-primary" onclick="window.location.href='S-21-target-setting.html'">Set targets →</button>
+  </div>
+</div>
+
+<script>
+// ── SAMPLE / DEMO DATA ──
+// In production this would come from Supabase (aggregated from emissions_data table)
+// For demo purposes, using representative data for a 42-person ICT/services SME
+
+const DEMO = {
+  company: 'ZYT Solutions Pte Ltd',
+  year: 2024,
+  industry: 'ICT & professional services',
+  employees: 42,
+  revenue_sgd: 3200000,  // SGD 3.2M (optional — from S-06)
+
+  // kgCO₂e values
+  scope1_kgco2e: 4820,   // diesel generator, company vehicles
+  scope2_kgco2e: 31200,  // grid electricity
+  scope3_kgco2e: 18940,  // commuting, cloud, business travel, waste
+
+  // SGD cost
+  scope1_sgd: 14200,
+  scope2_sgd: 38500,
+  scope3_sgd: 0,
+
+  // Scope 1 breakdown
+  s1_sources: [
+    { name: 'Company vehicles (petrol)', kgco2e: 3100 },
+    { name: 'Diesel generator (backup)', kgco2e: 1720 },
+  ],
+  // Scope 2 breakdown
+  s2_sources: [
+    { name: 'Office electricity (S-10)', kgco2e: 28400 },
+    { name: 'WFH electricity (S-15)', kgco2e: 2800 },
+  ],
+  // Scope 3 breakdown
+  s3_sources: [
+    { name: 'Employee commuting (Cat 7)', kgco2e: 8200 },
+    { name: 'Business travel (Cat 6)', kgco2e: 4100 },
+    { name: 'Cloud & IT (Cat 1+2)', kgco2e: 3840 },
+    { name: 'Waste & water (Cat 5)', kgco2e: 1600 },
+    { name: 'Upstream energy (Cat 3)', kgco2e: 1200 },
+  ],
+
+  // Benchmark (indicative — ZYT estimates for similar ICT SME)
+  benchmark_median_kgco2e: 62000,
+  benchmark_best_kgco2e: 38000,
+};
+
+// ── Load from localStorage if available, else use demo ──
+function loadData() {
+  // In production: aggregate from emissions_data rows
+  // For now: check if emissions data exists, otherwise use demo
+  return DEMO;
+}
+
+function fmt(kgco2e, decimals=1) {
+  return (kgco2e / 1000).toFixed(decimals);
+}
+function fmtSGD(v) {
+  if (!v) return '';
+  return 'SGD ' + v.toLocaleString('en-SG');
+}
+
+function buildDonut(s1, s2, s3) {
+  const total = s1 + s2 + s3;
+  if (total === 0) return;
+  const cx = 65, cy = 65, r = 48, strokeW = 14;
+  const circumference = 2 * Math.PI * r;
+
+  const segments = [
+    { val: s1, color: '#C75B2E' },
+    { val: s2, color: '#1D6FA4' },
+    { val: s3, color: '#4A8C3F' },
+  ];
+
+  let offset = 0;
+  const svg = document.getElementById('donut-svg');
+  svg.innerHTML = '';
+
+  // Background circle
+  const bg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  bg.setAttribute('cx', cx); bg.setAttribute('cy', cy); bg.setAttribute('r', r);
+  bg.setAttribute('fill', 'none'); bg.setAttribute('stroke', '#E2E0D8'); bg.setAttribute('stroke-width', strokeW);
+  svg.appendChild(bg);
+
+  segments.forEach(seg => {
+    const frac = seg.val / total;
+    const dashArr = frac * circumference;
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', cx); circle.setAttribute('cy', cy); circle.setAttribute('r', r);
+    circle.setAttribute('fill', 'none');
+    circle.setAttribute('stroke', seg.color);
+    circle.setAttribute('stroke-width', strokeW);
+    circle.setAttribute('stroke-dasharray', `${dashArr} ${circumference - dashArr}`);
+    circle.setAttribute('stroke-dashoffset', circumference * (0.25 - offset));
+    circle.setAttribute('transform', `rotate(-90 ${cx} ${cy})`);
+    // animate
+    circle.style.transition = 'stroke-dasharray 1s ease';
+    svg.appendChild(circle);
+    offset += frac;
+  });
+}
+
+function buildAnalogies(totalKg) {
+  const totalT = totalKg / 1000;
+  const analogies = [
+    {
+      emoji: '✈️',
+      val: Math.round(totalT / 0.255),
+      label: 'return flights Singapore → London (economy)',
+      source: 'HCMI CPOR / ICAO'
+    },
+    {
+      emoji: '🚗',
+      val: Math.round(totalKg / 0.1732 / 1000),
+      label: 'thousand km driven by a Singapore petrol car',
+      source: 'MOT Singapore'
+    },
+    {
+      emoji: '🌳',
+      val: Math.round(totalKg / 21.77),
+      label: 'trees needed to absorb this in one year',
+      source: 'FAO / IPCC (avg. 21.77 kgCO₂/tree/yr)'
+    },
+    {
+      emoji: '💡',
+      val: Math.round(totalKg / 0.412 / 1000),
+      label: 'MWh of Singapore grid electricity',
+      source: 'EMA GEF 2023'
+    },
+    {
+      emoji: '🍔',
+      val: Math.round(totalKg / 7.19),
+      label: 'beef burgers (lifecycle emissions)',
+      source: 'Our World in Data'
+    },
+    {
+      emoji: '🏠',
+      val: +(totalT / 4.5).toFixed(1),
+      label: 'average Singapore households annual footprint',
+      source: 'NEA 2023'
+    }
+  ];
+
+  // Show 3 most communicative analogies
+  const show = [0, 2, 5];
+  const row = document.getElementById('analogy-row');
+  row.innerHTML = '';
+  show.forEach(i => {
+    const a = analogies[i];
+    const card = document.createElement('div');
+    card.className = 'analogy-card';
+    card.innerHTML = `
+      <div class="analogy-emoji">${a.emoji}</div>
+      <div class="analogy-val">${a.val.toLocaleString()}</div>
+      <div class="analogy-label">${a.label}</div>
+    `;
+    row.appendChild(card);
+  });
+}
+
+function buildBenchmark(data) {
+  const total = data.scope1_kgco2e + data.scope2_kgco2e + data.scope3_kgco2e;
+  const median = data.benchmark_median_kgco2e;
+  const best = data.benchmark_best_kgco2e;
+  const maxVal = Math.max(total, median, best) * 1.1;
+
+  document.getElementById('bm-industry').textContent = data.industry;
+  document.getElementById('bm-you-val').textContent = fmt(total) + ' tCO₂e';
+  document.getElementById('bm-median-val').textContent = fmt(median) + ' tCO₂e';
+  document.getElementById('bm-best-val').textContent = fmt(best) + ' tCO₂e';
+
+  setTimeout(() => {
+    document.getElementById('bm-bar-you').style.width = (total/maxVal*100)+'%';
+    document.getElementById('bm-bar-median').style.width = (median/maxVal*100)+'%';
+    document.getElementById('bm-bar-best').style.width = (best/maxVal*100)+'%';
+  }, 300);
+
+  const verdictEl = document.getElementById('bm-verdict');
+  if (total < best) {
+    verdictEl.className = 'bm-verdict';
+    verdictEl.textContent = `✓ You are in the top 25% for your industry — your footprint is ${((1 - total/median)*100).toFixed(0)}% below the median. Strong starting position for a reduction target.`;
+  } else if (total < median) {
+    verdictEl.className = 'bm-verdict';
+    verdictEl.textContent = `✓ Your footprint is below the industry median — ${((1 - total/median)*100).toFixed(0)}% lower. Setting a 15–20% reduction target would bring you into the top quartile.`;
+  } else {
+    verdictEl.className = 'bm-verdict average';
+    verdictEl.textContent = `Your footprint is above the industry median by ${((total/median - 1)*100).toFixed(0)}%. There are significant reduction opportunities in your top emission sources. A 20–30% target over 3 years is achievable.`;
+  }
+}
+
+function buildSourceList(containerId, sources, color) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = sources.map(s =>
+    `<div class="sc-source-item"><span>${s.name}</span><span class="val">${(s.kgco2e/1000).toFixed(2)} t</span></div>`
+  ).join('');
+}
+
+function render() {
+  const d = loadData();
+
+  const s1 = d.scope1_kgco2e;
+  const s2 = d.scope2_kgco2e;
+  const s3 = d.scope3_kgco2e;
+  const total = s1 + s2 + s3;
+  const totalT = total / 1000;
+
+  // Hero
+  document.getElementById('hero-company').textContent = d.company;
+  document.getElementById('hero-year').textContent = d.year;
+  document.getElementById('hero-year2').textContent = d.year;
+  document.getElementById('hero-total-val').textContent = totalT.toFixed(1);
+  const totalSGD = (d.scope1_sgd || 0) + (d.scope2_sgd || 0);
+  if (totalSGD) document.getElementById('hero-total-sgd').textContent = 'SGD ' + totalSGD.toLocaleString('en-SG') + ' energy spend';
+
+  // Scope cards
+  document.getElementById('s1-val').textContent = fmt(s1);
+  document.getElementById('s2-val').textContent = fmt(s2);
+  document.getElementById('s3-val').textContent = fmt(s3);
+  document.getElementById('s1-pct').textContent = (s1/total*100).toFixed(0)+'%';
+  document.getElementById('s2-pct').textContent = (s2/total*100).toFixed(0)+'%';
+  document.getElementById('s3-pct').textContent = (s3/total*100).toFixed(0)+'%';
+  if (d.scope1_sgd) document.getElementById('s1-sgd').textContent = 'SGD ' + d.scope1_sgd.toLocaleString('en-SG');
+  if (d.scope2_sgd) document.getElementById('s2-sgd').textContent = 'SGD ' + d.scope2_sgd.toLocaleString('en-SG');
+  document.getElementById('s1-bar').style.width = (s1/total*100)+'%';
+  document.getElementById('s2-bar').style.width = (s2/total*100)+'%';
+  document.getElementById('s3-bar').style.width = (s3/total*100)+'%';
+
+  buildSourceList('s1-sources', d.s1_sources, '--s1');
+  buildSourceList('s2-sources', d.s2_sources, '--s2');
+  buildSourceList('s3-sources', d.s3_sources, '--s3');
+
+  // Donut
+  buildDonut(s1, s2, s3);
+  document.getElementById('donut-total').textContent = totalT.toFixed(1);
+  document.getElementById('dl-s1').textContent = fmt(s1) + ' t';
+  document.getElementById('dl-s2').textContent = fmt(s2) + ' t';
+  document.getElementById('dl-s3').textContent = fmt(s3) + ' t';
+  document.getElementById('dl-s1-pct').textContent = (s1/total*100).toFixed(0)+'%';
+  document.getElementById('dl-s2-pct').textContent = (s2/total*100).toFixed(0)+'%';
+  document.getElementById('dl-s3-pct').textContent = (s3/total*100).toFixed(0)+'%';
+
+  // Intensity
+  document.getElementById('int-s12').textContent = fmt(s1+s2);
+  if (d.employees > 0) document.getElementById('int-per-emp').textContent = (totalT/d.employees).toFixed(2);
+  if (d.revenue_sgd > 0) document.getElementById('int-per-rev').textContent = (total / (d.revenue_sgd/1000)).toFixed(1);
+  // Cat 3 auto-calc: upstream electricity (EMA SEFR Cat 3 = 0.00212 kgCO₂e/kWh)
+  // Approximated from scope 2 total
+  const cat3 = s2 * (0.00212 / 0.412);
+  document.getElementById('int-cat3').textContent = fmt(cat3, 2);
+
+  // Analogies
+  buildAnalogies(total);
+
+  // Benchmark
+  buildBenchmark(d);
+
+  // Advisory nudge
+  document.getElementById('advisory-nudge').style.display = 'flex';
+}
+
+// ── INIT ──
+render();
+</script>
+
+</body>
+</html>

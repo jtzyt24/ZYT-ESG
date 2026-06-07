@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZYT.ESG — Sustainability Context</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #F7F6F2;
+    --surface: #FFFFFF;
+    --surface2: #F0EFE9;
+    --border: #E2E0D8;
+    --text: #1A1917;
+    --text-muted: #6B6860;
+    --text-light: #9B9890;
+    --accent: #2D5F3F;
+    --accent-light: #E6F0EA;
+    --accent-mid: #B8D5C4;
+    --green: #1A7A4A;
+    --green-light: #E6F5ED;
+    --amber: #B45309;
+    --amber-light: #FEF3C7;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.07);
+    --shadow-md: 0 4px 14px rgba(0,0,0,0.09);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── NAV ── */
+  .topnav {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 24px; height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+  .logo span { color: var(--accent); }
+  .nav-left { display: flex; align-items: center; gap: 12px; }
+  .nav-divider { width: 1px; height: 20px; background: var(--border); }
+  .nav-crumb { font-size: 13px; color: var(--text-muted); }
+  .nav-crumb strong { color: var(--text); font-weight: 500; }
+  .save-indicator { font-size: 12px; color: var(--text-light); display: flex; align-items: center; gap: 5px; }
+  .save-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+
+  /* ── LAYOUT ── */
+  .page-wrap { max-width: 860px; margin: 0 auto; padding: 32px 24px 80px; }
+
+  /* ── PAGE HEADER ── */
+  .page-header { margin-bottom: 28px; }
+  .ph-eyebrow { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--accent); margin-bottom: 6px; }
+  .ph-title { font-size: 24px; font-weight: 600; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .ph-sub { font-size: 14px; color: var(--text-muted); max-width: 600px; }
+
+  /* ── SECTION ── */
+  .section {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); margin-bottom: 16px; overflow: hidden;
+  }
+  .section-header {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; user-select: none;
+  }
+  .section-header:hover { background: var(--bg); }
+  .sh-left { display: flex; align-items: center; gap: 12px; }
+  .sh-num {
+    width: 26px; height: 26px;
+    background: var(--accent-light); color: var(--accent);
+    border-radius: 50%; font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .sh-title { font-size: 15px; font-weight: 600; }
+  .sh-sub { font-size: 12.5px; color: var(--text-muted); }
+  .chevron { font-size: 14px; color: var(--text-light); transition: transform 0.2s; }
+  .section.collapsed .chevron { transform: rotate(-90deg); }
+  .section-body { padding: 20px; }
+  .section.collapsed .section-body { display: none; }
+
+  .sh-tag {
+    font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px;
+    background: var(--accent-light); color: var(--accent); border: 1px solid var(--accent-mid);
+  }
+  .sh-tag.auto { background: var(--surface2); color: var(--text-muted); border-color: var(--border); }
+
+  /* ── INTENT NARRATIVE BLOCK ── */
+  .intent-selector { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .intent-option {
+    border: 2px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px 16px; cursor: pointer;
+    display: flex; align-items: flex-start; gap: 12px;
+    transition: all 0.15s; background: var(--surface);
+  }
+  .intent-option:hover { border-color: var(--accent); }
+  .intent-option.selected { border-color: var(--accent); background: var(--accent-light); }
+  .intent-option.selected .io-radio { background: var(--accent); border-color: var(--accent); }
+  .intent-option.selected .io-radio::after { display: block; }
+  .io-radio {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid var(--border); flex-shrink: 0; margin-top: 1px;
+    position: relative; transition: all 0.15s;
+  }
+  .io-radio::after {
+    content: ''; display: none;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: white;
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  }
+  .io-title { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .io-desc { font-size: 12.5px; color: var(--text-muted); }
+
+  /* ── DRAFT NARRATIVE EDITOR ── */
+  .narrative-block {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  .nb-toolbar {
+    background: var(--surface2); padding: 8px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .nb-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+  .nb-actions { display: flex; gap: 8px; }
+  .nb-btn {
+    font-size: 12px; padding: 4px 10px; border-radius: 4px;
+    border: 1px solid var(--border); background: var(--surface);
+    cursor: pointer; color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+  .nb-btn:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent-mid); }
+  .nb-btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  .nb-btn.primary:hover { filter: brightness(1.1); }
+
+  /* Report-preview-style text area */
+  .narrative-editor {
+    width: 100%; min-height: 160px;
+    padding: 16px 18px;
+    font-family: 'Lora', Georgia, serif;
+    font-size: 14.5px; line-height: 1.75;
+    color: var(--text);
+    border: none; outline: none;
+    resize: vertical;
+    background: var(--surface);
+    transition: background 0.15s;
+  }
+  .narrative-editor:focus { background: #FEFEFE; }
+  .narrative-char-count { padding: 6px 14px; font-size: 11px; color: var(--text-light); background: var(--surface2); border-top: 1px solid var(--border); text-align: right; }
+
+  /* ── MATERIAL TOPICS ── */
+  .material-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  @media (max-width: 600px) { .material-grid { grid-template-columns: 1fr; } }
+
+  .material-item {
+    border: 2px solid var(--border); border-radius: var(--radius-sm);
+    padding: 10px 14px; cursor: pointer;
+    transition: all 0.15s; background: var(--surface);
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .material-item:hover { border-color: var(--accent); }
+  .material-item.selected { border-color: var(--accent); background: var(--accent-light); }
+  .mi-check {
+    width: 16px; height: 16px; border: 2px solid var(--border); border-radius: 3px;
+    flex-shrink: 0; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; transition: all 0.15s;
+  }
+  .material-item.selected .mi-check { background: var(--accent); border-color: var(--accent); color: white; }
+  .mi-title { font-size: 13px; font-weight: 500; }
+  .mi-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 1px; }
+  .mi-pillar { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+  .mi-pillar.e { color: var(--green); }
+  .mi-pillar.s { color: #1D6FA4; }
+  .mi-pillar.g { color: #4A3F8C; }
+
+  /* ── UNGC PRINCIPLES TABLE ── */
+  .ungc-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .ungc-table th {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;
+    color: var(--text-muted); padding: 8px 12px; background: var(--surface2);
+    border-bottom: 1px solid var(--border); text-align: left;
+  }
+  .ungc-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .ungc-table tr:last-child td { border-bottom: none; }
+  .ungc-p { font-size: 12px; font-weight: 600; color: var(--text-light); font-family: 'DM Mono', monospace; }
+  .ungc-text { font-size: 12.5px; color: var(--text-muted); }
+  .ungc-coverage {
+    font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 3px; white-space: nowrap;
+  }
+  .ungc-covered { background: var(--green-light); color: var(--green); }
+  .ungc-partial { background: var(--amber-light); color: var(--amber); }
+
+  /* ── LIMITATIONS ── */
+  .limitation-row { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .limitation-row:last-child { border-bottom: none; }
+  .lim-icon { font-size: 14px; flex-shrink: 0; }
+  .lim-text { color: var(--text-muted); flex: 1; }
+
+  /* ── INFO BOX ── */
+  .info-box {
+    background: var(--accent-light); border: 1px solid var(--accent-mid);
+    border-radius: var(--radius-sm); padding: 12px 14px;
+    font-size: 13px; color: #1A3A28; margin-bottom: 16px;
+    display: flex; gap: 10px;
+  }
+  .info-box-icon { font-size: 15px; flex-shrink: 0; }
+
+  /* ── FIELD ── */
+  .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+  .field-label { font-size: 12.5px; font-weight: 500; }
+  .field-hint { font-size: 11.5px; color: var(--text-muted); }
+  input[type="text"], select {
+    width: 100%; height: 38px; padding: 0 12px;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    color: var(--text); background: var(--surface);
+    outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input:focus, select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(45,95,63,0.1);
+  }
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%239B9890' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
+  }
+
+  /* ── ACTION BAR ── */
+  .action-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    padding: 14px 24px; display: flex; justify-content: space-between; align-items: center;
+    z-index: 90;
+  }
+  .action-bar-left { font-size: 13px; color: var(--text-muted); }
+  .action-bar-right { display: flex; gap: 10px; }
+  .btn {
+    height: 38px; padding: 0 18px; border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    cursor: pointer; border: none; transition: all 0.15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { filter: brightness(1.1); }
+  .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+
+  /* ── SPINNER ── */
+  .spinner-wrap { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); }
+  .spinner {
+    width: 16px; height: 16px; border: 2px solid var(--border);
+    border-top-color: var(--accent); border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner-wrap.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="nav-left">
+    <div class="logo">ZYT<span>.ESG</span></div>
+    <div class="nav-divider"></div>
+    <div class="nav-crumb">Report → <strong>Sustainability Context</strong></div>
+  </div>
+  <div class="save-indicator"><div class="save-dot"></div> Auto-saved</div>
+</nav>
+
+<div class="page-wrap">
+
+  <div class="page-header">
+    <div class="ph-eyebrow">Section 3 of 11 — Report generation</div>
+    <div class="ph-title">Our sustainability context</div>
+    <div class="ph-sub">This section opens your Sustainability Report. It tells readers <em>why</em> you're reporting, <em>what</em> matters to your business, and <em>who</em> is accountable.</div>
+  </div>
+
+  <!-- ══ SECTION 1: WHY WE REPORT ══ -->
+  <div class="section" id="sec-intent">
+    <div class="section-header" onclick="toggleSection('sec-intent')">
+      <div class="sh-left">
+        <div class="sh-num">1</div>
+        <div>
+          <div class="sh-title">Why we are reporting</div>
+          <div class="sh-sub">Your motivation — used to draft the opening narrative</div>
+        </div>
+      </div>
+      <div class="sh-right">
+        <span class="sh-tag">Required</span>
+        <span class="chevron">▾</span>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="info-box">
+        <span class="info-box-icon">💡</span>
+        <div>Select your primary reason for producing this report. ZYT.ESG will draft an opening narrative for your report — you can edit it freely before generating the PDF.</div>
+      </div>
+
+      <div class="intent-selector" id="intent-selector">
+        <div class="intent-option" onclick="selectIntent(this, 'buyer')" data-intent="buyer">
+          <div class="io-radio"></div>
+          <div>
+            <div class="io-title">🏢 A corporate customer requested our emissions data</div>
+            <div class="io-desc">Supply chain / Scope 3 request from a buyer, MNC, or procurement team</div>
+          </div>
+        </div>
+        <div class="intent-option" onclick="selectIntent(this, 'financing')" data-intent="financing">
+          <div class="io-radio"></div>
+          <div>
+            <div class="io-title">🏦 We are applying for sustainability-linked financing</div>
+            <div class="io-desc">UOB SAGE, OCBC Start-ESG, DBS green loan, or similar programme</div>
+          </div>
+        </div>
+        <div class="intent-option" onclick="selectIntent(this, 'cost')" data-intent="cost">
+          <div class="io-radio"></div>
+          <div>
+            <div class="io-title">💡 We want to reduce costs through operational efficiency</div>
+            <div class="io-desc">Energy, fuel, and waste savings — carbon is a by-product of cost reduction</div>
+          </div>
+        </div>
+        <div class="intent-option" onclick="selectIntent(this, 'annual')" data-intent="annual">
+          <div class="io-radio"></div>
+          <div>
+            <div class="io-title">📄 This is our annual Sustainability Report</div>
+            <div class="io-desc">Year-on-year reporting for stakeholders, employees, and public record</div>
+          </div>
+        </div>
+        <div class="intent-option" onclick="selectIntent(this, 'ungc')" data-intent="ungc">
+          <div class="io-radio"></div>
+          <div>
+            <div class="io-title">🌐 UNGC Communication on Progress (CoP)</div>
+            <div class="io-desc">Fulfilling our obligation as a UNGC signatory — Ten Principles alignment required</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ SECTION 2: NARRATIVE EDITOR ══ -->
+  <div class="section" id="sec-narrative">
+    <div class="section-header" onclick="toggleSection('sec-narrative')">
+      <div class="sh-left">
+        <div class="sh-num">2</div>
+        <div>
+          <div class="sh-title">Opening narrative</div>
+          <div class="sh-sub">Drafted from your intent — edit before generating the report</div>
+        </div>
+      </div>
+      <div class="sh-right">
+        <span class="sh-tag">Required</span>
+        <span class="chevron">▾</span>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="info-box">
+        <span class="info-box-icon">✍️</span>
+        <div>
+          Select your intent above and click <strong>"Generate draft"</strong> to produce a report-ready paragraph. Edit it to match your voice and add any specific context — customers, markets, team commitments — before proceeding.
+        </div>
+      </div>
+
+      <div class="narrative-block">
+        <div class="nb-toolbar">
+          <div class="nb-label">
+            <span class="spinner-wrap hidden" id="draft-spinner"><span class="spinner"></span> Drafting…</span>
+            <span id="draft-label">Opening paragraph — Section 3 of your Sustainability Report</span>
+          </div>
+          <div class="nb-actions">
+            <button class="nb-btn" onclick="clearNarrative()">Clear</button>
+            <button class="nb-btn primary" id="gen-btn" onclick="generateDraft()">✦ Generate draft</button>
+          </div>
+        </div>
+        <textarea class="narrative-editor" id="narrative-text" 
+          placeholder="Select your reporting intent above, then click 'Generate draft' — or write your own opening paragraph here."
+          oninput="updateCharCount()"></textarea>
+        <div class="narrative-char-count" id="char-count">0 characters</div>
+      </div>
+
+      <!-- Statement by responsible person -->
+      <div style="margin-top:16px">
+        <div class="field-label" style="font-size:12.5px;font-weight:500;margin-bottom:8px">
+          Statement attributed to (appears in report as signed statement)
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <input type="text" id="sign-name" placeholder="e.g. Tan Wei Ming" style="font-size:13.5px">
+          <input type="text" id="sign-role" placeholder="e.g. Managing Director" style="font-size:13.5px">
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ SECTION 3: MATERIAL TOPICS ══ -->
+  <div class="section" id="sec-material">
+    <div class="section-header" onclick="toggleSection('sec-material')">
+      <div class="sh-left">
+        <div class="sh-num">3</div>
+        <div>
+          <div class="sh-title">Material topics</div>
+          <div class="sh-sub">The ESG issues most relevant to your business and stakeholders</div>
+        </div>
+      </div>
+      <div class="sh-right">
+        <span class="sh-tag">Required</span>
+        <span class="chevron">▾</span>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="info-box">
+        <span class="info-box-icon">📌</span>
+        <div>
+          GHG Protocol and SGX Core ESG Metrics require you to identify which ESG topics are <strong>material</strong> to your business. Select the topics most relevant to your operations — these appear in your report and justify your data collection scope.
+        </div>
+      </div>
+
+      <div class="material-grid" id="material-grid">
+
+        <div class="material-item selected" onclick="toggleMaterial(this)">
+          <div class="mi-check">✓</div>
+          <div>
+            <div class="mi-pillar e">Environmental</div>
+            <div class="mi-title">GHG emissions & energy use</div>
+            <div class="mi-sub">Scope 1, 2, 3 footprint; energy efficiency; carbon reduction</div>
+          </div>
+        </div>
+
+        <div class="material-item selected" onclick="toggleMaterial(this)">
+          <div class="mi-check">✓</div>
+          <div>
+            <div class="mi-pillar e">Environmental</div>
+            <div class="mi-title">Waste management</div>
+            <div class="mi-sub">General waste, food waste, recycling; NEA compliance</div>
+          </div>
+        </div>
+
+        <div class="material-item" onclick="toggleMaterial(this)">
+          <div class="mi-check"></div>
+          <div>
+            <div class="mi-pillar e">Environmental</div>
+            <div class="mi-title">Water use</div>
+            <div class="mi-sub">PUB metered consumption; water efficiency initiatives</div>
+          </div>
+        </div>
+
+        <div class="material-item" onclick="toggleMaterial(this)">
+          <div class="mi-check"></div>
+          <div>
+            <div class="mi-pillar e">Environmental</div>
+            <div class="mi-title">Supply chain & procurement</div>
+            <div class="mi-sub">Packaging, upstream Scope 3; responsible sourcing</div>
+          </div>
+        </div>
+
+        <div class="material-item selected" onclick="toggleMaterial(this)">
+          <div class="mi-check">✓</div>
+          <div>
+            <div class="mi-pillar s">Social</div>
+            <div class="mi-title">Employee health & safety</div>
+            <div class="mi-sub">Incident rates, bizSAFE, MOM compliance</div>
+          </div>
+        </div>
+
+        <div class="material-item" onclick="toggleMaterial(this)">
+          <div class="mi-check"></div>
+          <div>
+            <div class="mi-pillar s">Social</div>
+            <div class="mi-title">Workforce diversity & inclusion</div>
+            <div class="mi-sub">Gender parity, Fair Employment Practices, TAFEP alignment</div>
+          </div>
+        </div>
+
+        <div class="material-item" onclick="toggleMaterial(this)">
+          <div class="mi-check"></div>
+          <div>
+            <div class="mi-pillar s">Social</div>
+            <div class="mi-title">Training & development</div>
+            <div class="mi-sub">SkillsFuture, WSQ programmes, staff upskilling hours</div>
+          </div>
+        </div>
+
+        <div class="material-item" onclick="toggleMaterial(this)">
+          <div class="mi-check"></div>
+          <div>
+            <div class="mi-pillar s">Social</div>
+            <div class="mi-title">Community engagement</div>
+            <div class="mi-sub">Volunteerism, charity partnerships, local sourcing</div>
+          </div>
+        </div>
+
+        <div class="material-item selected" onclick="toggleMaterial(this)">
+          <div class="mi-check">✓</div>
+          <div>
+            <div class="mi-pillar g">Governance</div>
+            <div class="mi-title">Anti-corruption & ethics</div>
+            <div class="mi-sub">Code of conduct, gifts policy, conflict of interest</div>
+          </div>
+        </div>
+
+        <div class="material-item" onclick="toggleMaterial(this)">
+          <div class="mi-check"></div>
+          <div>
+            <div class="mi-pillar g">Governance</div>
+            <div class="mi-title">Data protection & privacy</div>
+            <div class="mi-sub">PDPA compliance, DPO appointment, data governance</div>
+          </div>
+        </div>
+
+        <div class="material-item" onclick="toggleMaterial(this)">
+          <div class="mi-check"></div>
+          <div>
+            <div class="mi-pillar g">Governance</div>
+            <div class="mi-title">Regulatory compliance</div>
+            <div class="mi-sub">Employment Act, WSH Act, environmental licences</div>
+          </div>
+        </div>
+
+        <div class="material-item" onclick="toggleMaterial(this)">
+          <div class="mi-check"></div>
+          <div>
+            <div class="mi-pillar g">Governance</div>
+            <div class="mi-title">ESG strategy & leadership</div>
+            <div class="mi-sub">Board/management oversight, targets, reporting cadence</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="field">
+        <div class="field-label">Additional material topics <span style="font-weight:400;font-size:11.5px;color:var(--text-light)">(optional)</span></div>
+        <input type="text" id="material-other" placeholder="e.g. Halal certification, food safety, customer data security…">
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ SECTION 4: UNGC PRINCIPLES (conditional) ══ -->
+  <div class="section" id="sec-ungc" style="display:none">
+    <div class="section-header" onclick="toggleSection('sec-ungc')">
+      <div class="sh-left">
+        <div class="sh-num">4</div>
+        <div>
+          <div class="sh-title">UNGC Ten Principles alignment</div>
+          <div class="sh-sub">Auto-generated for CoP submission — included in report appendix</div>
+        </div>
+      </div>
+      <div class="sh-right">
+        <span class="sh-tag auto">Auto-generated</span>
+        <span class="chevron">▾</span>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="info-box">
+        <span class="info-box-icon">🌐</span>
+        <div>
+          As a UNGC signatory, your Communication on Progress (CoP) must demonstrate action on all Ten Principles. ZYT.ESG maps your data to each principle automatically. This table appears in your report appendix.
+        </div>
+      </div>
+
+      <table class="ungc-table">
+        <thead>
+          <tr>
+            <th style="width:60px">Principle</th>
+            <th>UNGC principle</th>
+            <th>ZYT.ESG coverage</th>
+            <th style="width:90px">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ungc-p">P1–2</td>
+            <td class="ungc-text">Human Rights — support and respect human rights; non-complicity in abuses</td>
+            <td class="ungc-text">Workforce data (S-31), training hours, OHS disclosure (S-32)</td>
+            <td><span class="ungc-coverage ungc-covered">Covered</span></td>
+          </tr>
+          <tr>
+            <td class="ungc-p">P3–6</td>
+            <td class="ungc-text">Labour — freedom of association; no forced labour; no child labour; no discrimination</td>
+            <td class="ungc-text">Gender split, age groups, training hours, MOM injury categories, bizSAFE</td>
+            <td><span class="ungc-coverage ungc-covered">Covered</span></td>
+          </tr>
+          <tr>
+            <td class="ungc-p">P7–9</td>
+            <td class="ungc-text">Environment — precautionary approach; environmental responsibility; clean technology</td>
+            <td class="ungc-text">Full Scope 1/2/3 baseline, reduction targets, SEFR-verified factors</td>
+            <td><span class="ungc-coverage ungc-covered">Covered</span></td>
+          </tr>
+          <tr>
+            <td class="ungc-p">P10</td>
+            <td class="ungc-text">Anti-Corruption — work against corruption in all forms, including extortion and bribery</td>
+            <td class="ungc-text">Anti-corruption policy, staff training %, whistleblowing channel (S-33)</td>
+            <td><span class="ungc-coverage ungc-partial">Partial</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="font-size:12px;color:var(--text-light);margin-top:10px">
+        P10 is marked "Partial" until anti-corruption policy is confirmed in Governance (S-33). Full coverage achieved when policy = Yes.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ SECTION 5: REPORTING LIMITATIONS ══ -->
+  <div class="section collapsed" id="sec-limits">
+    <div class="section-header" onclick="toggleSection('sec-limits')">
+      <div class="sh-left">
+        <div class="sh-num" id="limits-num">5</div>
+        <div>
+          <div class="sh-title">Reporting boundary & limitations</div>
+          <div class="sh-sub">Auto-generated — appears in Section 2 of your report</div>
+        </div>
+      </div>
+      <div class="sh-right">
+        <span class="sh-tag auto">Auto-generated</span>
+        <span class="chevron">▾</span>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="limitation-row">
+        <span class="lim-icon">🏢</span>
+        <div class="lim-text"><strong>Organisational boundary:</strong> Operational control method (GHG Protocol). All facilities and activities under company operational control in Singapore are included.</div>
+      </div>
+      <div class="limitation-row">
+        <span class="lim-icon">📅</span>
+        <div class="lim-text"><strong>Reporting period:</strong> 1 January – 31 December <span id="limit-year">2024</span>. Financial year companies: period matches financial year end.</div>
+      </div>
+      <div class="limitation-row">
+        <span class="lim-icon">📊</span>
+        <div class="lim-text"><strong>Emission factors:</strong> Singapore Emission Factors Registry (SEFR), NEA, January 2026. Grid emission factor: EMA 2023, 0.412 kgCO₂/kWh.</div>
+      </div>
+      <div class="limitation-row">
+        <span class="lim-icon">⚠️</span>
+        <div class="lim-text"><strong>Scope 3 coverage:</strong> Categories 10–15 are excluded as not material to our operations (see Appendix for full exclusions table). Category 1 includes water, packaging, and outsourced services only — raw materials excluded due to data availability.</div>
+      </div>
+      <div class="limitation-row">
+        <span class="lim-icon">🔍</span>
+        <div class="lim-text"><strong>Assurance:</strong> This report is <span id="assurance-text">self-declared</span>. No external assurance has been obtained for this reporting period.</div>
+      </div>
+      <div class="limitation-row">
+        <span class="lim-icon">📋</span>
+        <div class="lim-text"><strong>Framework alignment:</strong> Prepared with reference to SGX Core ESG Metrics (April 2023) and GHG Protocol Corporate Standard. Not prepared in full accordance with GRI Standards.</div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /page-wrap -->
+
+<div class="action-bar">
+  <div class="action-bar-left" id="action-status">Select intent and edit narrative to continue</div>
+  <div class="action-bar-right">
+    <button class="btn btn-ghost" onclick="window.history.back()">← Back</button>
+    <button class="btn btn-primary" onclick="saveAndContinue()">Save & preview report →</button>
+  </div>
+</div>
+
+<script>
+// ── Intent drafts ──
+const DRAFTS = {
+  buyer: `{company} is committed to responsible business practices and understands the critical role that supply chain sustainability plays in meeting our customers' environmental goals. This report has been prepared in response to requests from our valued customers for transparency on our carbon emissions and broader ESG performance.\n\nAs a Singapore-based SME, we recognise that our Scope 1 and 2 emissions form part of our customers' Scope 3 footprint under the GHG Protocol. We have measured our {year} emissions baseline using Singapore's official emission factors (SEFR) and present this data to support their reporting requirements. We are committed to reducing our footprint year-on-year and to continuing this reporting annually.`,
+
+  financing: `{company} is taking a systematic approach to sustainability as part of our long-term business resilience strategy. This report supports our application for sustainability-linked financing and demonstrates our commitment to measured, evidence-based emissions reduction.\n\nWe have established our {year} baseline using Singapore's official emission factors (SEFR) and the GHG Protocol Corporate Standard. Our targets and action plan reflect commercially viable reduction pathways that align with both our operational priorities and the eligibility criteria of Singapore's green finance programmes.`,
+
+  cost: `{company} prepared this Sustainability Report as part of a strategic review of our operational efficiency. We believe that reducing our environmental impact and reducing operational costs are the same objective — measured differently.\n\nThis {year} baseline reveals where our energy, fuel, and waste costs are concentrated, and where the greatest opportunities for cost and carbon reduction lie. All targets in this report are grounded in measurable financial return as well as environmental benefit.`,
+
+  annual: `{company} is pleased to present our {year} Sustainability Report — our {ordinal} annual disclosure on Environmental, Social, and Governance performance. We produce this report as a matter of good governance and to maintain transparency with our customers, employees, and business partners.\n\nThis report covers our full Scope 1, 2, and 3 carbon footprint, our people and safety data, and our governance practices, aligned to SGX Core ESG Metrics (April 2023) and the GHG Protocol Corporate Standard.`,
+
+  ungc: `{company} is a signatory to the United Nations Global Compact (UNGC). This report constitutes our Communication on Progress (CoP) for {year}, demonstrating our commitment to the UNGC Ten Principles on Human Rights, Labour, Environment, and Anti-Corruption.\n\nWe have measured and disclosed our full Scope 1, 2, and 3 carbon footprint using Singapore's official emission factors (SEFR) and GHG Protocol methodology. Our workforce, safety, and governance disclosures are aligned to SGX Core ESG Metrics (April 2023). The Appendix contains our UNGC Ten Principles alignment table.`
+};
+
+const ORDINALS = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth'];
+
+let selectedIntent = null;
+
+function toggleSection(id) {
+  document.getElementById(id).classList.toggle('collapsed');
+}
+
+function selectIntent(el, intent) {
+  document.querySelectorAll('.intent-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedIntent = intent;
+
+  // Show UNGC section if applicable
+  const ungcSec = document.getElementById('sec-ungc');
+  ungcSec.style.display = intent === 'ungc' ? 'block' : 'none';
+  document.getElementById('limits-num').textContent = intent === 'ungc' ? '6' : '5';
+  localStorage.setItem('zyt_intent_ungc', intent === 'ungc' ? 'true' : 'false');
+
+  // Update action status
+  document.getElementById('action-status').textContent = 'Intent selected — generate or write your opening narrative';
+  updateCompletionStatus();
+}
+
+function generateDraft() {
+  if (!selectedIntent) {
+    alert('Please select your reporting intent above first.');
+    return;
+  }
+
+  const btn = document.getElementById('gen-btn');
+  const spinner = document.getElementById('draft-spinner');
+  const label = document.getElementById('draft-label');
+
+  btn.disabled = true;
+  btn.textContent = '…';
+  spinner.classList.remove('hidden');
+  label.style.display = 'none';
+
+  // Load company data
+  const profile = JSON.parse(localStorage.getItem('zyt_company_profile') || '{}');
+  const company = profile.companyName || '[Your Company Name]';
+  const year = profile.reportingYear || new Date().getFullYear() - 1;
+  const reportCount = profile.reportCount || 1;
+  const ordinal = ORDINALS[Math.min(reportCount - 1, ORDINALS.length - 1)] || 'annual';
+
+  // Build prompt for Claude API
+  const baseTemplate = DRAFTS[selectedIntent];
+  const filledTemplate = baseTemplate
+    .replace(/{company}/g, company)
+    .replace(/{year}/g, year)
+    .replace(/{ordinal}/g, ordinal);
+
+  // Use Claude API to refine the draft
+  const systemPrompt = `You are a professional sustainability report writer for Singapore SMEs. 
+Your task: take the template narrative below and refine it into a polished, authentic 2-paragraph opening statement for a Sustainability Report.
+Rules:
+- Keep it concise — 100-150 words total
+- Professional but not corporate-speak
+- Use first person plural (we, our)
+- Do NOT add headers, bullet points, or formatting
+- Do NOT change company name or year
+- Return ONLY the narrative text, nothing else`;
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: `Refine this draft:\n\n${filledTemplate}` }]
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    const text = data.content?.find(b => b.type === 'text')?.text || filledTemplate;
+    document.getElementById('narrative-text').value = text;
+    updateCharCount();
+    spinner.classList.add('hidden');
+    label.style.display = '';
+    btn.disabled = false;
+    btn.textContent = '↻ Regenerate';
+    updateCompletionStatus();
+  })
+  .catch(() => {
+    // Fallback: use template directly
+    document.getElementById('narrative-text').value = filledTemplate;
+    updateCharCount();
+    spinner.classList.add('hidden');
+    label.style.display = '';
+    btn.disabled = false;
+    btn.textContent = '↻ Regenerate';
+    updateCompletionStatus();
+  });
+}
+
+function clearNarrative() {
+  if (document.getElementById('narrative-text').value && !confirm('Clear the narrative text?')) return;
+  document.getElementById('narrative-text').value = '';
+  updateCharCount();
+}
+
+function updateCharCount() {
+  const len = document.getElementById('narrative-text').value.length;
+  document.getElementById('char-count').textContent = `${len} characters`;
+  updateCompletionStatus();
+}
+
+function toggleMaterial(el) {
+  el.classList.toggle('selected');
+  const check = el.querySelector('.mi-check');
+  check.textContent = el.classList.contains('selected') ? '✓' : '';
+}
+
+function updateCompletionStatus() {
+  const intentSelected = selectedIntent !== null;
+  const narrativeOk = document.getElementById('narrative-text').value.trim().length > 20;
+  const done = [intentSelected, narrativeOk].filter(Boolean).length;
+  const el = document.getElementById('action-status');
+  if (done === 2) {
+    el.innerHTML = '<span style="color:var(--green)">✓ Context complete — ready to preview report</span>';
+  } else {
+    el.textContent = `${done} of 2 required items complete`;
+  }
+}
+
+function saveAndContinue() {
+  const materials = [...document.querySelectorAll('.material-item.selected')]
+    .map(m => m.querySelector('.mi-title').textContent);
+  if (document.getElementById('material-other').value) {
+    materials.push(document.getElementById('material-other').value);
+  }
+
+  const data = {
+    intent: selectedIntent,
+    narrative: document.getElementById('narrative-text').value,
+    signatoryName: document.getElementById('sign-name').value,
+    signatoryRole: document.getElementById('sign-role').value,
+    materialTopics: materials,
+  };
+  localStorage.setItem('zyt_context_data', JSON.stringify(data));
+  window.location.href = 'S-24-report-preview.html';
+}
+
+// ── Load saved data ──
+const savedCtx = localStorage.getItem('zyt_context_data');
+if (savedCtx) {
+  try {
+    const d = JSON.parse(savedCtx);
+    if (d.intent) {
+      const opt = document.querySelector(`[data-intent="${d.intent}"]`);
+      if (opt) selectIntent(opt, d.intent);
+    }
+    if (d.narrative) {
+      document.getElementById('narrative-text').value = d.narrative;
+      updateCharCount();
+    }
+    if (d.signatoryName) document.getElementById('sign-name').value = d.signatoryName;
+    if (d.signatoryRole) document.getElementById('sign-role').value = d.signatoryRole;
+  } catch(e) {}
+}
+
+// ── Set year in limitations ──
+const profileY = JSON.parse(localStorage.getItem('zyt_company_profile') || '{}');
+if (profileY.reportingYear) document.getElementById('limit-year').textContent = profileY.reportingYear;
+
+// Check assurance from governance data
+const govData = JSON.parse(localStorage.getItem('zyt_governance_data') || '{}');
+if (govData.assuranceType && govData.assuranceType !== 'none') {
+  document.getElementById('assurance-text').textContent = govData.assuranceType.replace('_', ' ');
+}
+
+updateCompletionStatus();
+</script>
+
+</body>
+</html>

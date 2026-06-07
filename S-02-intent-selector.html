@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What brings you here? — ZYT.ESG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:     #17160e;
+  --ink2:    #44423a;
+  --ink3:    #88867c;
+  --ink4:    #c6c3ba;
+  --bg:      #f5f2eb;
+  --card:    #ffffff;
+  --border:  #e3dfd5;
+  --border2: #edeae2;
+
+  /* Intent colours */
+  --c1:  #1a6b4a; --c1b: #eaf4ee; --c1e: #b4d9c4;
+  --c2:  #7a3a0a; --c2b: #fdf0e6; --c2e: #edc89a;
+  --c3:  #1a3a7a; --c3b: #edf2fc; --c3e: #b4c8f0;
+  --c4:  #4a1a6b; --c4b: #f2eaf8; --c4e: #ccb4e0;
+  --c5:  #5a4a1a; --c5b: #f8f4e8; --c5e: #d8c88a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── NAV ── */
+nav {
+  height: 52px;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.logo {
+  font-family: 'Fraunces', serif;
+  font-size: 17px;
+  font-weight: 300;
+  letter-spacing: -0.3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--c1);
+  background: var(--c1b);
+  border: 1px solid var(--c1e);
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+.nav-back {
+  font-size: 12px;
+  color: var(--ink3);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.15s;
+}
+.nav-back:hover { color: var(--ink); }
+
+/* ── PAGE ── */
+.page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 44px 20px 72px;
+}
+
+/* ── HEADER ── */
+.hd {
+  text-align: center;
+  max-width: 460px;
+  margin-bottom: 36px;
+  animation: up 0.5s ease both;
+}
+.hd-step {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.hd-step::before, .hd-step::after {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--ink4);
+}
+.hd-title {
+  font-family: 'Fraunces', serif;
+  font-size: 30px;
+  font-weight: 300;
+  letter-spacing: -0.6px;
+  line-height: 1.2;
+  margin-bottom: 10px;
+  color: var(--ink);
+}
+.hd-title em { font-style: italic; }
+.hd-sub {
+  font-size: 13px;
+  color: var(--ink3);
+  line-height: 1.6;
+}
+
+/* ── CARDS ── */
+.cards {
+  width: 100%;
+  max-width: 540px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card {
+  position: relative;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: border-color 0.18s, box-shadow 0.18s, transform 0.12s;
+  animation: up 0.45s ease both;
+  overflow: hidden;
+}
+.card:nth-child(1) { animation-delay: 0.06s; }
+.card:nth-child(2) { animation-delay: 0.12s; }
+.card:nth-child(3) { animation-delay: 0.18s; }
+.card:nth-child(4) { animation-delay: 0.24s; }
+.card:nth-child(5) { animation-delay: 0.30s; }
+
+.card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.07); }
+.card:active { transform: translateY(0); }
+
+/* Colour stripe on left edge */
+.card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  border-radius: 14px 0 0 14px;
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+.card.sel::before { opacity: 1; }
+.card[data-i="1"]::before { background: var(--c1); }
+.card[data-i="2"]::before { background: var(--c2); }
+.card[data-i="3"]::before { background: var(--c3); }
+.card[data-i="4"]::before { background: var(--c4); }
+.card[data-i="5"]::before { background: var(--c5); }
+
+.card[data-i="1"].sel { border-color: var(--c1); background: #fcfffd; }
+.card[data-i="2"].sel { border-color: var(--c2); background: #fffcf8; }
+.card[data-i="3"].sel { border-color: var(--c3); background: #f8faff; }
+.card[data-i="4"].sel { border-color: var(--c4); background: #fdf9ff; }
+.card[data-i="5"].sel { border-color: var(--c5); background: #fefdf5; }
+
+/* Main row */
+.card-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 16px 16px 18px;
+}
+
+.card-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.18s;
+}
+.card[data-i="1"] .card-icon { background: var(--c1b); color: var(--c1); }
+.card[data-i="2"] .card-icon { background: var(--c2b); color: var(--c2); }
+.card[data-i="3"] .card-icon { background: var(--c3b); color: var(--c3); }
+.card[data-i="4"] .card-icon { background: var(--c4b); color: var(--c4); }
+.card[data-i="5"] .card-icon { background: var(--c5b); color: var(--c5); }
+.card-icon svg { width: 18px; height: 18px; }
+
+.card-text { flex: 1; }
+.card-trigger {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  margin-bottom: 3px;
+  transition: color 0.18s;
+}
+.card[data-i="1"] .card-trigger { color: var(--c1); }
+.card[data-i="2"] .card-trigger { color: var(--c2); }
+.card[data-i="3"] .card-trigger { color: var(--c3); }
+.card[data-i="4"] .card-trigger { color: var(--c4); }
+.card[data-i="5"] .card-trigger { color: var(--c5); }
+
+.card-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.35;
+  margin-bottom: 2px;
+}
+.card-desc {
+  font-size: 12px;
+  color: var(--ink3);
+  line-height: 1.5;
+}
+
+.card-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s;
+}
+.card[data-i="1"].sel .card-dot { background: var(--c1); border-color: var(--c1); }
+.card[data-i="2"].sel .card-dot { background: var(--c2); border-color: var(--c2); }
+.card[data-i="3"].sel .card-dot { background: var(--c3); border-color: var(--c3); }
+.card[data-i="4"].sel .card-dot { background: var(--c4); border-color: var(--c4); }
+.card[data-i="5"].sel .card-dot { background: var(--c5); border-color: var(--c5); }
+.card-dot svg { width: 10px; height: 10px; color: white; opacity: 0; transition: opacity 0.15s; }
+.card.sel .card-dot svg { opacity: 1; }
+
+/* Expand panel */
+.card-expand {
+  display: none;
+  padding: 0 16px 16px 70px;
+  animation: fadein 0.2s ease;
+}
+.card.sel .card-expand { display: block; }
+.expand-divider {
+  height: 1px;
+  background: var(--border2);
+  margin-bottom: 12px;
+}
+.expand-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--ink3);
+  margin-bottom: 8px;
+}
+.expand-items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.expand-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--ink2);
+  line-height: 1.45;
+}
+.expand-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+.card[data-i="1"] .expand-dot { background: var(--c1); }
+.card[data-i="2"] .expand-dot { background: var(--c2); }
+.card[data-i="3"] .expand-dot { background: var(--c3); }
+.card[data-i="4"] .expand-dot { background: var(--c4); }
+.card[data-i="5"] .expand-dot { background: var(--c5); }
+
+/* PCR badge */
+.new-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  margin-left: 6px;
+  vertical-align: middle;
+  background: var(--c5b);
+  color: var(--c5);
+  border: 1px solid var(--c5e);
+}
+
+/* ── CTA ── */
+.cta-wrap {
+  width: 100%;
+  max-width: 540px;
+  margin-top: 20px;
+  animation: up 0.45s ease 0.36s both;
+}
+.btn-go {
+  width: 100%;
+  height: 48px;
+  background: var(--ink);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: -0.1px;
+  transition: background 0.15s, opacity 0.2s, transform 0.1s;
+}
+.btn-go:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn-go:not(:disabled):hover { background: #262519; }
+.btn-go:not(:disabled):active { transform: scale(0.99); }
+.btn-go svg { width: 15px; height: 15px; transition: transform 0.15s; }
+.btn-go:not(:disabled):hover svg { transform: translateX(3px); }
+
+/* ── TRUST STRIP ── */
+.trust {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 28px;
+  animation: up 0.45s ease 0.42s both;
+}
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--ink3);
+}
+.trust-item svg { width: 11px; height: 11px; color: var(--ink4); }
+
+@keyframes up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (max-width: 540px) {
+  .hd-title { font-size: 26px; }
+  nav { padding: 0 16px; }
+  .card-expand { padding-left: 18px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">ZYT.ESG <span class="logo-tag">ESG</span></div>
+  <a href="/index.html" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M9 2.5L4 7l5 4.5"/></svg>
+    Back
+  </a>
+</nav>
+
+<div class="page">
+
+  <div class="hd">
+    <div class="hd-step">Before we start</div>
+    <h1 class="hd-title">What brings you to<br>ZYT.ESG <em>today?</em></h1>
+    <p class="hd-sub">We'll show you what matters most first.<br>You can always change this in Settings later.</p>
+  </div>
+
+  <div class="cards" id="cards">
+
+    <!-- 1. Buyer / client asked -->
+    <div class="card" data-i="1" role="button" tabindex="0" aria-pressed="false">
+      <div class="card-main">
+        <div class="card-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 5h14M3 10h10M3 15h6"/>
+            <circle cx="16" cy="14" r="3"/>
+            <path d="M16 13v1.5l1 1"/>
+          </svg>
+        </div>
+        <div class="card-text">
+          <div class="card-trigger">A customer or buyer asked</div>
+          <div class="card-title">I need to provide carbon data to a client</div>
+          <div class="card-desc">A company you supply to has requested your emissions figures for their reporting or a tender.</div>
+        </div>
+        <div class="card-dot"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="card-expand">
+        <div class="expand-divider"></div>
+        <div class="expand-label">What we'll show you first</div>
+        <div class="expand-items">
+          <div class="expand-item"><div class="expand-dot"></div>Fast path to your Sustainability Report and one-page Carbon Report</div>
+          <div class="expand-item"><div class="expand-dot"></div>Scope 1 & 2 data front and centre — what most buyers request</div>
+          <div class="expand-item"><div class="expand-dot"></div>Your report works for any buyer who asks — not just this one</div>
+          <div class="expand-item"><div class="expand-dot"></div>If it's for a specific project or event, use option 5 instead</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Green financing -->
+    <div class="card" data-i="2" role="button" tabindex="0" aria-pressed="false">
+      <div class="card-main">
+        <div class="card-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="5" width="16" height="11" rx="2"/>
+            <path d="M6 5V4a2 2 0 014 0v1M10 10a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM10 10v2"/>
+          </svg>
+        </div>
+        <div class="card-text">
+          <div class="card-trigger">Sustainability-linked financing</div>
+          <div class="card-title">I'm supporting a green loan or lower interest rate application</div>
+          <div class="card-desc">Banks like UOB SAGE and OCBC Start-ESG require a documented carbon baseline before reviewing sustainability-linked loan terms.</div>
+        </div>
+        <div class="card-dot"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="card-expand">
+        <div class="expand-divider"></div>
+        <div class="expand-label">What we'll show you first</div>
+        <div class="expand-items">
+          <div class="expand-item"><div class="expand-dot"></div>Your Scope 1 & 2 baseline — the starting point most banks require</div>
+          <div class="expand-item"><div class="expand-dot"></div>Formal reduction targets with specific timelines — key for loan KPIs</div>
+          <div class="expand-item"><div class="expand-dot"></div>Reference list of Singapore sustainability financing programmes</div>
+          <div class="expand-item"><div class="expand-dot"></div>Annual tracking to demonstrate progress to your bank each year</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Cut costs -->
+    <div class="card" data-i="3" role="button" tabindex="0" aria-pressed="false">
+      <div class="card-main">
+        <div class="card-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 3v14M5 7l5-4 5 4M5 13l5 4 5-4"/>
+            <path d="M3 10h14"/>
+          </svg>
+        </div>
+        <div class="card-text">
+          <div class="card-trigger">Operational efficiency</div>
+          <div class="card-title">I want to find where we're wasting money on energy, fuel or waste</div>
+          <div class="card-desc">Understanding where your carbon comes from is the same as understanding where your costs go. Energy, diesel and waste are often 10–20% reducible.</div>
+        </div>
+        <div class="card-dot"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="card-expand">
+        <div class="expand-divider"></div>
+        <div class="expand-label">What we'll show you first</div>
+        <div class="expand-items">
+          <div class="expand-item"><div class="expand-dot"></div>Every emission source shown alongside its estimated SGD cost</div>
+          <div class="expand-item"><div class="expand-dot"></div>Your highest-cost sources ranked first — not just highest carbon</div>
+          <div class="expand-item"><div class="expand-dot"></div>Practical reduction actions ranked by how quickly they pay back</div>
+          <div class="expand-item"><div class="expand-dot"></div>A Sustainability Report as a byproduct — ready if buyers ever ask</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Annual Sustainability Report -->
+    <div class="card" data-i="4" role="button" tabindex="0" aria-pressed="false">
+      <div class="card-main">
+        <div class="card-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h12v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
+            <path d="M8 4V2M12 4V2"/>
+            <path d="M7 9h6M7 12h4"/>
+          </svg>
+        </div>
+        <div class="card-text">
+          <div class="card-trigger">Annual reporting commitment</div>
+          <div class="card-title">I want to produce our Sustainability Report</div>
+          <div class="card-desc">Reporting annually on Environmental, Social and Governance performance — for stakeholders, partners, UNGC commitments, or our own records.</div>
+        </div>
+        <div class="card-dot"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="card-expand">
+        <div class="expand-divider"></div>
+        <div class="expand-label">What we'll show you first</div>
+        <div class="expand-items">
+          <div class="expand-item"><div class="expand-dot"></div>Full E + S + G data entry — Environmental, Social, Governance</div>
+          <div class="expand-item"><div class="expand-dot"></div>Complete 13-section Sustainability Report aligned with SGX Core ESG Metrics</div>
+          <div class="expand-item"><div class="expand-dot"></div>Year-on-year comparison from your second report onwards</div>
+          <div class="expand-item"><div class="expand-dot"></div>Methodology cited: GHG Protocol + Singapore SEFR emission factors</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Project Carbon Report -->
+    <div class="card" data-i="5" role="button" tabindex="0" aria-pressed="false">
+      <div class="card-main">
+        <div class="card-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="14" height="14" rx="2"/>
+            <path d="M7 7h2M7 10h6M7 13h4"/>
+            <path d="M13 5l2 2-2 2"/>
+          </svg>
+        </div>
+        <div class="card-text">
+          <div class="card-trigger">Project-specific reporting</div>
+          <div class="card-title">I want to produce a Project Carbon Report
+            <span class="new-badge">PCR</span>
+          </div>
+          <div class="card-desc">Carbon footprint for a specific project, event, or contract — not the whole company. For event managers, contractors, and project-based tender submissions.</div>
+        </div>
+        <div class="card-dot"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="card-expand">
+        <div class="expand-divider"></div>
+        <div class="expand-label">What we'll show you first</div>
+        <div class="expand-items">
+          <div class="expand-item"><div class="expand-dot"></div>Define your project: name, client, dates, boundary</div>
+          <div class="expand-item"><div class="expand-dot"></div>Enter only the activities relevant to this specific project</div>
+          <div class="expand-item"><div class="expand-dot"></div>Produces a standalone Project Carbon Report PDF — not a company-wide SR</div>
+          <div class="expand-item"><div class="expand-dot"></div>Multiple PCRs can be produced — one per project or event</div>
+          <div class="expand-item"><div class="expand-dot"></div>Can be linked to your company SR when you're ready to report company-wide</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /cards -->
+
+  <!-- CTA -->
+  <div class="cta-wrap">
+    <button class="btn-go" id="cta" disabled onclick="proceed()">
+      <span id="cta-label">Select one to continue</span>
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+    </button>
+  </div>
+
+  <!-- Trust strip -->
+  <div class="trust">
+    <div class="trust-item">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="6" cy="6" r="4.5"/><path d="M4 6l1.5 1.5L8 4"/></svg>
+      Free to use
+    </div>
+    <div class="trust-item">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="2" y="3.5" width="8" height="6" rx="1"/><path d="M4 3.5V3a2 2 0 014 0v.5"/></svg>
+      Your data stays yours
+    </div>
+    <div class="trust-item">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M6 1.5v9M3 5l3-3.5L9 5M3 8.5l3 2.5 3-2.5"/></svg>
+      Singapore SEFR standards
+    </div>
+    <div class="trust-item">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="6" cy="5" r="2.5"/><path d="M2 11c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>
+      No sustainability expertise needed
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+const LABELS = {
+  1: 'Continue — buyer submission →',
+  2: 'Continue — financing documentation →',
+  3: 'Continue — cost savings view →',
+  4: 'Continue — full Sustainability Report →',
+  5: 'Continue — Project Carbon Report →',
+};
+
+const INTENTS = {
+  1: 'buyer',
+  2: 'financing',
+  3: 'cost_savings',
+  4: 'annual_sr',
+  5: 'pcr',
+};
+
+let chosen = null;
+
+document.querySelectorAll('.card').forEach(card => {
+  card.addEventListener('click', () => toggle(card));
+  card.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(card); }
+  });
+});
+
+function toggle(card) {
+  const i = parseInt(card.dataset.i);
+  if (chosen === i) {
+    // deselect
+    card.classList.remove('sel');
+    card.setAttribute('aria-pressed', 'false');
+    chosen = null;
+    document.getElementById('cta').disabled = true;
+    document.getElementById('cta-label').textContent = 'Select one to continue';
+  } else {
+    // deselect previous
+    document.querySelectorAll('.card.sel').forEach(c => {
+      c.classList.remove('sel');
+      c.setAttribute('aria-pressed', 'false');
+    });
+    card.classList.add('sel');
+    card.setAttribute('aria-pressed', 'true');
+    chosen = i;
+    document.getElementById('cta').disabled = false;
+    document.getElementById('cta-label').textContent = LABELS[i];
+  }
+}
+
+function proceed() {
+  if (!chosen) return;
+  const intent = INTENTS[chosen];
+  localStorage.setItem('zyt_intent', intent);
+  localStorage.setItem('zyt_intent_ungc', intent === 'ungc_cop' ? 'true' : 'false');
+  localStorage.setItem('zyt_intent_pcr', intent === 'pcr' ? 'true' : 'false');
+  window.location.href = '/S-03-signup.html';
+}
+</script>
+
+</body>
+</html>

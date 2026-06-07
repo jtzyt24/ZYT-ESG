@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Set Your Targets — ZYT.ESG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1916;
+  --ink2: #4a4844;
+  --ink3: #8c8a84;
+  --ink4: #c4c2bc;
+  --bg: #f5f3ee;
+  --surface: #ffffff;
+  --surface2: #f0ede6;
+  --border: #e2ddd5;
+  --border2: #ede9e2;
+  --green: #1a6b4a;
+  --green-bg: #eaf4ee;
+  --green-border: #b4d9c4;
+  --amber: #8b5a0a;
+  --amber-bg: #fdf3e0;
+  --amber-border: #f0d090;
+  --red: #8b1a1a;
+  --red-bg: #fdf0ec;
+  --red-border: #f0c4b4;
+  --blue: #1a4a8b;
+  --blue-bg: #edf4fc;
+  --blue-border: #b4cef0;
+  --r: 10px;
+  --r-lg: 14px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* NAV */
+nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.nav-logo {
+  font-family: 'Fraunces', serif;
+  font-size: 17px;
+  font-weight: 300;
+  letter-spacing: -0.3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nav-logo .esg {
+  font-size: 10px;
+  font-family: 'DM Mono', monospace;
+  color: var(--green);
+  background: var(--green-bg);
+  border: 1px solid var(--green-border);
+  padding: 2px 7px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+.nav-steps {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+.nav-step {
+  padding: 4px 12px;
+  border-radius: 20px;
+  color: var(--ink3);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.nav-step.done { color: var(--green); }
+.nav-step.done::before { content: '✓'; font-size: 10px; }
+.nav-step.active {
+  background: var(--ink);
+  color: white;
+  font-weight: 500;
+}
+.nav-sep { color: var(--ink4); font-size: 10px; }
+
+/* LAYOUT */
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 36px 24px 80px;
+}
+
+/* PAGE HEADER */
+.page-head {
+  margin-bottom: 32px;
+}
+.page-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.page-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 1px;
+  background: var(--green);
+}
+.page-title {
+  font-family: 'Fraunces', serif;
+  font-size: 30px;
+  font-weight: 300;
+  letter-spacing: -0.5px;
+  color: var(--ink);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+.page-sub {
+  font-size: 14px;
+  color: var(--ink2);
+  max-width: 560px;
+  line-height: 1.6;
+}
+
+/* BASELINE SUMMARY STRIP */
+.baseline-strip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin-bottom: 32px;
+  box-shadow: var(--shadow);
+}
+.baseline-item {
+  padding: 4px 16px;
+  border-right: 1px solid var(--border2);
+}
+.baseline-item:first-child { padding-left: 0; }
+.baseline-item:last-child { border-right: none; }
+.bl-label {
+  font-size: 10px;
+  font-family: 'DM Mono', monospace;
+  color: var(--ink3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.bl-value {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.1;
+}
+.bl-unit {
+  font-size: 11px;
+  color: var(--ink3);
+  margin-top: 1px;
+}
+.bl-scope {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.bl-tag {
+  font-size: 9px;
+  font-family: 'DM Mono', monospace;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+/* SECTION */
+.section-title {
+  font-family: 'Fraunces', serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.section-sub {
+  font-size: 12px;
+  color: var(--ink3);
+  margin-bottom: 16px;
+}
+
+/* TARGET CARDS */
+.targets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.target-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.target-card.selected {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(26,107,74,0.08), var(--shadow);
+}
+.target-card.selected .tc-header {
+  background: var(--green-bg);
+}
+
+.tc-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.tc-header:hover { background: var(--surface2); }
+.target-card.selected .tc-header:hover { background: var(--green-bg); }
+
+.tc-check {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  background: white;
+}
+.target-card.selected .tc-check {
+  background: var(--green);
+  border-color: var(--green);
+}
+.tc-check svg {
+  width: 10px;
+  height: 10px;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.target-card.selected .tc-check svg { opacity: 1; }
+
+.tc-body { flex: 1; }
+.tc-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+.tc-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.tc-cluster {
+  font-size: 10px;
+  font-family: 'DM Mono', monospace;
+  color: var(--ink3);
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  padding: 1px 7px;
+  border-radius: 8px;
+}
+.tc-who {
+  font-size: 10px;
+  color: var(--ink3);
+  font-style: italic;
+}
+.tc-desc {
+  font-size: 12px;
+  color: var(--ink2);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.tc-metrics {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.tc-metric {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+.tc-metric.carbon {
+  background: var(--green-bg);
+  border-color: var(--green-border);
+  color: var(--green);
+}
+.tc-metric.cost {
+  background: var(--amber-bg);
+  border-color: var(--amber-border);
+  color: var(--amber);
+}
+.tc-metric.payback {
+  background: var(--blue-bg);
+  border-color: var(--blue-border);
+  color: var(--blue);
+}
+.tc-metric.scope {
+  background: var(--surface2);
+  border-color: var(--border);
+  color: var(--ink3);
+}
+.tc-metric svg {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+}
+
+/* EXPAND AREA */
+.tc-expand {
+  display: none;
+  padding: 0 18px 18px 52px;
+  border-top: 1px solid var(--border2);
+}
+.target-card.selected .tc-expand { display: block; }
+.tc-expand-inner {
+  padding-top: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.tc-field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: 'DM Mono', monospace;
+  margin-bottom: 6px;
+}
+.tc-field input,
+.tc-field select {
+  width: 100%;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface);
+  padding: 0 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.12s;
+}
+.tc-field input:focus,
+.tc-field select:focus { border-color: var(--green); }
+
+.tc-statement {
+  grid-column: 1 / -1;
+  background: var(--green-bg);
+  border: 1px solid var(--green-border);
+  border-radius: var(--r);
+  padding: 12px 14px;
+}
+.tc-statement-label {
+  font-size: 10px;
+  font-family: 'DM Mono', monospace;
+  color: var(--green);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+.tc-statement-text {
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+/* CUSTOM TARGET */
+.add-custom {
+  border: 1.5px dashed var(--border);
+  border-radius: var(--r-lg);
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+}
+.add-custom:hover {
+  border-color: var(--ink3);
+  background: var(--surface);
+}
+.add-custom-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.add-custom-text {
+  font-size: 13px;
+  color: var(--ink2);
+}
+.add-custom-text strong { color: var(--ink); font-weight: 500; }
+
+/* COMMITMENT SUMMARY */
+.commitment-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  margin-top: 32px;
+}
+.commitment-header {
+  padding: 16px 20px;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.commitment-title {
+  font-family: 'Fraunces', serif;
+  font-size: 16px;
+  font-weight: 300;
+  color: white;
+}
+.commitment-count {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+}
+.commitment-body {
+  padding: 20px;
+}
+.commitment-empty {
+  text-align: center;
+  padding: 28px;
+  color: var(--ink3);
+  font-size: 13px;
+  font-style: italic;
+}
+.commitment-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.commitment-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--surface2);
+  border-radius: var(--r);
+}
+.ci-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+.ci-text { font-size: 12px; color: var(--ink); line-height: 1.5; }
+.ci-remove {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--ink4);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  flex-shrink: 0;
+}
+.ci-remove:hover { color: var(--red); background: var(--red-bg); }
+
+.commitment-totals {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.ct-box {
+  background: var(--surface2);
+  border-radius: var(--r);
+  padding: 12px 14px;
+  text-align: center;
+}
+.ct-val {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 400;
+  margin-bottom: 2px;
+}
+.ct-label {
+  font-size: 10px;
+  font-family: 'DM Mono', monospace;
+  color: var(--ink3);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.btn-primary {
+  width: 100%;
+  height: 44px;
+  background: var(--green);
+  color: white;
+  border: none;
+  border-radius: var(--r);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s, transform 0.1s;
+  letter-spacing: 0.1px;
+}
+.btn-primary:hover { background: #155a3d; }
+.btn-primary:active { transform: scale(0.99); }
+.btn-secondary {
+  width: 100%;
+  height: 40px;
+  background: transparent;
+  color: var(--ink2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: border-color 0.12s;
+}
+.btn-secondary:hover { border-color: var(--ink3); }
+
+/* ZYT ADVISORY NUDGE */
+.advisory-nudge {
+  margin-top: 20px;
+  background: linear-gradient(135deg, #1a1916 0%, #2d2b27 100%);
+  border-radius: var(--r-lg);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.an-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 18px;
+}
+.an-text { flex: 1; }
+.an-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: white;
+  margin-bottom: 2px;
+}
+.an-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.4;
+}
+.an-btn {
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 7px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s;
+  flex-shrink: 0;
+}
+.an-btn:hover { background: rgba(255,255,255,0.2); }
+
+@media (max-width: 640px) {
+  .baseline-strip { grid-template-columns: 1fr 1fr; }
+  .baseline-item:nth-child(2) { border-right: none; }
+  .baseline-item:nth-child(3) { border-top: 1px solid var(--border2); }
+  .tc-expand-inner { grid-template-columns: 1fr; }
+  .commitment-totals { grid-template-columns: 1fr; }
+  .nav-steps { display: none; }
+  .advisory-nudge { flex-direction: column; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">ZYT.ESG <span class="esg">ESG</span></div>
+  <div class="nav-steps">
+    <div class="nav-step done">Company profile</div>
+    <div class="nav-sep">›</div>
+    <div class="nav-step done">Data entry</div>
+    <div class="nav-sep">›</div>
+    <div class="nav-step active">Set targets</div>
+    <div class="nav-sep">›</div>
+    <div class="nav-step">Carbon Passport</div>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="page-head">
+    <div class="page-eyebrow">Step 3 of 4 — Alignment</div>
+    <h1 class="page-title">Set your reduction targets</h1>
+    <p class="page-sub">Based on your 2024 emissions data, we've identified your highest-impact opportunities. Select the targets you're committing to — they'll be embedded in your Carbon Passport and tracked year on year.</p>
+  </div>
+
+  <!-- BASELINE STRIP -->
+  <div class="baseline-strip">
+    <div class="baseline-item">
+      <div class="bl-label">Your 2024 baseline</div>
+      <div class="bl-value">47.3</div>
+      <div class="bl-unit">tCO₂e total emissions</div>
+      <div class="bl-scope">
+        <span class="bl-tag" style="background:#FAECE7;color:#712B13">S1: 18.4t</span>
+        <span class="bl-tag" style="background:#E6F1FB;color:#0C447C">S2: 14.2t</span>
+        <span class="bl-tag" style="background:#EAF3DE;color:#27500A">S3: 14.7t</span>
+      </div>
+    </div>
+    <div class="baseline-item">
+      <div class="bl-label">Annual energy cost</div>
+      <div class="bl-value">SGD 38,400</div>
+      <div class="bl-unit">electricity + fuel combined</div>
+    </div>
+    <div class="baseline-item">
+      <div class="bl-label">Highest impact source</div>
+      <div class="bl-value">Transport</div>
+      <div class="bl-unit">fleet diesel — 12.1 tCO₂e</div>
+    </div>
+    <div class="baseline-item">
+      <div class="bl-label">Avoidable emissions</div>
+      <div class="bl-value">~14.2t</div>
+      <div class="bl-unit">30% reduction is achievable</div>
+    </div>
+  </div>
+
+  <!-- RECOMMENDED TARGETS -->
+  <div class="section-title">Recommended targets for your business</div>
+  <p class="section-sub">Ranked by SGD savings per year. Select any you're ready to commit to.</p>
+
+  <div class="targets-list" id="targets-list">
+
+    <!-- TARGET 1 -->
+    <div class="target-card" data-id="t1" data-carbon="6.8" data-saving="8400" data-payback="8">
+      <div class="tc-header" onclick="toggleTarget('t1')">
+        <div class="tc-check">
+          <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="tc-body">
+          <div class="tc-top">
+            <span class="tc-name">Reduce diesel fleet fuel consumption</span>
+            <span class="tc-cluster">🚚 Transport & fleet</span>
+            <span class="tc-who">Logistics coordinator</span>
+          </div>
+          <p class="tc-desc">Your 3 diesel vans account for 12.1 tCO₂e — your single largest emission source. Route optimisation and driver behaviour coaching typically reduces fuel use by 15–20% with zero capital investment.</p>
+          <div class="tc-metrics">
+            <span class="tc-metric carbon"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3.5v2.5l1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Reduce by 6.8 tCO₂e/yr</span>
+            <span class="tc-metric cost"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1v10M3.5 3.5h3.5a1.5 1.5 0 010 3H4a1.5 1.5 0 000 3H8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Save SGD 8,400/yr in diesel</span>
+            <span class="tc-metric payback"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3v3l2 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Payback: immediate</span>
+            <span class="tc-metric scope">Scope 1 — Mobile combustion</span>
+          </div>
+        </div>
+      </div>
+      <div class="tc-expand">
+        <div class="tc-expand-inner">
+          <div class="tc-field">
+            <label>Target reduction %</label>
+            <select onchange="updateStatement('t1')">
+              <option value="15">15% reduction (conservative)</option>
+              <option value="20" selected>20% reduction (recommended)</option>
+              <option value="25">25% reduction (ambitious)</option>
+            </select>
+          </div>
+          <div class="tc-field">
+            <label>Target year</label>
+            <select onchange="updateStatement('t1')">
+              <option>2025</option>
+              <option selected>2026</option>
+              <option>2027</option>
+            </select>
+          </div>
+          <div class="tc-statement" id="stmt-t1">
+            <div class="tc-statement-label">Your target statement</div>
+            <div class="tc-statement-text" id="stmt-text-t1">
+              "We commit to reducing Scope 1 mobile combustion emissions from our diesel fleet by <strong>20%</strong> by end of <strong>2026</strong>, against our 2024 baseline of 12.1 tCO₂e, through route optimisation and driver behaviour improvements."
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TARGET 2 -->
+    <div class="target-card" data-id="t2" data-carbon="4.2" data-saving="5800" data-payback="14">
+      <div class="tc-header" onclick="toggleTarget('t2')">
+        <div class="tc-check">
+          <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="tc-body">
+          <div class="tc-top">
+            <span class="tc-name">Reduce grid electricity consumption</span>
+            <span class="tc-cluster">⚡ Power & energy</span>
+            <span class="tc-who">Facilities manager / office manager</span>
+          </div>
+          <p class="tc-desc">Your annual electricity bill of SGD 29,000 is above average for your industry. Lighting upgrades to LED and smart aircon scheduling can cut consumption by 15–20% with a payback of 12–18 months.</p>
+          <div class="tc-metrics">
+            <span class="tc-metric carbon"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3.5v2.5l1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Reduce by 4.2 tCO₂e/yr</span>
+            <span class="tc-metric cost"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1v10M3.5 3.5h3.5a1.5 1.5 0 010 3H4a1.5 1.5 0 000 3H8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Save SGD 5,800/yr in electricity</span>
+            <span class="tc-metric payback"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3v3l2 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Payback: 14 months</span>
+            <span class="tc-metric scope">Scope 2 — Grid electricity</span>
+          </div>
+        </div>
+      </div>
+      <div class="tc-expand">
+        <div class="tc-expand-inner">
+          <div class="tc-field">
+            <label>Target reduction %</label>
+            <select onchange="updateStatement('t2')">
+              <option value="10">10% reduction (conservative)</option>
+              <option value="15">15% reduction (recommended)</option>
+              <option value="20" selected>20% reduction (ambitious)</option>
+            </select>
+          </div>
+          <div class="tc-field">
+            <label>Target year</label>
+            <select onchange="updateStatement('t2')">
+              <option>2025</option>
+              <option selected>2026</option>
+              <option>2027</option>
+            </select>
+          </div>
+          <div class="tc-statement" id="stmt-t2">
+            <div class="tc-statement-label">Your target statement</div>
+            <div class="tc-statement-text" id="stmt-text-t2">
+              "We commit to reducing Scope 2 electricity emissions by <strong>20%</strong> by end of <strong>2026</strong>, against our 2024 baseline of 14.2 tCO₂e, through LED lighting upgrades and air-conditioning scheduling improvements."
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TARGET 3 -->
+    <div class="target-card" data-id="t3" data-carbon="3.1" data-saving="4200" data-payback="0">
+      <div class="tc-header" onclick="toggleTarget('t3')">
+        <div class="tc-check">
+          <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="tc-body">
+          <div class="tc-top">
+            <span class="tc-name">Fix refrigerant leaks — cold room & AC</span>
+            <span class="tc-cluster">❄ Cooling & refrigeration</span>
+            <span class="tc-who">Facilities manager</span>
+          </div>
+          <p class="tc-desc">Your AC and cold room refrigerant top-up records suggest a leak rate above the Singapore average. Proactive leak detection and repair eliminates a high-GWP emission source at very low cost — typically SGD 300–800 per unit.</p>
+          <div class="tc-metrics">
+            <span class="tc-metric carbon"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3.5v2.5l1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Reduce by 3.1 tCO₂e/yr</span>
+            <span class="tc-metric cost"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1v10M3.5 3.5h3.5a1.5 1.5 0 010 3H4a1.5 1.5 0 000 3H8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Save SGD 4,200/yr in refrigerant</span>
+            <span class="tc-metric payback"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3v3l2 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Payback: immediate</span>
+            <span class="tc-metric scope">Scope 1 — Fugitive emissions</span>
+          </div>
+        </div>
+      </div>
+      <div class="tc-expand">
+        <div class="tc-expand-inner">
+          <div class="tc-field">
+            <label>Target reduction %</label>
+            <select onchange="updateStatement('t3')">
+              <option value="50">50% reduction (conservative)</option>
+              <option value="75" selected>75% reduction (recommended)</option>
+              <option value="100">Eliminate entirely (ambitious)</option>
+            </select>
+          </div>
+          <div class="tc-field">
+            <label>Target year</label>
+            <select onchange="updateStatement('t3')">
+              <option selected>2025</option>
+              <option>2026</option>
+              <option>2027</option>
+            </select>
+          </div>
+          <div class="tc-statement" id="stmt-t3">
+            <div class="tc-statement-label">Your target statement</div>
+            <div class="tc-statement-text" id="stmt-text-t3">
+              "We commit to reducing Scope 1 fugitive emissions from refrigerant leakage by <strong>75%</strong> by end of <strong>2025</strong>, against our 2024 baseline of 4.1 tCO₂e, through scheduled leak detection and prompt repair of AC and cold room units."
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TARGET 4 -->
+    <div class="target-card" data-id="t4" data-carbon="1.8" data-saving="2100" data-payback="24">
+      <div class="tc-header" onclick="toggleTarget('t4')">
+        <div class="tc-check">
+          <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="tc-body">
+          <div class="tc-top">
+            <span class="tc-name">Reduce general and food waste to landfill</span>
+            <span class="tc-cluster">♻ Waste & water</span>
+            <span class="tc-who">Operations / kitchen supervisor</span>
+          </div>
+          <p class="tc-desc">Your estimated 480 kg/month of food waste going to incineration represents both a carbon and a procurement cost. Portion control and stock rotation improvements in the kitchen typically reduce food waste by 20–30%.</p>
+          <div class="tc-metrics">
+            <span class="tc-metric carbon"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3.5v2.5l1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Reduce by 1.8 tCO₂e/yr</span>
+            <span class="tc-metric cost"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1v10M3.5 3.5h3.5a1.5 1.5 0 010 3H4a1.5 1.5 0 000 3H8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Save SGD 2,100/yr in food cost</span>
+            <span class="tc-metric payback"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3v3l2 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Payback: 24 months</span>
+            <span class="tc-metric scope">Scope 3 — Waste</span>
+          </div>
+        </div>
+      </div>
+      <div class="tc-expand">
+        <div class="tc-expand-inner">
+          <div class="tc-field">
+            <label>Target reduction %</label>
+            <select onchange="updateStatement('t4')">
+              <option value="20" selected>20% reduction (conservative)</option>
+              <option value="30">30% reduction (recommended)</option>
+              <option value="50">50% reduction (ambitious)</option>
+            </select>
+          </div>
+          <div class="tc-field">
+            <label>Target year</label>
+            <select onchange="updateStatement('t4')">
+              <option>2025</option>
+              <option selected>2026</option>
+              <option>2027</option>
+            </select>
+          </div>
+          <div class="tc-statement" id="stmt-t4">
+            <div class="tc-statement-label">Your target statement</div>
+            <div class="tc-statement-text" id="stmt-text-t4">
+              "We commit to reducing Scope 3 waste emissions from food and general waste by <strong>20%</strong> by end of <strong>2026</strong>, against our 2024 baseline, through kitchen portion control and stock rotation improvements."
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD CUSTOM -->
+    <button class="add-custom" onclick="this.textContent='Coming soon'; setTimeout(()=>this.textContent='+ Add custom target',2000)">
+      <div class="add-custom-icon">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="#8c8a84" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div class="add-custom-text">
+        <strong>Add a custom target</strong> — set your own emission source, reduction %, and timeline
+      </div>
+    </button>
+
+  </div>
+
+  <!-- COMMITMENT SUMMARY -->
+  <div class="commitment-box">
+    <div class="commitment-header">
+      <span class="commitment-title">Your commitment summary</span>
+      <span class="commitment-count" id="commit-count">0 targets selected</span>
+    </div>
+    <div class="commitment-body">
+      <div id="commit-empty" class="commitment-empty">
+        Select targets above to build your commitment statement.
+      </div>
+      <div id="commit-items" class="commitment-items" style="display:none"></div>
+      <div id="commit-totals" class="commitment-totals" style="display:none">
+        <div class="ct-box">
+          <div class="ct-val" id="total-carbon" style="color:var(--green)">0 t</div>
+          <div class="ct-label">CO₂e reduction / yr</div>
+        </div>
+        <div class="ct-box">
+          <div class="ct-val" id="total-saving" style="color:var(--amber)">SGD 0</div>
+          <div class="ct-label">Estimated savings / yr</div>
+        </div>
+        <div class="ct-box">
+          <div class="ct-val" id="total-pct" style="color:var(--blue)">0%</div>
+          <div class="ct-label">Of 2024 baseline reduced</div>
+        </div>
+      </div>
+      <button class="btn-primary" id="generate-btn" onclick="generatePassport()" disabled style="opacity:0.4;cursor:not-allowed">
+        Generate Carbon Passport with targets →
+      </button>
+      <button class="btn-secondary" onclick="window.location.href='/S-23-sustainability-context.html'">
+        Skip for now — generate report without targets
+      </button>
+    </div>
+  </div>
+
+  <!-- ADVISORY NUDGE -->
+  <div class="advisory-nudge">
+    <div class="an-icon">🧭</div>
+    <div class="an-text">
+      <div class="an-title">Not sure which targets to commit to?</div>
+      <div class="an-sub">ZYT can help you map these targets to your team, estimate real implementation costs, and build a credible reduction plan for your buyers and bank.</div>
+    </div>
+    <button class="an-btn" onclick="window.open('https://zyt.one/consult','_blank')">Book a free call →</button>
+  </div>
+
+</div>
+
+<script>
+const selected = new Set();
+
+const STMTS = {
+  t1: {
+    template: (pct, yr) => `"We commit to reducing Scope 1 mobile combustion emissions from our diesel fleet by <strong>${pct}%</strong> by end of <strong>${yr}</strong>, against our 2024 baseline of 12.1 tCO₂e, through route optimisation and driver behaviour improvements."`,
+    defaultCarbon: 6.8, defaultSaving: 8400
+  },
+  t2: {
+    template: (pct, yr) => `"We commit to reducing Scope 2 electricity emissions by <strong>${pct}%</strong> by end of <strong>${yr}</strong>, against our 2024 baseline of 14.2 tCO₂e, through LED lighting upgrades and air-conditioning scheduling improvements."`,
+    defaultCarbon: 4.2, defaultSaving: 5800
+  },
+  t3: {
+    template: (pct, yr) => `"We commit to reducing Scope 1 fugitive emissions from refrigerant leakage by <strong>${pct}%</strong> by end of <strong>${yr}</strong>, against our 2024 baseline of 4.1 tCO₂e, through scheduled leak detection and prompt repair of AC and cold room units."`,
+    defaultCarbon: 3.1, defaultSaving: 4200
+  },
+  t4: {
+    template: (pct, yr) => `"We commit to reducing Scope 3 waste emissions from food and general waste by <strong>${pct}%</strong> by end of <strong>${yr}</strong>, against our 2024 baseline, through kitchen portion control and stock rotation improvements."`,
+    defaultCarbon: 1.8, defaultSaving: 2100
+  }
+};
+
+function toggleTarget(id) {
+  const card = document.querySelector(`[data-id="${id}"]`);
+  if (selected.has(id)) {
+    selected.delete(id);
+    card.classList.remove('selected');
+  } else {
+    selected.add(id);
+    card.classList.add('selected');
+  }
+  updateSummary();
+}
+
+function updateStatement(id) {
+  const card = document.querySelector(`[data-id="${id}"]`);
+  const selects = card.querySelectorAll('select');
+  const pct = selects[0].value;
+  const yr = selects[1].value;
+  document.getElementById(`stmt-text-${id}`).innerHTML = STMTS[id].template(pct, yr);
+}
+
+function updateSummary() {
+  const count = selected.size;
+  document.getElementById('commit-count').textContent = `${count} target${count !== 1 ? 's' : ''} selected`;
+
+  const empty = document.getElementById('commit-empty');
+  const items = document.getElementById('commit-items');
+  const totals = document.getElementById('commit-totals');
+  const btn = document.getElementById('generate-btn');
+
+  if (count === 0) {
+    empty.style.display = 'block';
+    items.style.display = 'none';
+    totals.style.display = 'none';
+    btn.disabled = true;
+    btn.style.opacity = '0.4';
+    btn.style.cursor = 'not-allowed';
+    return;
+  }
+
+  empty.style.display = 'none';
+  items.style.display = 'flex';
+  totals.style.display = 'grid';
+  btn.disabled = false;
+  btn.style.opacity = '1';
+  btn.style.cursor = 'pointer';
+
+  items.innerHTML = '';
+  let totalCarbon = 0, totalSaving = 0;
+
+  selected.forEach(id => {
+    const card = document.querySelector(`[data-id="${id}"]`);
+    const stmtText = document.getElementById(`stmt-text-${id}`).innerHTML;
+    const carbon = parseFloat(card.dataset.carbon);
+    const saving = parseFloat(card.dataset.saving);
+    totalCarbon += carbon;
+    totalSaving += saving;
+
+    const item = document.createElement('div');
+    item.className = 'commitment-item';
+    item.innerHTML = `<div class="ci-dot"></div><div class="ci-text">${stmtText}</div><button class="ci-remove" onclick="toggleTarget('${id}')">✕</button>`;
+    items.appendChild(item);
+  });
+
+  document.getElementById('total-carbon').textContent = `${totalCarbon.toFixed(1)} t`;
+  document.getElementById('total-saving').textContent = `SGD ${totalSaving.toLocaleString()}`;
+  document.getElementById('total-pct').textContent = `${Math.round((totalCarbon / 47.3) * 100)}%`;
+}
+
+function generatePassport() {
+  const targets = [];
+  document.querySelectorAll('.target-card.selected').forEach(card => {
+    targets.push({
+      id: card.dataset.id,
+      carbon: card.dataset.carbon,
+      saving: card.dataset.saving,
+      payback: card.dataset.payback,
+    });
+  });
+  localStorage.setItem('zyt_targets_data', JSON.stringify({ targets, savedAt: Date.now() }));
+  window.location.href = '/S-23-sustainability-context.html';
+}
+</script>
+</body>
+</html>

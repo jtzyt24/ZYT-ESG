@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review & Confirm — ZYT.ESG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#15140d;--ink2:#42403a;--ink3:#84827a;--ink4:#c2bfb6;
+  --bg:#f3f0e9;--card:#ffffff;--b1:#e0dbd2;--b2:#eae6de;
+  --s1c:#b04020;--s1b:#fdf0ec;--s1d:#f0c4b4;
+  --s2c:#1a4a8b;--s2b:#edf2fc;--s2d:#b4c8f0;
+  --s3c:#27500a;--s3b:#eaf4ee;--s3d:#b4d9c4;
+  --gc:#1a6b4a;--gb:#eaf4ee;--gd:#b4d9c4;
+  --ac:#7a5a0a;--ab:#fdf3e0;--ad:#e8c87a;
+  --wc:#7a1a1a;--wb:#fdf0ec;--wd:#f0b4b4;
+  --r:10px;--rl:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:14px}
+nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30}
+.logo{font-family:'Fraunces',serif;font-size:17px;font-weight:300;display:flex;align-items:center;gap:8px}
+.logo-tag{font-family:'DM Mono',monospace;font-size:10px;color:var(--gc);background:var(--gb);border:1px solid var(--gd);padding:2px 7px;border-radius:20px;letter-spacing:.5px}
+.nav-steps{display:flex;align-items:center;gap:4px;font-size:12px}
+.ns{padding:3px 10px;border-radius:20px;color:var(--ink3)}.ns.done{color:var(--gc)}.ns.done::before{content:'✓ ';font-size:10px}.ns.active{background:var(--ink);color:white;font-weight:500}.ns-sep{color:var(--ink4);font-size:10px}
+.layout{display:grid;grid-template-columns:1fr 300px;gap:20px;max-width:1060px;margin:0 auto;padding:28px 24px 100px;align-items:start}
+
+/* PAGE HEADER */
+.page-hdr{margin-bottom:20px}
+.page-title{font-family:'Fraunces',serif;font-size:26px;font-weight:300;letter-spacing:-.4px;margin-bottom:6px}
+.page-sub{font-size:12px;color:var(--ink3);line-height:1.5}
+
+/* COMPLETENESS SCORE */
+.score-card{background:var(--ink);border-radius:var(--rl);padding:22px 24px;margin-bottom:20px;display:flex;align-items:center;gap:20px}
+.score-ring-wrap{position:relative;width:80px;height:80px;flex-shrink:0}
+.score-ring{transform:rotate(-90deg)}
+.score-track{fill:none;stroke:rgba(255,255,255,.1);stroke-width:6}
+.score-fill{fill:none;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .8s ease}
+.score-number{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-pct{font-family:'Fraunces',serif;font-size:22px;font-weight:300;color:white;line-height:1}
+.score-lbl{font-size:9px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.score-body{flex:1}
+.score-title{font-family:'Fraunces',serif;font-size:16px;font-weight:300;color:white;margin-bottom:4px}
+.score-desc{font-size:11px;color:rgba(255,255,255,.55);line-height:1.5;margin-bottom:10px}
+.score-bar-row{display:flex;gap:6px;margin-bottom:4px;align-items:center}
+.score-bar-label{font-size:10px;color:rgba(255,255,255,.45);width:80px;flex-shrink:0}
+.score-bar-track{flex:1;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.score-bar-fill{height:100%;border-radius:2px;transition:width .6s ease}
+.score-bar-val{font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.5);width:32px;text-align:right;flex-shrink:0}
+
+/* CLUSTER GRID */
+.cluster-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.cluster-row{background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:14px 16px;display:grid;grid-template-columns:32px 1fr auto auto auto;gap:10px;align-items:center;cursor:pointer;transition:border-color .15s}
+.cluster-row:hover{border-color:var(--ink3)}
+.cluster-row.complete{border-color:var(--gd);background:var(--gb)}
+.cluster-row.partial{border-color:var(--ad)}
+.cluster-row.empty{opacity:.75}
+.cl-icon{font-size:18px;text-align:center}
+.cl-name{font-size:13px;font-weight:500;color:var(--ink)}
+.cl-sub{font-size:10px;color:var(--ink3);margin-top:1px}
+.cl-scope{display:flex;gap:3px}
+.scope-dot{width:6px;height:6px;border-radius:50%}
+.cl-co2{font-family:'DM Mono',monospace;font-size:12px;color:var(--gc);font-weight:500;text-align:right;min-width:80px}
+.cl-co2.empty-val{color:var(--ink4);font-weight:400}
+.cl-status{display:flex;align-items:center;gap:4px;font-size:10px;font-family:'DM Mono',monospace;min-width:72px;justify-content:flex-end}
+.status-complete{color:var(--gc)}.status-partial{color:var(--ac)}.status-empty{color:var(--ink3)}
+
+/* SCOPE SUMMARY */
+.scope-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}
+.scope-card{background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:14px 16px}
+.sc-label{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.sc-dot{width:8px;height:8px;border-radius:50%}
+.sc-val{font-family:'Fraunces',serif;font-size:22px;font-weight:300;color:var(--ink);line-height:1;transition:all .4s}
+.sc-unit{font-size:10px;color:var(--ink3);margin-top:2px;font-family:'DM Mono',monospace}
+.sc-sgd{font-size:11px;color:var(--ac);margin-top:5px;font-family:'DM Mono',monospace}
+
+/* ACCURACY SUMMARY */
+.accuracy-card{background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:14px 16px;margin-bottom:16px}
+.acc-title{font-size:12px;font-weight:500;color:var(--ink);margin-bottom:10px}
+.acc-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px}
+.acc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.acc-name{flex:1;color:var(--ink2)}
+.acc-badge{font-size:9px;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:6px}
+.acc-high{background:var(--gb);color:var(--gc)}.acc-med{background:var(--ab);color:var(--ac)}.acc-low{background:var(--wb);color:var(--wc)}.acc-none{background:var(--bg);color:var(--ink3)}
+
+/* MISSING DATA PROMPT */
+.missing-card{display:none;background:var(--wb);border:.5px solid var(--wd);border-radius:var(--r);padding:14px 16px;margin-bottom:16px}
+.missing-card.show{display:block}
+.missing-title{font-size:12px;font-weight:500;color:var(--wc);margin-bottom:8px}
+.missing-item{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--ink2);margin-bottom:5px}
+.missing-go{font-size:10px;color:var(--gc);cursor:pointer;text-decoration:underline;margin-left:auto}
+
+/* ACTIONS */
+.action-card{background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:16px}
+.action-title{font-size:12px;font-weight:500;color:var(--ink);margin-bottom:12px}
+.btn-primary{width:100%;height:44px;background:var(--ink);color:white;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s;margin-bottom:8px}
+.btn-primary:hover{background:#2a2a1a}
+.btn-primary svg{width:14px;height:14px}
+.btn-secondary{width:100%;height:38px;background:transparent;color:var(--ink3);border:1px solid var(--b1);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;margin-bottom:6px}
+.btn-secondary:hover{border-color:var(--ink3);color:var(--ink)}
+
+/* SCOPE CAT COUNTS */
+.cat-breakdown{padding:10px;background:var(--bg);border-radius:8px;margin-top:10px}
+.cat-row{display:flex;justify-content:space-between;font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);margin-bottom:3px}
+.cat-row span:last-child{color:var(--ink2);font-weight:500}
+
+/* SUMMARY SIDEBAR */
+.summary-col{position:sticky;top:72px}
+.sum-card{background:var(--ink);border-radius:var(--rl);overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.12)}
+.sum-hdr{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-hdr-title{font-family:'Fraunces',serif;font-size:15px;font-weight:300;color:white;margin-bottom:2px}
+.sum-hdr-sub{font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.35)}
+.sum-grand{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-grand-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.3);margin-bottom:6px}
+.sum-grand-val{font-family:'Fraunces',serif;font-size:30px;font-weight:300;color:white;line-height:1;letter-spacing:-.5px}
+.sum-grand-unit{font-size:11px;color:rgba(255,255,255,.4);margin-top:3px}
+.sum-grand-sgd{font-family:'DM Mono',monospace;font-size:13px;color:#f0d090;margin-top:8px}
+.sum-scopes{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.scope-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:11px}
+.scope-lbl{color:rgba(255,255,255,.55);display:flex;align-items:center;gap:6px}
+.scope-sdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.scope-val{font-family:'DM Mono',monospace;font-weight:500;color:white}
+.sum-analogy{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-anal-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.25);margin-bottom:5px}
+.sum-anal-text{font-size:11px;color:rgba(255,255,255,.6);line-height:1.55;font-style:italic}
+.sum-actions{padding:14px 18px}
+.btn-results{width:100%;height:44px;background:white;color:var(--ink);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px}
+.btn-results:hover{background:#f0ede6}
+.btn-results svg{width:13px;height:13px}
+.btn-save{width:100%;height:36px;background:transparent;color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.12);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer}
+
+@keyframes fadein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:768px){.layout{grid-template-columns:1fr}.summary-col{position:static}.nav-steps{display:none}.scope-summary{grid-template-columns:1fr}.cluster-row{grid-template-columns:28px 1fr auto}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">ZYT.ESG <span class="logo-tag">ESG</span></div>
+  <div class="nav-steps">
+    <div class="ns done">Profile</div><div class="ns-sep">›</div>
+    <div class="ns done">Data entry</div><div class="ns-sep">›</div>
+    <div class="ns active">Review</div><div class="ns-sep">›</div>
+    <div class="ns">Results</div><div class="ns-sep">›</div>
+    <div class="ns">Report</div>
+  </div>
+</nav>
+
+<div class="layout">
+<div class="form-col">
+
+<div class="page-hdr">
+  <div class="page-title">Review your data</div>
+  <div class="page-sub">Check what you've entered across all 8 clusters before proceeding to your carbon results. You can go back and update any cluster at any time — your data is saved automatically.</div>
+</div>
+
+<!-- COMPLETENESS SCORE -->
+<div class="score-card">
+  <div class="score-ring-wrap">
+    <svg class="score-ring" width="80" height="80" viewBox="0 0 80 80">
+      <circle class="score-track" cx="40" cy="40" r="33"/>
+      <circle class="score-fill" id="score-circle" cx="40" cy="40" r="33" stroke="#a8e4c4"
+        stroke-dasharray="207.3" stroke-dashoffset="207.3"/>
+    </svg>
+    <div class="score-number">
+      <div class="score-pct" id="score-pct">0%</div>
+      <div class="score-lbl">complete</div>
+    </div>
+  </div>
+  <div class="score-body">
+    <div class="score-title" id="score-title">No data entered yet</div>
+    <div class="score-desc" id="score-desc">Enter data in at least your key clusters — electricity, gas, and waste — to generate a credible baseline report.</div>
+    <div id="score-bars"></div>
+  </div>
+</div>
+
+<!-- SCOPE SUMMARY -->
+<div class="scope-summary">
+  <div class="scope-card">
+    <div class="sc-label"><div class="sc-dot" style="background:#f4a88a"></div>Scope 1 — Direct</div>
+    <div class="sc-val" id="s1-val">0</div>
+    <div class="sc-unit">tCO₂e / yr</div>
+    <div class="sc-sgd" id="s1-sgd">—</div>
+    <div class="cat-breakdown">
+      <div class="cat-row"><span>Fuel combustion</span><span id="c-fuel">—</span></div>
+      <div class="cat-row"><span>Fugitive (refrigerants)</span><span id="c-fug">—</span></div>
+    </div>
+  </div>
+  <div class="scope-card">
+    <div class="sc-label"><div class="sc-dot" style="background:#8ab4f4"></div>Scope 2 — Electricity</div>
+    <div class="sc-val" id="s2-val">0</div>
+    <div class="sc-unit">tCO₂e / yr</div>
+    <div class="sc-sgd" id="s2-sgd">—</div>
+    <div class="cat-breakdown">
+      <div class="cat-row"><span>Grid electricity</span><span id="c-elec">—</span></div>
+      <div class="cat-row"><span>District cooling</span><span id="c-dc">—</span></div>
+    </div>
+  </div>
+  <div class="scope-card">
+    <div class="sc-label"><div class="sc-dot" style="background:#a8d4a8"></div>Scope 3 — Value chain</div>
+    <div class="sc-val" id="s3-val">0</div>
+    <div class="sc-unit">tCO₂e / yr</div>
+    <div class="sc-sgd" id="s3-sgd">—</div>
+    <div class="cat-breakdown">
+      <div class="cat-row"><span>Cat 1 — Purchased goods</span><span id="c-cat1">—</span></div>
+      <div class="cat-row"><span>Cat 4 — Upstream freight</span><span id="c-cat4">—</span></div>
+      <div class="cat-row"><span>Cat 5 — Waste</span><span id="c-cat5">—</span></div>
+      <div class="cat-row"><span>Cat 6 — Business travel</span><span id="c-cat6">—</span></div>
+      <div class="cat-row"><span>Cat 7 — Commuting</span><span id="c-cat7">—</span></div>
+      <div class="cat-row"><span>Cat 9 — Outbound delivery</span><span id="c-cat9">—</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- CLUSTER ROWS -->
+<div style="font-size:12px;font-weight:500;color:var(--ink2);margin-bottom:8px">Environmental data clusters</div>
+<div class="cluster-grid" id="cluster-grid">
+  <!-- Populated by JS -->
+</div>
+
+<!-- MISSING DATA PROMPT -->
+<div class="missing-card" id="missing-card">
+  <div class="missing-title">⚠ Recommended data not yet entered</div>
+  <div id="missing-list"></div>
+  <div style="font-size:11px;color:var(--ink3);margin-top:8px;line-height:1.5">You can still generate a report with partial data — incomplete sections will be noted in the report appendix as per GHG Protocol disclosure requirements.</div>
+</div>
+
+<!-- ACCURACY SUMMARY -->
+<div class="accuracy-card">
+  <div class="acc-title">Data quality summary</div>
+  <div id="acc-rows"></div>
+  <div style="font-size:10px;color:var(--ink3);margin-top:8px;line-height:1.4">
+    <strong>High</strong> = all 12 months entered or verified weighed data ·
+    <strong>Medium</strong> = annual total or 6+ months ·
+    <strong>Low</strong> = single bill extrapolated or spend-based estimate
+  </div>
+</div>
+
+<!-- CONFIRM & PROCEED -->
+<div class="action-card">
+  <div class="action-title">Ready to see your results?</div>
+  <button class="btn-primary" onclick="proceedToResults()">
+    Calculate & see carbon overview
+    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg>
+  </button>
+  <button class="btn-secondary" onclick="window.location.href = '/S-09-data-entry-hub.html'">← Go back and add more data</button>
+  <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:6px;line-height:1.5">
+    All data is saved. You can update any cluster and regenerate results at any time.
+  </div>
+</div>
+
+</div><!-- /form-col -->
+
+<!-- SUMMARY SIDEBAR -->
+<div class="summary-col">
+<div class="sum-card">
+  <div class="sum-hdr">
+    <div class="sum-hdr-title">Total emissions</div>
+    <div class="sum-hdr-sub">ZYT Sustainability · 2024 · All scopes</div>
+  </div>
+  <div class="sum-grand">
+    <div class="sum-grand-lbl">Estimated grand total</div>
+    <div class="sum-grand-val" id="grand-total">0</div>
+    <div class="sum-grand-unit">tCO₂e / year</div>
+    <div class="sum-grand-sgd" id="grand-sgd">≈ SGD — / yr energy & fuel spend</div>
+  </div>
+  <div class="sum-scopes">
+    <div class="scope-row">
+      <div class="scope-lbl"><div class="scope-sdot" style="background:#f4a88a"></div>Scope 1</div>
+      <div class="scope-val" id="ss1">0 tCO₂e</div>
+    </div>
+    <div class="scope-row">
+      <div class="scope-lbl"><div class="scope-sdot" style="background:#8ab4f4"></div>Scope 2</div>
+      <div class="scope-val" id="ss2">0 tCO₂e</div>
+    </div>
+    <div class="scope-row">
+      <div class="scope-lbl"><div class="scope-sdot" style="background:#a8d4a8"></div>Scope 3</div>
+      <div class="scope-val" id="ss3">0 tCO₂e</div>
+    </div>
+  </div>
+  <div class="sum-analogy">
+    <div class="sum-anal-lbl">What this means</div>
+    <div class="sum-anal-text" id="analogy-text">Enter data in the clusters to see your total carbon footprint.</div>
+  </div>
+  <div class="sum-actions">
+    <button class="btn-results" onclick="proceedToResults()">
+      View carbon overview →
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg>
+    </button>
+    <button class="btn-save">Save & exit</button>
+  </div>
+</div>
+</div>
+</div>
+
+<script>
+// ── DEMO DATA ──
+// Simulates what would come from Supabase after user has completed data entry
+const DEMO = {
+  company: 'ZYT Sustainability Consultancy Pte Ltd',
+  year: 2024,
+  clusters: [
+    { id:'power',    icon:'⚡', name:'Power & energy',         sub:'Electricity, generator, solar, district cooling',
+      s1:0, s2:12.4, s3_cat3:0.21, sgd:29800, status:'complete', acc:'medium',
+      scopes:['s2','s3'], notes:'Monthly bills entered for 4 months, extrapolated' },
+    { id:'transport',icon:'🚚', name:'Transport & fleet',       sub:'Vehicles, freight, business travel',
+      s1:8.2, s2:0, s3:3.4, sgd:18600, status:'complete', acc:'medium',
+      scopes:['s1','s3'], notes:'1 diesel van + Grab travel entered' },
+    { id:'cooling',  icon:'❄', name:'Cooling & refrigeration', sub:'Refrigerant leakage, TRU diesel',
+      s1:0, s2:0, s3:0, sgd:0, status:'na', acc:'none',
+      scopes:['s1'], notes:'Marked N/A — no cold room or reefer' },
+    { id:'cooking',  icon:'🔥', name:'Cooking & process heat',  sub:'Town gas, LPG, boilers',
+      s1:0, s2:0, s3:0, sgd:0, status:'na', acc:'none',
+      scopes:['s1'], notes:'Marked N/A — professional services' },
+    { id:'waste',    icon:'♻', name:'Waste & water',           sub:'General waste, food waste, PUB water',
+      s1:0, s2:0, s3:1.8, sgd:4200, status:'partial', acc:'low',
+      scopes:['s3'], notes:'Only general waste entered — water bills not yet added' },
+    { id:'people',   icon:'🚶', name:'People & commuting',      sub:'MRT, bus, car, WFH electricity',
+      s1:0, s2:0, s3:2.1, sgd:0, status:'complete', acc:'medium',
+      scopes:['s3'], notes:'Staff survey data entered' },
+    { id:'digital',  icon:'💻', name:'Digital & IT',            sub:'Cloud services, hardware',
+      s1:0, s2:0, s3:0.9, sgd:8400, status:'complete', acc:'low',
+      scopes:['s3'], notes:'Cloud spend-based estimate' },
+    { id:'procure',  icon:'📦', name:'Procurement & supply chain', sub:'Packaging, services, goods',
+      s1:0, s2:0, s3:2.2, sgd:12000, status:'partial', acc:'low',
+      scopes:['s3'], notes:'Packaging entered; professional services not yet added' },
+  ]
+};
+
+// ── CALCULATE TOTALS ──
+let totals = { s1:0, s2:0, s3:0, sgd:0 };
+DEMO.clusters.forEach(c => {
+  totals.s1 += (c.s1||0);
+  totals.s2 += (c.s2||0);
+  totals.s3 += (c.s3||0) + (c.s3_cat3||0);
+  totals.sgd += (c.sgd||0);
+});
+const grand = totals.s1 + totals.s2 + totals.s3;
+
+// ── RENDER SCORE ──
+function renderScore() {
+  const complete = DEMO.clusters.filter(c=>c.status==='complete'||c.status==='na').length;
+  const partial  = DEMO.clusters.filter(c=>c.status==='partial').length;
+  const total    = DEMO.clusters.length;
+  const pct      = Math.round((complete + partial * 0.5) / total * 100);
+
+  document.getElementById('score-pct').textContent = pct + '%';
+
+  // Animate ring
+  const circ = 207.3;
+  const offset = circ - (circ * pct / 100);
+  document.getElementById('score-circle').style.strokeDashoffset = offset;
+  document.getElementById('score-circle').style.stroke = pct >= 80 ? '#a8e4c4' : pct >= 50 ? '#e8c87a' : '#f0b4b4';
+
+  const titles = { 80:'Strong baseline — ready to generate your report', 50:'Good start — a few clusters still need data', 0:'Getting started — enter your key clusters first' };
+  const descs = {
+    80:'Your data covers all major emission sources. Proceed to see your results and generate your report.',
+    50:'Fill in the remaining clusters for a more complete picture. You can still generate a report with the data you have.',
+    0:'Start with electricity (biggest source for most businesses) then add transport and waste.'
+  };
+  const key = pct >= 80 ? 80 : pct >= 50 ? 50 : 0;
+  document.getElementById('score-title').textContent = titles[key];
+  document.getElementById('score-desc').textContent = descs[key];
+
+  // Score bars
+  const bars = [
+    { label:'Environmental', done: complete, total, pct, color:'#a8e4c4' },
+    { label:'Scope coverage', done: grand > 0 ? (totals.s1 > 0 ? 1 : 0) + (totals.s2 > 0 ? 1 : 0) + (totals.s3 > 0 ? 1 : 0) : 0, total:3, pct: grand>0 ? Math.round(((totals.s1>0?1:0)+(totals.s2>0?1:0)+(totals.s3>0?1:0))/3*100) : 0, color:'#8ab4f4' },
+  ];
+  document.getElementById('score-bars').innerHTML = bars.map(b =>
+    `<div class="score-bar-row">
+      <div class="score-bar-label">${b.label}</div>
+      <div class="score-bar-track"><div class="score-bar-fill" style="width:${b.pct}%;background:${b.color}"></div></div>
+      <div class="score-bar-val">${b.pct}%</div>
+    </div>`
+  ).join('');
+}
+
+// ── RENDER SCOPE CARDS ──
+function renderScopeCards() {
+  document.getElementById('s1-val').textContent = totals.s1.toFixed(2);
+  document.getElementById('s2-val').textContent = totals.s2.toFixed(2);
+  document.getElementById('s3-val').textContent = totals.s3.toFixed(2);
+  document.getElementById('s1-sgd').textContent = totals.sgd > 0 ? `≈ SGD ${Math.round(totals.sgd * 0.4).toLocaleString()} fuel costs` : '—';
+  document.getElementById('s2-sgd').textContent = totals.s2 > 0 ? `≈ SGD ${Math.round(DEMO.clusters[0].sgd).toLocaleString()} electricity` : '—';
+  document.getElementById('s3-sgd').textContent = totals.s3 > 0 ? `Scope 3 — no direct cost` : '—';
+  // Cat breakdown (demo values)
+  document.getElementById('c-fuel').textContent = totals.s1 > 0 ? `~ ${(totals.s1).toFixed(1)} t` : '—';
+  document.getElementById('c-elec').textContent = totals.s2 > 0 ? `~ ${totals.s2.toFixed(1)} t` : '—';
+  document.getElementById('c-cat7').textContent = `~ 2.1 t`;
+  document.getElementById('c-cat1').textContent = `~ 3.1 t`;
+  document.getElementById('c-cat5').textContent = `~ 1.8 t`;
+  document.getElementById('c-cat6').textContent = `~ 0.8 t`;
+  document.getElementById('c-cat4').textContent = `—`;
+  document.getElementById('c-cat9').textContent = `—`;
+  document.getElementById('c-fug').textContent = `—`;
+  document.getElementById('c-dc').textContent = `—`;
+  document.getElementById('c-cat3') && (document.getElementById('c-cat3').textContent = `~ 0.21 t`);
+}
+
+// ── RENDER CLUSTER ROWS ──
+function renderClusters() {
+  const grid = document.getElementById('cluster-grid');
+  const statusConfig = {
+    complete: { cls:'complete', icon:'✓', label:'Complete', cls2:'status-complete' },
+    partial:  { cls:'partial',  icon:'◐', label:'Partial',  cls2:'status-partial' },
+    na:       { cls:'complete', icon:'—', label:'N/A',      cls2:'status-complete' },
+    empty:    { cls:'empty',    icon:'○', label:'Not started', cls2:'status-empty' },
+  };
+  const scopeColors = { s1:'#f4a88a', s2:'#8ab4f4', s3:'#a8d4a8' };
+
+  grid.innerHTML = DEMO.clusters.map(c => {
+    const cfg = statusConfig[c.status] || statusConfig.empty;
+    const co2 = (c.s1||0) + (c.s2||0) + (c.s3||0) + (c.s3_cat3||0);
+    const scopes = c.scopes || [];
+    return `<div class="cluster-row ${cfg.cls}" onclick="goToCluster('${c.id}')">
+      <div class="cl-icon">${c.icon}</div>
+      <div>
+        <div class="cl-name">${c.name}</div>
+        <div class="cl-sub">${c.sub}</div>
+      </div>
+      <div class="cl-scope">${scopes.map(s => `<div class="scope-dot" style="background:${scopeColors[s]||'#ccc'}" title="${s}"></div>`).join('')}</div>
+      <div class="cl-co2 ${co2 > 0 ? '' : 'empty-val'}">${co2 > 0 ? '~ '+co2.toFixed(1)+' t' : c.status==='na'?'N/A':'—'}</div>
+      <div class="cl-status ${cfg.cls2}"><span>${cfg.icon}</span><span>${cfg.label}</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ── RENDER MISSING ──
+function renderMissing() {
+  const missing = DEMO.clusters.filter(c => c.status === 'partial' || c.status === 'empty');
+  const card = document.getElementById('missing-card');
+  const list = document.getElementById('missing-list');
+  if (missing.length > 0) {
+    card.className = 'missing-card show';
+    list.innerHTML = missing.map(c =>
+      `<div class="missing-item">
+        <span>${c.icon}</span>
+        <span>${c.name} — ${c.notes || 'no data entered'}</span>
+        <span class="missing-go" onclick="goToCluster('${c.id}')">Update →</span>
+      </div>`
+    ).join('');
+  }
+}
+
+// ── RENDER ACCURACY ──
+function renderAccuracy() {
+  const rows = document.getElementById('acc-rows');
+  const accColors = { high:'#a8d4a8', medium:'#e8c87a', low:'#f0b4a8', none:'#c2bfb6' };
+  rows.innerHTML = DEMO.clusters.filter(c=>c.status!=='na').map(c => {
+    const cls = c.acc === 'high' ? 'acc-high' : c.acc === 'medium' ? 'acc-med' : c.acc === 'low' ? 'acc-low' : 'acc-none';
+    const label = c.acc === 'high' ? 'High' : c.acc === 'medium' ? 'Medium' : c.acc === 'low' ? 'Low' : 'Not entered';
+    return `<div class="acc-row">
+      <div class="acc-dot" style="background:${accColors[c.acc]||'#ccc'}"></div>
+      <div class="acc-name">${c.name}</div>
+      <div class="acc-badge ${cls}">${label}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── RENDER SIDEBAR ──
+function renderSidebar() {
+  document.getElementById('grand-total').textContent = grand.toFixed(2);
+  document.getElementById('ss1').textContent = totals.s1.toFixed(2) + ' tCO₂e';
+  document.getElementById('ss2').textContent = totals.s2.toFixed(2) + ' tCO₂e';
+  document.getElementById('ss3').textContent = totals.s3.toFixed(2) + ' tCO₂e';
+  document.getElementById('grand-sgd').textContent = totals.sgd > 0 ? `≈ SGD ${Math.round(totals.sgd).toLocaleString()} / yr energy & fuel spend` : '≈ SGD — / yr';
+  if (grand > 0) {
+    const carKm = Math.round(grand * 1000 / 0.173);
+    document.getElementById('analogy-text').textContent =
+      `${grand.toFixed(1)} tCO₂e is equivalent to driving a petrol car ${carKm.toLocaleString()} km, or leaving 1HP air-conditioning running for ${Math.round(grand*1000/0.412).toLocaleString()} hours.`;
+  }
+}
+
+// ── NAVIGATION ──
+function goToCluster(id) {
+  const screens = { power:'S-10', transport:'S-11', cooling:'S-12', cooking:'S-13', waste:'S-14', people:'S-15', digital:'S-16', procure:'S-17' };
+  const clusterMap = {
+        'S-10': '/S-10-power-energy-v3.html',
+        'S-11': '/S-11-transport-fleet.html',
+        'S-12': '/S-12-cooling-refrigeration.html',
+        'S-13': '/S-13-cooking-process-heat.html',
+        'S-14': '/S-14-waste-water.html',
+        'S-15': '/S-15-people-commuting.html',
+        'S-16': '/S-16-digital-it.html',
+        'S-17': '/S-17-procurement.html',
+      };
+      if (clusterMap[id]) window.location.href = clusterMap[id];
+}
+
+function proceedToResults() {
+  window.location.href = '/S-19-carbon-overview.html';
+}
+
+// ── INIT ──
+window.addEventListener('load', () => {
+  renderScore();
+  renderScopeCards();
+  renderClusters();
+  renderMissing();
+  renderAccuracy();
+  renderSidebar();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cooling & Refrigeration — ZYT.ESG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#15140d;--ink2:#42403a;--ink3:#84827a;--ink4:#c2bfb6;
+  --bg:#f3f0e9;--card:#ffffff;--b1:#e0dbd2;--b2:#eae6de;
+  --s1c:#b04020;--s1b:#fdf0ec;--s1d:#f0c4b4;
+  --s2c:#1a4a8b;--s2b:#edf2fc;--s2d:#b4c8f0;
+  --s3c:#27500a;--s3b:#eaf4ee;--s3d:#b4d9c4;
+  --gc:#1a6b4a;--gb:#eaf4ee;--gd:#b4d9c4;
+  --ac:#7a5a0a;--ab:#fdf3e0;--ad:#e8c87a;
+  --wc:#7a1a1a;--wb:#fdf0ec;--wd:#f0b4b4;
+  --bc:#1a3a7a;--bb:#edf0fc;--bd:#b4bef0;
+  --r:10px;--rl:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:14px}
+
+nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30}
+.logo{font-family:'Fraunces',serif;font-size:17px;font-weight:300;display:flex;align-items:center;gap:8px}
+.logo-tag{font-family:'DM Mono',monospace;font-size:10px;color:var(--gc);background:var(--gb);border:1px solid var(--gd);padding:2px 7px;border-radius:20px;letter-spacing:.5px}
+.nav-steps{display:flex;align-items:center;gap:4px;font-size:12px}
+.ns{padding:3px 10px;border-radius:20px;color:var(--ink3)}
+.ns.done{color:var(--gc)}.ns.done::before{content:'✓ ';font-size:10px}
+.ns.active{background:var(--ink);color:white;font-weight:500}
+.ns-sep{color:var(--ink4);font-size:10px}
+.btn-back{font-size:12px;color:var(--ink3);background:transparent;border:.5px solid var(--b1);padding:5px 12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:color .15s,border-color .15s}
+.btn-back:hover{color:var(--ink);border-color:var(--ink3)}
+
+.layout{display:grid;grid-template-columns:1fr 300px;gap:20px;max-width:1060px;margin:0 auto;padding:28px 24px 100px;align-items:start}
+
+.cluster-hdr{background:var(--card);border:1px solid var(--b1);border-radius:var(--rl);padding:20px 22px;margin-bottom:16px;display:flex;align-items:flex-start;gap:14px}
+.hdr-icon{font-size:26px;width:50px;height:50px;background:var(--bg);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hdr-body{flex:1}
+.hdr-name{font-family:'Fraunces',serif;font-size:22px;font-weight:300;letter-spacing:-.3px;margin-bottom:3px}
+.hdr-sub{font-size:12px;color:var(--ink3);line-height:1.5;margin-bottom:8px}
+.hdr-role{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3);background:var(--bg);border:1px solid var(--b2);padding:3px 9px;border-radius:20px}
+.prog-bar{height:3px;background:var(--b2);border-radius:2px;overflow:hidden;margin-top:10px}
+.prog-fill{height:100%;background:var(--gc);border-radius:2px;transition:width .5s ease}
+.prog-label{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);margin-top:4px}
+
+/* GWP EDUCATION BANNER */
+.gwp-banner{background:var(--bc);border-radius:var(--rl);padding:16px 18px;margin-bottom:16px;display:flex;gap:12px;align-items:flex-start}
+.gwp-icon{font-size:22px;flex-shrink:0;margin-top:2px}
+.gwp-title{font-size:13px;font-weight:500;color:white;margin-bottom:4px}
+.gwp-text{font-size:11px;color:rgba(255,255,255,.75);line-height:1.6}
+.gwp-pill{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);padding:1px 7px;border-radius:8px;margin:0 2px;color:rgba(255,255,255,.9)}
+
+/* SECTION */
+.section{margin-bottom:12px}
+.sec-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card);border:1px solid var(--b1);border-radius:10px 10px 0 0;cursor:pointer;user-select:none}
+.sec-hdr:hover{background:var(--bg)}
+.scope-pill{font-size:10px;font-family:'DM Mono',monospace;font-weight:500;padding:2px 8px;border-radius:8px;white-space:nowrap}
+.s1-pill{background:var(--s1b);color:var(--s1c);border:1px solid var(--s1d)}
+.sec-title{font-size:13px;font-weight:500;color:var(--ink);flex:1}
+.sec-total{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);transition:color .3s}
+.sec-total.live{color:var(--gc);font-weight:500}
+.sec-chev{width:12px;height:12px;color:var(--ink3);transition:transform .2s;flex-shrink:0}
+.sec-chev.open{transform:rotate(90deg)}
+.sec-body{display:none;background:var(--card);border:1px solid var(--b1);border-top:none;border-radius:0 0 10px 10px;overflow:hidden}
+.sec-body.open{display:block}
+
+/* ACTIVITY */
+.activity{padding:16px;border-bottom:1px solid var(--b2)}
+.activity:last-child{border-bottom:none}
+.act-name-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.act-name{font-size:13px;font-weight:500;color:var(--ink)}
+.opt-tag{font-size:9px;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:6px;background:var(--ab);color:var(--ac);border:1px solid var(--ad)}
+.tip-btn{width:16px;height:16px;border-radius:50%;background:var(--bg);border:1px solid var(--b1);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;color:var(--ink3);font-family:'DM Mono',monospace;font-weight:500;flex-shrink:0;transition:background .15s,color .15s}
+.tip-btn:hover{background:var(--ink);color:white;border-color:var(--ink)}
+.act-sub{font-size:11px;color:var(--ink3);margin-bottom:10px;line-height:1.4}
+.tip-panel{display:none;background:var(--ink);color:white;border-radius:8px;padding:12px 14px;font-size:11px;line-height:1.6;margin-bottom:10px}
+.tip-panel.open{display:block;animation:fadein .15s ease}
+.tip-analogy{margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.15);font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.65)}
+.tip-ef{margin-top:4px;font-size:10px;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace}
+
+/* REFRIGERANT SELECTOR */
+.ref-selector{margin-bottom:12px}
+.ref-selector-label{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block}
+.ref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin-bottom:8px}
+.ref-btn{padding:8px 10px;border:1px solid var(--b1);border-radius:var(--r);cursor:pointer;background:var(--card);text-align:center;transition:all .15s}
+.ref-btn:hover{border-color:var(--ink3)}
+.ref-btn.active{border-color:var(--s1c);background:var(--s1b)}
+.ref-name{font-size:12px;font-weight:500;color:var(--ink);margin-bottom:2px}
+.ref-gwp{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3)}
+.ref-gwp.high{color:var(--wc)}
+.ref-gwp.medium{color:var(--ac)}
+.ref-gwp.low{color:var(--gc)}
+.ref-use{font-size:10px;color:var(--ink3);margin-top:1px;font-style:italic}
+.ref-gwp-badge{display:inline-block;font-family:'DM Mono',monospace;font-size:9px;font-weight:500;padding:1px 6px;border-radius:6px;margin-top:3px}
+.gwp-high{background:var(--wb);color:var(--wc);border:.5px solid var(--wd)}
+.gwp-med{background:var(--ab);color:var(--ac);border:.5px solid var(--ad)}
+.gwp-low{background:var(--gb);color:var(--gc);border:.5px solid var(--gd)}
+
+/* DONT KNOW PANEL */
+.dontknow-panel{display:none;background:var(--bb);border:.5px solid var(--bd);border-radius:8px;padding:12px 14px;margin-bottom:10px;font-size:11px;color:var(--bc);line-height:1.6}
+.dontknow-panel.open{display:block}
+.dontknow-panel strong{font-weight:500}
+.dontknow-panel ol{margin:6px 0 0 16px}
+.dontknow-panel li{margin-bottom:4px}
+
+/* EVENT ENTRIES */
+.event-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.event-entry{background:var(--bg);border:1px solid var(--b1);border-radius:var(--r);padding:10px 12px;position:relative;display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}
+.event-entry.has-data{background:var(--s1b);border-color:var(--s1d)}
+.ev-remove{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;background:transparent;border:.5px solid var(--b1);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:9px;transition:all .15s}
+.ev-remove:hover{background:var(--wb);border-color:var(--wd);color:var(--wc)}
+.ev-result{font-family:'DM Mono',monospace;font-size:11px;color:var(--s1c);font-weight:500;flex-basis:100%;margin-top:4px;padding-top:4px;border-top:.5px solid var(--s1d)}
+.ev-result.empty{color:var(--ink4);font-weight:400;border-top:.5px solid var(--b2)}
+
+/* INPUT MODES */
+.mode-tabs{display:flex;gap:3px;background:var(--bg);border:1px solid var(--b1);border-radius:8px;padding:3px;width:fit-content;margin-bottom:10px}
+.mtab{font-size:11px;padding:5px 11px;border-radius:6px;border:none;background:transparent;color:var(--ink3);cursor:pointer;transition:all .15s;white-space:nowrap}
+.mtab.active{background:var(--card);color:var(--ink);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.mode-panel{display:none}
+.mode-panel.active{display:block}
+
+/* FIELDS */
+.field-row{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:8px}
+.fwrap{flex:1;min-width:90px}
+.fwrap label{display:block;font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.inp{width:100%;height:36px;border:.5px solid var(--b1);border-radius:7px;background:var(--card);padding:0 10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .15s}
+.inp:focus{border-color:var(--gc)}
+.sel{width:100%;height:36px;border:.5px solid var(--b1);border-radius:7px;background:var(--card);padding:0 10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;cursor:pointer;transition:border-color .15s}
+.sel:focus{border-color:var(--gc)}
+.unit-box{height:36px;padding:0 10px;background:var(--bg);border:.5px solid var(--b2);border-radius:7px;font-size:11px;color:var(--ink3);display:flex;align-items:center;white-space:nowrap;font-family:'DM Mono',monospace}
+
+/* ADD BUTTON */
+.add-btn{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--s1c);background:transparent;border:1px dashed var(--s1d);padding:7px 14px;border-radius:var(--r);cursor:pointer;width:100%;justify-content:center;transition:all .15s;margin-bottom:10px}
+.add-btn:hover{background:var(--s1b)}
+.add-btn svg{width:12px;height:12px}
+
+/* GWP IMPACT INDICATOR */
+.gwp-impact{padding:8px 10px;border-radius:7px;font-size:11px;line-height:1.5;margin-bottom:8px;display:none}
+.gwp-impact.show{display:block}
+.gwp-impact.critical{background:var(--wb);border:.5px solid var(--wd);color:var(--wc)}
+.gwp-impact.warning{background:var(--ab);border:.5px solid var(--ad);color:var(--ac)}
+.gwp-impact.ok{background:var(--gb);border:.5px solid var(--gd);color:var(--gc)}
+
+/* NA */
+.na-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.na-cb{width:14px;height:14px;cursor:pointer;accent-color:var(--ink3)}
+.na-lbl{font-size:11px;color:var(--ink3);cursor:pointer}
+
+/* RESULT PILLS */
+.result-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:.5px solid var(--b2);align-items:center}
+.rpill{display:flex;align-items:center;gap:4px;font-size:11px;padding:3px 9px;border-radius:16px;border:.5px solid;white-space:nowrap}
+.rpill.co2{background:var(--gb);color:var(--gc);border-color:var(--gd)}
+.rpill.co2-high{background:var(--wb);color:var(--wc);border-color:var(--wd)}
+.rpill.cost{background:var(--ab);color:var(--ac);border-color:var(--ad)}
+.rpill.empty{background:var(--bg);color:var(--ink4);border-color:var(--b2)}
+.rpill-val{font-family:'DM Mono',monospace;font-weight:500}
+
+/* COST CONTEXT */
+.cost-context{display:none;margin-top:6px;font-size:11px;color:var(--ac);line-height:1.5;padding:7px 10px;background:var(--ab);border:.5px solid var(--ad);border-radius:7px}
+.cost-context.show{display:block}
+
+/* ATTACH */
+.attach-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.attach-btn{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3);background:transparent;border:.5px solid var(--b1);padding:4px 10px;border-radius:6px;cursor:pointer;transition:all .15s}
+.attach-btn:hover{color:var(--ink);border-color:var(--ink3)}
+.attach-btn svg{width:12px;height:12px}
+.attach-info{font-size:10px;color:var(--ink3);font-style:italic}
+
+/* SUMMARY */
+.summary-col{position:sticky;top:72px}
+.sum-card{background:var(--ink);border-radius:var(--rl);overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.12)}
+.sum-hdr{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-hdr-title{font-family:'Fraunces',serif;font-size:15px;font-weight:300;color:white;margin-bottom:2px}
+.sum-hdr-sub{font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.35)}
+.sum-ref-breakdown{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-ref-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.3);margin-bottom:8px}
+.ref-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;font-size:11px}
+.ref-row-name{color:rgba(255,255,255,.55)}
+.ref-row-val{font-family:'DM Mono',monospace;font-weight:500;color:white}
+.ref-row-gwp{font-family:'DM Mono',monospace;font-size:9px;padding:1px 5px;border-radius:4px;margin-left:6px}
+.sum-total{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-est-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.3);margin-bottom:5px}
+.sum-total-val{font-family:'Fraunces',serif;font-size:26px;font-weight:300;color:white;line-height:1;letter-spacing:-.5px;transition:all .3s}
+.sum-total-unit{font-size:11px;color:rgba(255,255,255,.4);margin-top:2px}
+.sum-cost-block{margin-top:10px;padding:10px 12px;background:rgba(255,255,255,.06);border-radius:8px;border:.5px solid rgba(255,255,255,.1)}
+.sum-cost-label{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.3);margin-bottom:4px}
+.sum-cost-val{font-family:'Fraunces',serif;font-size:18px;font-weight:300;color:#f0d090;line-height:1;transition:all .3s}
+.sum-cost-desc{font-size:10px;color:rgba(255,255,255,.4);margin-top:3px;line-height:1.4}
+.sum-alert{margin-top:8px;padding:8px 10px;background:rgba(176,64,32,.25);border:.5px solid rgba(240,196,180,.3);border-radius:7px;font-size:11px;color:#f4c4a8;line-height:1.5;display:none}
+.sum-alert.show{display:block}
+.sum-analogy{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-anal-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.25);margin-bottom:5px}
+.sum-anal-text{font-size:11px;color:rgba(255,255,255,.6);line-height:1.55;font-style:italic;transition:all .3s}
+.sum-ef{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-ef-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.25);margin-bottom:6px}
+.ef-row{display:flex;justify-content:space-between;font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.4);margin-bottom:3px}
+.ef-row span:last-child{color:rgba(255,255,255,.6)}
+.sum-actions{padding:14px 18px;display:flex;flex-direction:column;gap:8px}
+.btn-next{width:100%;height:40px;background:white;color:var(--ink);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
+.btn-next:hover{background:#f0ede6}
+.btn-next svg{width:13px;height:13px;transition:transform .15s}
+.btn-next:hover svg{transform:translateX(2px)}
+.btn-save-draft{width:100%;height:36px;background:transparent;color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.12);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s}
+.btn-save-draft:hover{color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.3)}
+
+@keyframes fadein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:768px){.layout{grid-template-columns:1fr}.summary-col{position:static}.nav-steps{display:none}.ref-grid{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">ZYT.ESG <span class="logo-tag">ESG</span></div>
+  <div class="nav-steps">
+    <div class="ns done">Profile</div><div class="ns-sep">›</div>
+    <div class="ns active">Data entry</div><div class="ns-sep">›</div>
+    <div class="ns">Results</div><div class="ns-sep">›</div>
+    <div class="ns">Targets</div><div class="ns-sep">›</div>
+    <div class="ns">Report</div>
+  </div>
+  <button class="btn-back">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 2L4 6l4 4"/></svg>
+    Back to hub
+  </button>
+</nav>
+
+<div class="layout">
+<div class="form-col">
+
+<!-- CLUSTER HEADER -->
+<div class="cluster-hdr">
+  <div class="hdr-icon">❄</div>
+  <div class="hdr-body">
+    <div class="hdr-name">Cooling & refrigeration</div>
+    <div class="hdr-sub">Air-conditioning, cold rooms, and refrigerated vehicles. Refrigerant leaks are Scope 1 fugitive emissions — often overlooked but very high-impact due to refrigerants' extreme global warming potential.</div>
+    <div class="hdr-role">
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="6" cy="4" r="2.5"/><path d="M2 11c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>
+      Facilities manager / technician records
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="prog-label" id="prog-label">0 of 3 sections completed</div>
+  </div>
+</div>
+
+<!-- GWP EDUCATION BANNER -->
+<div class="gwp-banner" style="background:linear-gradient(135deg,#1a3a7a 0%,#2a4a9a 100%)">
+  <div class="gwp-icon">⚠️</div>
+  <div>
+    <div class="gwp-title">Why refrigerants matter so much</div>
+    <div class="gwp-text">
+      Refrigerant gases are hundreds to thousands of times more potent than CO₂ as greenhouse gases. This potency is measured by GWP (Global Warming Potential) — the higher the number, the more damaging each kilogram leaked.
+      <br><br>
+      <span class="gwp-pill">R-410A GWP 2,088</span> — 1 kg leaked = 2.1 tonnes CO₂e — equivalent to driving 12,000 km
+      <br>
+      <span class="gwp-pill">R-404A GWP 3,922</span> — 1 kg leaked = 3.9 tonnes CO₂e — equivalent to driving 22,000 km
+      <br><br>
+      The good news: fixing a refrigerant leak costs SGD 300–800 and eliminates the emission entirely. This is often the single highest-return action available to an SME.
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 1: AIR-CONDITIONING (Scope 1) ══ -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('ac')">
+    <svg class="sec-chev open" id="chev-ac" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s1-pill">Scope 1</span>
+    <span class="sec-title">Air-conditioning — split units, ceiling cassettes, chillers</span>
+    <span class="sec-total" id="st-ac">—</span>
+  </div>
+  <div class="sec-body open" id="body-ac">
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">Refrigerant top-up (air-conditioning)</div>
+        <span class="tip-btn" onclick="toggleTip('tip-ac')">?</span>
+      </div>
+      <div class="act-sub">Every time your air-con technician tops up the gas, refrigerant has leaked. The quantity topped up equals the quantity emitted to atmosphere. This is a Scope 1 fugitive emission.</div>
+      <div class="tip-panel" id="tip-ac">
+        Refrigerant leaks happen gradually through micro-cracks in copper piping, faulty fittings, and worn seals. Signs of leakage: AC not cooling as well as before, ice forming on the outdoor unit, or hissing sounds. The refrigerant topped up by the technician equals what has leaked — all of which entered the atmosphere.
+        <div class="tip-analogy">🌡 1 kg of R-410A leaked ≈ 2.1 tCO₂e — more than 5,000 kWh of electricity from the Singapore grid</div>
+        <div class="tip-ef">SEFR: Greenhouse Gases → Refrigerants → GWP values per IPCC Fifth Assessment Report (AR5)</div>
+      </div>
+
+      <!-- STEP 1: What refrigerant? -->
+      <div class="ref-selector">
+        <span class="ref-selector-label">Step 1 — What refrigerant does your air-conditioning use?</span>
+        <div class="ref-grid" id="ac-ref-grid">
+          <button class="ref-btn active" data-ref="R-410A" data-gwp="2088" onclick="selectRef('ac', this)">
+            <div class="ref-name">R-410A</div>
+            <div class="ref-gwp high">GWP 2,088</div>
+            <div class="ref-use">Standard AC<br>2010–present</div>
+            <div class="ref-gwp-badge gwp-high">High impact</div>
+          </button>
+          <button class="ref-btn" data-ref="R-32" data-gwp="677" onclick="selectRef('ac', this)">
+            <div class="ref-name">R-32</div>
+            <div class="ref-gwp medium">GWP 677</div>
+            <div class="ref-use">Newer inverter<br>2018–present</div>
+            <div class="ref-gwp-badge gwp-med">Medium impact</div>
+          </button>
+          <button class="ref-btn" data-ref="R-22" data-gwp="1760" onclick="selectRef('ac', this)">
+            <div class="ref-name">R-22</div>
+            <div class="ref-gwp high">GWP 1,760</div>
+            <div class="ref-use">Older systems<br>pre-2010</div>
+            <div class="ref-gwp-badge gwp-high">High impact</div>
+          </button>
+          <button class="ref-btn" data-ref="R-407C" data-gwp="1774" onclick="selectRef('ac', this)">
+            <div class="ref-name">R-407C</div>
+            <div class="ref-gwp high">GWP 1,774</div>
+            <div class="ref-use">Commercial AC<br>chillers</div>
+            <div class="ref-gwp-badge gwp-high">High impact</div>
+          </button>
+          <button class="ref-btn" data-ref="R-134a" data-gwp="1300" onclick="selectRef('ac', this)">
+            <div class="ref-name">R-134a</div>
+            <div class="ref-gwp medium">GWP 1,300</div>
+            <div class="ref-use">Some chillers<br>& older units</div>
+            <div class="ref-gwp-badge gwp-med">Medium impact</div>
+          </button>
+          <button class="ref-btn" data-ref="other-ac" data-gwp="0" onclick="selectRef('ac', this)">
+            <div class="ref-name">Other / unknown</div>
+            <div class="ref-gwp" style="color:var(--ink3)">— GWP</div>
+            <div class="ref-use">Enter manually below</div>
+            <div class="ref-gwp-badge" style="background:var(--bg);color:var(--ink3);border:.5px solid var(--b1)">See guide ↓</div>
+          </button>
+        </div>
+
+        <!-- Don't know panel -->
+        <div class="dontknow-panel" id="ac-dontknow">
+          <strong>How to find your refrigerant type:</strong>
+          <ol>
+            <li>Look at the label on your <strong>outdoor condenser unit</strong> (the box outside or on the roof). It will say "Refrigerant: R-410A" or similar.</li>
+            <li>Check your <strong>air-con service report</strong> — the technician records the refrigerant type when topping up.</li>
+            <li>Ask your <strong>regular air-con contractor</strong> — they will know from their records.</li>
+            <li>If your system was installed before 2010, it's likely R-22. After 2010, most Singapore systems use R-410A. After 2018, newer inverter models may use R-32.</li>
+          </ol>
+          <br>
+          <div class="field-row" style="margin-bottom:0">
+            <div class="fwrap" style="max-width:200px">
+              <label>Manual GWP entry</label>
+              <input class="inp" type="number" id="ac-manual-gwp" placeholder="e.g. 2088" oninput="updateManualGWP('ac')">
+            </div>
+            <div class="fwrap" style="max-width:160px">
+              <label>Refrigerant name</label>
+              <input class="inp" type="text" id="ac-manual-name" placeholder="e.g. R-410A">
+            </div>
+          </div>
+        </div>
+
+        <!-- GWP impact for selected refrigerant -->
+        <div class="gwp-impact" id="ac-gwp-impact"></div>
+      </div>
+
+      <!-- STEP 2: How much topped up? -->
+      <div>
+        <span class="ref-selector-label">Step 2 — How much refrigerant was topped up in total this year?</span>
+        <div class="mode-tabs" id="ac-mode-tabs">
+          <button class="mtab active" onclick="switchMode('ac',['ac-kg','ac-visits'],'ac-kg',this)">By total kg topped up</button>
+          <button class="mtab" onclick="switchMode('ac',['ac-kg','ac-visits'],'ac-visits',this)">By service visits</button>
+        </div>
+        <div class="mode-panel active" id="ac-kg">
+          <div class="field-row">
+            <div class="fwrap" style="max-width:200px">
+              <label>Total refrigerant topped up this year</label>
+              <input class="inp" type="number" id="ac-kg-val" placeholder="e.g. 1.5" step="0.1" oninput="calcAC()">
+            </div>
+            <div class="unit-box">kg / year</div>
+          </div>
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">Check your air-con service records or invoices — the quantity is typically noted as "X kg refrigerant added". If you had multiple top-ups, add them all together.</div>
+        </div>
+        <div class="mode-panel" id="ac-visits">
+          <div class="field-row">
+            <div class="fwrap">
+              <label>Service visits with top-up this year</label>
+              <input class="inp" type="number" id="ac-visits-count" placeholder="e.g. 2" oninput="calcACVisits()">
+            </div>
+            <div class="fwrap">
+              <label>Avg refrigerant per visit</label>
+              <input class="inp" type="number" id="ac-kg-per-visit" value="0.5" step="0.1" oninput="calcACVisits()">
+            </div>
+            <div class="unit-box">kg / visit</div>
+          </div>
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">Typical top-up for a wall unit: 0.3–1.0 kg. For a ceiling cassette or fan coil: 0.5–2.0 kg. Check with your technician if unsure.</div>
+        </div>
+      </div>
+
+      <div class="result-row" id="result-ac">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual service cost</span></div>
+      </div>
+      <div class="cost-context" id="cost-ctx-ac">
+        💡 Fixing the leak permanently costs SGD 300–800 per unit and eliminates this emission entirely. This is likely the highest-return action in your entire carbon report.
+      </div>
+
+      <div class="attach-row">
+        <button class="attach-btn" onclick="attachFile('ac')">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 1H3a1 1 0 00-1 1v8a1 1 0 001 1h6a1 1 0 001-1V4L8 1z"/><path d="M8 1v3h3"/></svg>
+          Attach service records (documentation)
+        </button>
+        <span class="attach-info">Technician invoices, service reports</span>
+      </div>
+
+      <div class="na-row" style="margin-top:8px">
+        <input type="checkbox" class="na-cb" id="ac-no-topup" onchange="toggleNoTopup('ac', this)">
+        <label class="na-lbl" for="ac-no-topup">No top-up was needed this year (no leak detected)</label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 2: COLD ROOM / FREEZER (Scope 1) ══ -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('coldroom')">
+    <svg class="sec-chev" id="chev-coldroom" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s1-pill">Scope 1</span>
+    <span class="sec-title">Walk-in cold room & commercial freezer</span>
+    <span class="sec-total" id="st-coldroom">—</span>
+  </div>
+  <div class="sec-body" id="body-coldroom">
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">Refrigerant top-up (cold room / freezer) <span class="opt-tag">optional</span></div>
+        <span class="tip-btn" onclick="toggleTip('tip-coldroom')">?</span>
+      </div>
+      <div class="act-sub">Walk-in cold rooms, blast freezers, and commercial display chillers. These typically use refrigerants with very high GWP — a small leak has a large carbon impact.</div>
+      <div class="tip-panel" id="tip-coldroom">
+        Cold room refrigerants (R-404A is most common in Singapore cold chain) have among the highest GWP of any commercial refrigerant. A 2 kg leak of R-404A generates 7.8 tCO₂e — equivalent to leaving a 1HP air-con running continuously for 17 years.
+        <div class="tip-analogy">🧊 1 kg R-404A leaked = 3.9 tCO₂e · Compare: 1 kg R-32 = 0.68 tCO₂e — switch to lower-GWP refrigerant when servicing</div>
+        <div class="tip-ef">SEFR: Greenhouse Gases → Refrigerants → R-404A: GWP 3,922 · R-448A: GWP 1,273 · R-449A: GWP 1,282 · Source: IPCC AR5</div>
+      </div>
+
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="coldroom-na" checked onchange="toggleNA('coldroom-inputs',this,'coldroom')">
+        <label class="na-lbl" for="coldroom-na">We don't have a walk-in cold room or commercial freezer</label>
+      </div>
+
+      <div id="coldroom-inputs" style="opacity:.3;pointer-events:none">
+        <div class="ref-selector">
+          <span class="ref-selector-label">What refrigerant does your cold room use?</span>
+          <div class="ref-grid" id="cr-ref-grid">
+            <button class="ref-btn active" data-ref="R-404A" data-gwp="3922" onclick="selectRef('cr', this)">
+              <div class="ref-name">R-404A</div>
+              <div class="ref-gwp high">GWP 3,922</div>
+              <div class="ref-use">Most common<br>cold rooms SG</div>
+              <div class="ref-gwp-badge gwp-high">Very high impact</div>
+            </button>
+            <button class="ref-btn" data-ref="R-448A" data-gwp="1273" onclick="selectRef('cr', this)">
+              <div class="ref-name">R-448A</div>
+              <div class="ref-gwp medium">GWP 1,273</div>
+              <div class="ref-use">Newer cold rooms<br>R-404A replacement</div>
+              <div class="ref-gwp-badge gwp-med">Medium impact</div>
+            </button>
+            <button class="ref-btn" data-ref="R-449A" data-gwp="1282" onclick="selectRef('cr', this)">
+              <div class="ref-name">R-449A</div>
+              <div class="ref-gwp medium">GWP 1,282</div>
+              <div class="ref-use">Newer cold rooms<br>R-404A replacement</div>
+              <div class="ref-gwp-badge gwp-med">Medium impact</div>
+            </button>
+            <button class="ref-btn" data-ref="R-134a" data-gwp="1300" onclick="selectRef('cr', this)">
+              <div class="ref-name">R-134a</div>
+              <div class="ref-gwp medium">GWP 1,300</div>
+              <div class="ref-use">Some display<br>chillers</div>
+              <div class="ref-gwp-badge gwp-med">Medium impact</div>
+            </button>
+            <button class="ref-btn" data-ref="R-717" data-gwp="0" onclick="selectRef('cr', this)">
+              <div class="ref-name">R-717 (NH₃)</div>
+              <div class="ref-gwp low">GWP 0</div>
+              <div class="ref-use">Industrial<br>ammonia systems</div>
+              <div class="ref-gwp-badge gwp-low">Zero GWP</div>
+            </button>
+            <button class="ref-btn" data-ref="other-cr" data-gwp="0" onclick="selectRef('cr', this)">
+              <div class="ref-name">Other / unknown</div>
+              <div class="ref-gwp" style="color:var(--ink3)">— GWP</div>
+              <div class="ref-use">Enter manually</div>
+              <div class="ref-gwp-badge" style="background:var(--bg);color:var(--ink3);border:.5px solid var(--b1)">Manual entry</div>
+            </button>
+          </div>
+          <div class="dontknow-panel" id="cr-dontknow">
+            <strong>Finding your cold room refrigerant:</strong>
+            <ol>
+              <li>Check the <strong>compressor unit label</strong> — usually shows refrigerant type</li>
+              <li>Ask your <strong>cold room service contractor</strong> — they will have records</li>
+              <li>Check the <strong>service logbook</strong> kept with the unit</li>
+            </ol>
+            <div class="field-row" style="margin-top:8px;margin-bottom:0">
+              <div class="fwrap" style="max-width:200px">
+                <label>Manual GWP entry</label>
+                <input class="inp" type="number" id="cr-manual-gwp" placeholder="e.g. 3922" oninput="updateManualGWP('cr')">
+              </div>
+            </div>
+          </div>
+          <div class="gwp-impact" id="cr-gwp-impact"></div>
+        </div>
+
+        <span class="ref-selector-label">How much refrigerant was topped up this year?</span>
+        <div class="mode-tabs" id="cr-mode-tabs">
+          <button class="mtab active" onclick="switchMode('cr',['cr-kg','cr-visits'],'cr-kg',this)">By total kg topped up</button>
+          <button class="mtab" onclick="switchMode('cr',['cr-kg','cr-visits'],'cr-visits',this)">By service visits</button>
+        </div>
+        <div class="mode-panel active" id="cr-kg">
+          <div class="field-row">
+            <div class="fwrap" style="max-width:200px">
+              <label>Total refrigerant topped up</label>
+              <input class="inp" type="number" id="cr-kg-val" placeholder="e.g. 2.0" step="0.1" oninput="calcColdroom()">
+            </div>
+            <div class="unit-box">kg / year</div>
+          </div>
+        </div>
+        <div class="mode-panel" id="cr-visits">
+          <div class="field-row">
+            <div class="fwrap">
+              <label>Service visits with top-up</label>
+              <input class="inp" type="number" id="cr-visits-count" placeholder="e.g. 1" oninput="calcColdroomVisits()">
+            </div>
+            <div class="fwrap">
+              <label>Avg refrigerant per visit</label>
+              <input class="inp" type="number" id="cr-kg-per-visit" value="2.0" step="0.1" oninput="calcColdroomVisits()">
+            </div>
+            <div class="unit-box">kg / visit</div>
+          </div>
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">Typical cold room top-up: 1.0–5.0 kg depending on system size and severity of leak.</div>
+        </div>
+      </div>
+
+      <div class="result-row" id="result-coldroom">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual service cost</span></div>
+      </div>
+      <div class="cost-context" id="cost-ctx-cr">
+        💡 Cold room refrigerant leaks are extremely high-impact. If R-404A is used, consider switching to R-448A or R-449A (GWP ~1,280) at the next service — a 67% GWP reduction with no performance loss.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 3: REEFER VEHICLES (Scope 1) ══ -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('reefer')">
+    <svg class="sec-chev" id="chev-reefer" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s1-pill">Scope 1</span>
+    <span class="sec-title">Refrigerated vehicles (reefer trucks / vans)</span>
+    <span class="sec-total" id="st-reefer">—</span>
+  </div>
+  <div class="sec-body" id="body-reefer">
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">Refrigerant top-up (reefer vehicles) <span class="opt-tag">optional</span></div>
+        <span class="tip-btn" onclick="toggleTip('tip-reefer')">?</span>
+      </div>
+      <div class="act-sub">Refrigeration units fitted to delivery vehicles for cold chain logistics. The refrigerant leak calculation is identical to cold rooms — only the system type differs.</div>
+      <div class="tip-panel" id="tip-reefer">
+        Mobile refrigeration units on trucks and vans are subject to higher vibration stress than static cold rooms, often leading to faster seal wear and more frequent top-ups. Singapore's hot climate also means these systems work harder, increasing leak risk.
+        <div class="tip-analogy">🚛 A reefer van leaking 1 kg of R-404A per year ≈ 3.9 tCO₂e — more than the van's diesel fuel combustion from 15,000 km of driving</div>
+        <div class="tip-ef">Same SEFR refrigerant GWP values as cold rooms — R-404A most common in Singapore cold chain vehicles</div>
+      </div>
+
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="reefer-na" checked onchange="toggleNA('reefer-inputs',this,'reefer')">
+        <label class="na-lbl" for="reefer-na">We don't have refrigerated vehicles</label>
+      </div>
+
+      <div id="reefer-inputs" style="opacity:.3;pointer-events:none">
+        <div class="ref-selector">
+          <span class="ref-selector-label">Refrigerant type (usually same as cold room)</span>
+          <div class="ref-grid" id="rf-ref-grid" style="grid-template-columns:repeat(3,1fr)">
+            <button class="ref-btn active" data-ref="R-404A" data-gwp="3922" onclick="selectRef('rf', this)">
+              <div class="ref-name">R-404A</div>
+              <div class="ref-gwp high">GWP 3,922</div>
+              <div class="ref-use">Most common</div>
+              <div class="ref-gwp-badge gwp-high">Very high</div>
+            </button>
+            <button class="ref-btn" data-ref="R-452A" data-gwp="2140" onclick="selectRef('rf', this)">
+              <div class="ref-name">R-452A</div>
+              <div class="ref-gwp high">GWP 2,140</div>
+              <div class="ref-use">Newer vehicles</div>
+              <div class="ref-gwp-badge gwp-high">High</div>
+            </button>
+            <button class="ref-btn" data-ref="other-rf" data-gwp="0" onclick="selectRef('rf', this)">
+              <div class="ref-name">Other</div>
+              <div class="ref-gwp" style="color:var(--ink3)">— GWP</div>
+              <div class="ref-use">Enter manually</div>
+              <div class="ref-gwp-badge" style="background:var(--bg);color:var(--ink3);border:.5px solid var(--b1)">Manual</div>
+            </button>
+          </div>
+          <div class="dontknow-panel" id="rf-dontknow">
+            <div class="field-row" style="margin-bottom:0">
+              <div class="fwrap" style="max-width:200px">
+                <label>Manual GWP entry</label>
+                <input class="inp" type="number" id="rf-manual-gwp" placeholder="e.g. 3922" oninput="updateManualGWP('rf')">
+              </div>
+            </div>
+          </div>
+          <div class="gwp-impact" id="rf-gwp-impact"></div>
+        </div>
+
+        <div class="field-row">
+          <div class="fwrap">
+            <label>Number of reefer vehicles</label>
+            <input class="inp" type="number" id="rf-vehicles" placeholder="e.g. 2" oninput="calcReefer()">
+          </div>
+          <div class="fwrap">
+            <label>Avg annual top-up per vehicle</label>
+            <input class="inp" type="number" id="rf-kg" value="1.0" step="0.1" oninput="calcReefer()">
+          </div>
+          <div class="unit-box">kg / vehicle / yr</div>
+        </div>
+      </div>
+
+      <div class="result-row" id="result-reefer">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual service cost</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /form-col -->
+
+<!-- ══ SUMMARY PANEL ══ -->
+<div class="summary-col">
+<div class="sum-card">
+  <div class="sum-hdr">
+    <div class="sum-hdr-title">Estimated cluster total</div>
+    <div class="sum-hdr-sub">Cooling & refrigeration · 2024</div>
+  </div>
+  <div class="sum-ref-breakdown">
+    <div class="sum-ref-lbl">Breakdown by system</div>
+    <div class="ref-row">
+      <span class="ref-row-name">Air-conditioning</span>
+      <span class="ref-row-val" id="sum-ac">0 tCO₂e</span>
+    </div>
+    <div class="ref-row">
+      <span class="ref-row-name">Cold room / freezer</span>
+      <span class="ref-row-val" id="sum-cr">0 tCO₂e</span>
+    </div>
+    <div class="ref-row">
+      <span class="ref-row-name">Reefer vehicles</span>
+      <span class="ref-row-val" id="sum-rf">0 tCO₂e</span>
+    </div>
+  </div>
+  <div class="sum-total">
+    <div class="sum-est-lbl">Estimated total</div>
+    <div class="sum-total-val" id="sum-total">0</div>
+    <div class="sum-total-unit">tCO₂e / year</div>
+    <div class="sum-cost-block">
+      <div class="sum-cost-label">Annual refrigerant service cost</div>
+      <div class="sum-cost-val" id="sum-cost">—</div>
+      <div class="sum-cost-desc">Cost of service calls for top-ups. Fixing leaks permanently eliminates both the cost and the emission.</div>
+    </div>
+    <div class="sum-alert" id="sum-alert">
+      🚨 <strong>High-impact source identified.</strong> Your refrigerant emissions are significant. Proactive leak detection and repair is the single most cost-effective carbon reduction action available. Consider scheduling a full refrigerant audit.
+    </div>
+  </div>
+  <div class="sum-analogy">
+    <div class="sum-anal-lbl">What this means</div>
+    <div class="sum-anal-text" id="sum-analogy">Enter your refrigerant top-up data to see the impact.</div>
+  </div>
+  <div class="sum-ef">
+    <div class="sum-ef-lbl">Refrigerant GWP values used (SEFR / IPCC AR5)</div>
+    <div class="ef-row"><span>R-410A (standard AC)</span><span>GWP 2,088</span></div>
+    <div class="ef-row"><span>R-32 (newer inverter)</span><span>GWP 677</span></div>
+    <div class="ef-row"><span>R-22 (older systems)</span><span>GWP 1,760</span></div>
+    <div class="ef-row"><span>R-404A (cold rooms)</span><span>GWP 3,922</span></div>
+    <div class="ef-row"><span>R-448A / R-449A (low-GWP replacement)</span><span>GWP ~1,280</span></div>
+    <div class="ef-row"><span>Source</span><span>SEFR Jan 2026 · IPCC AR5</span></div>
+  </div>
+  <div class="sum-actions">
+    <button class="btn-next" onclick="saveAndNext()">
+      Save & go to Cooking & process heat
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg>
+    </button>
+    <button class="btn-save-draft">Save & exit</button>
+  </div>
+</div>
+</div>
+
+</div><!-- /layout -->
+
+<script>
+// ── STATE ──
+const S = {
+  ac: { ref:'R-410A', gwp:2088, kg:0, co2:0, sgd:0 },
+  cr: { ref:'R-404A', gwp:3922, kg:0, co2:0, sgd:0 },
+  rf: { ref:'R-404A', gwp:3922, kg:0, co2:0, sgd:0 },
+};
+
+// ── SECTION TOGGLE ──
+function toggleSec(id) {
+  const body=document.getElementById('body-'+id);
+  const chev=document.getElementById('chev-'+id);
+  const open=body.classList.contains('open');
+  body.classList.toggle('open',!open);
+  chev.classList.toggle('open',!open);
+}
+
+// ── TOOLTIP ──
+function toggleTip(id) { document.getElementById(id).classList.toggle('open'); }
+
+// ── MODE SWITCH ──
+function switchMode(group, panels, activeId, btn) {
+  const tabParent=btn.parentElement;
+  tabParent.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  panels.forEach(p=>document.getElementById(p).classList.toggle('active',p===activeId));
+}
+
+// ── NA TOGGLE ──
+function toggleNA(inputId, cb, key) {
+  const el=document.getElementById(inputId);
+  el.style.opacity=cb.checked?'0.3':'1';
+  el.style.pointerEvents=cb.checked?'none':'';
+  if(cb.checked){S[key].co2=0;S[key].sgd=0;}
+  updateProgress(); updateSummary();
+}
+
+// ── NO TOP-UP TOGGLE ──
+function toggleNoTopup(section, cb) {
+  if(cb.checked){
+    S[section].kg=0;S[section].co2=0;S[section].sgd=0;
+    clearResult('result-'+section);
+    document.getElementById('st-'+section).textContent='✓ No leak';
+    document.getElementById('st-'+section).className='sec-total';
+    document.getElementById('cost-ctx-'+section).className='cost-context';
+  }
+  updateProgress(); updateSummary();
+}
+
+// ── REFRIGERANT SELECTION ──
+function selectRef(section, btn) {
+  const grid=btn.parentElement;
+  grid.querySelectorAll('.ref-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const ref=btn.dataset.ref;
+  const gwp=parseInt(btn.dataset.gwp)||0;
+  const isOther=ref.startsWith('other');
+  // Show/hide don't know panel
+  const dkPanel=document.getElementById(section+'-dontknow');
+  if(dkPanel) dkPanel.classList.toggle('open',isOther);
+  S[section].ref=ref;
+  if(!isOther) S[section].gwp=gwp;
+  // Show GWP impact
+  showGWPImpact(section, gwp, ref, isOther);
+  // Recalculate
+  if(section==='ac') calcAC();
+  else if(section==='cr') calcColdroom();
+  else if(section==='rf') calcReefer();
+}
+
+function showGWPImpact(section, gwp, ref, isOther) {
+  const el=document.getElementById(section+'-gwp-impact');
+  if(!el||isOther||!gwp) { if(el) el.className='gwp-impact'; return; }
+  let cls, msg;
+  if(gwp>=3000) {
+    cls='critical';
+    msg=`⚠️ <strong>${ref}</strong> has a very high GWP of ${gwp.toLocaleString()}. Every 1 kg leaked = ${(gwp/1000).toFixed(1)} tCO₂e. If you're using R-404A in a cold room, ask your technician about switching to R-448A or R-449A (GWP ~1,280) at the next major service.`;
+  } else if(gwp>=1500) {
+    cls='warning';
+    msg=`⚠️ <strong>${ref}</strong> has a moderate-high GWP of ${gwp.toLocaleString()}. Every 1 kg leaked = ${(gwp/1000).toFixed(1)} tCO₂e. Fix leaks promptly — each kg matters.`;
+  } else {
+    cls='ok';
+    msg=`✓ <strong>${ref}</strong> has a relatively low GWP of ${gwp.toLocaleString()} for a refrigerant. Every 1 kg leaked = ${(gwp/1000).toFixed(1)} tCO₂e. Still important to fix leaks promptly.`;
+  }
+  el.className='gwp-impact show '+cls;
+  el.innerHTML=msg;
+}
+
+function updateManualGWP(section) {
+  const val=parseInt(document.getElementById(section+'-manual-gwp').value)||0;
+  S[section].gwp=val;
+  if(val>0) showGWPImpact(section, val, 'Custom', false);
+  if(section==='ac') calcAC();
+  else if(section==='cr') calcColdroom();
+  else if(section==='rf') calcReefer();
+}
+
+// ── CALCULATIONS ──
+const SERVICE_COST_PER_KG = 200; // SGD estimate per kg of refrigerant service
+
+function calcAC() {
+  const kg=parseFloat(document.getElementById('ac-kg-val').value)||0;
+  doCalc('ac', kg);
+}
+function calcACVisits() {
+  const visits=parseFloat(document.getElementById('ac-visits-count').value)||0;
+  const kgPv=parseFloat(document.getElementById('ac-kg-per-visit').value)||0.5;
+  document.getElementById('ac-kg-val').value=(visits*kgPv).toFixed(1);
+  doCalc('ac', visits*kgPv);
+}
+function calcColdroom() {
+  const kg=parseFloat(document.getElementById('cr-kg-val').value)||0;
+  doCalc('cr', kg);
+}
+function calcColdroomVisits() {
+  const visits=parseFloat(document.getElementById('cr-visits-count').value)||0;
+  const kgPv=parseFloat(document.getElementById('cr-kg-per-visit').value)||2.0;
+  document.getElementById('cr-kg-val').value=(visits*kgPv).toFixed(1);
+  doCalc('cr', visits*kgPv);
+}
+function calcReefer() {
+  const vehicles=parseFloat(document.getElementById('rf-vehicles').value)||0;
+  const kgPv=parseFloat(document.getElementById('rf-kg').value)||1.0;
+  doCalc('rf', vehicles*kgPv);
+}
+
+function doCalc(section, kg) {
+  const gwp=S[section].gwp||0;
+  const co2=kg*gwp/1000;
+  const sgd=kg*SERVICE_COST_PER_KG;
+  S[section].kg=kg; S[section].co2=co2; S[section].sgd=sgd;
+  const r=document.getElementById('result-'+section).querySelectorAll('.rpill');
+  if(kg>0&&gwp>0) {
+    const isHigh=co2>2;
+    r[0].className=isHigh?'rpill co2-high':'rpill co2';
+    r[0].innerHTML=`<span class="rpill-val">~ ${co2.toFixed(2)}</span><span>tCO₂e / yr</span>`;
+    r[1].className='rpill cost';
+    r[1].innerHTML=`<span class="rpill-val">≈ SGD ${Math.round(sgd).toLocaleString()}</span><span>annual service cost</span>`;
+    document.getElementById('cost-ctx-'+section).className='cost-context show';
+    document.getElementById('st-'+section).textContent=`~ ${co2.toFixed(2)} tCO₂e`;
+    document.getElementById('st-'+section).className='sec-total live';
+  } else if(kg>0&&gwp===0) {
+    r[0].className='rpill co2';
+    r[0].innerHTML=`<span class="rpill-val">0</span><span>tCO₂e (GWP = 0)</span>`;
+    document.getElementById('st-'+section).textContent='0 tCO₂e';
+  }
+  updateSummary();
+}
+
+function clearResult(id) {
+  const r=document.getElementById(id).querySelectorAll('.rpill');
+  r.forEach(p=>{p.className='rpill empty';p.innerHTML='<span class="rpill-val">—</span><span>—</span>';});
+}
+
+// ── SUMMARY ──
+function updateSummary() {
+  const total=S.ac.co2+S.cr.co2+S.rf.co2;
+  const totalSgd=S.ac.sgd+S.cr.sgd+S.rf.sgd;
+
+  document.getElementById('sum-ac').textContent=S.ac.co2>0?`~ ${S.ac.co2.toFixed(2)} tCO₂e`:'—';
+  document.getElementById('sum-cr').textContent=S.cr.co2>0?`~ ${S.cr.co2.toFixed(2)} tCO₂e`:'—';
+  document.getElementById('sum-rf').textContent=S.rf.co2>0?`~ ${S.rf.co2.toFixed(2)} tCO₂e`:'—';
+  document.getElementById('sum-total').textContent=total.toFixed(2);
+  document.getElementById('sum-cost').textContent=totalSgd>0?`≈ SGD ${Math.round(totalSgd).toLocaleString()} / yr`:'—';
+
+  // High-impact alert
+  const alert=document.getElementById('sum-alert');
+  alert.className=total>3?'sum-alert show':'sum-alert';
+
+  // Analogy
+  if(total>0) {
+    const carKm=Math.round(total*1000/0.173);
+    const elecKwh=Math.round(total*1000/0.412);
+    document.getElementById('sum-analogy').textContent=
+      `${total.toFixed(2)} tCO₂e is equivalent to driving a petrol car ${carKm.toLocaleString()} km, or consuming ${elecKwh.toLocaleString()} kWh of electricity — all from refrigerant that has leaked into the atmosphere.`;
+  } else {
+    document.getElementById('sum-analogy').textContent='Enter your refrigerant top-up data to see the impact.';
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  let done=0;
+  const acDone=document.getElementById('ac-no-topup')?.checked||S.ac.co2>0||S.ac.kg===0;
+  const crDone=document.getElementById('coldroom-na')?.checked||S.cr.co2>0;
+  const rfDone=document.getElementById('reefer-na')?.checked||S.rf.co2>0;
+  if(S.ac.kg>0||document.getElementById('ac-no-topup')?.checked) done++;
+  if(crDone) done++;
+  if(rfDone) done++;
+  document.getElementById('prog-fill').style.width=Math.round(done/3*100)+'%';
+  document.getElementById('prog-label').textContent=done+' of 3 sections completed';
+}
+
+function attachFile(section) {
+  alert(`Attaching documentation for ${section}.\n\nIn production: opens file picker → stores in Supabase Storage → listed in report appendix.`);
+}
+function saveAndNext() {
+localStorage.setItem('zyt_s12_cooling_refrigeration_data', JSON.stringify({saved:true}));
+  window.location.href = '/S-13-cooking-process-heat.html';
+}
+
+// ── INIT ──
+window.addEventListener('load', () => {
+  // Pre-show GWP impact for default R-410A selection
+  showGWPImpact('ac', 2088, 'R-410A', false);
+  updateProgress();
+});
+</script>
+
+</body>
+</html>

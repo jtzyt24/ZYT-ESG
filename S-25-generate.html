@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZYT.ESG — Generate Report</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #F7F6F2;
+    --surface: #FFFFFF;
+    --surface2: #F0EFE9;
+    --border: #E2E0D8;
+    --text: #1A1917;
+    --text-muted: #6B6860;
+    --text-light: #9B9890;
+    --accent: #2D5F3F;
+    --accent-light: #E6F0EA;
+    --accent-mid: #B8D5C4;
+    --green: #1A7A4A;
+    --green-light: #E6F5ED;
+    --amber: #B45309;
+    --amber-light: #FEF3C7;
+    --s1: #C75B2E; --s2: #1D6FA4; --s3: #4A8C3F;
+    --radius: 10px; --radius-sm: 6px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg); color: var(--text);
+    font-size: 15px; line-height: 1.5; min-height: 100vh;
+  }
+
+  .topnav {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 24px; height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+  .logo span { color: var(--accent); }
+  .nav-left { display: flex; align-items: center; gap: 12px; }
+  .nav-divider { width: 1px; height: 20px; background: var(--border); }
+  .nav-crumb { font-size: 13px; color: var(--text-muted); }
+  .nav-crumb strong { color: var(--text); font-weight: 500; }
+
+  .page-wrap { max-width: 760px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* ── COMPLETION HERO ── */
+  .completion-hero {
+    background: linear-gradient(135deg, #1A2F23 0%, #2D5F3F 60%, #1A4A6B 100%);
+    border-radius: var(--radius);
+    padding: 40px 40px 32px;
+    color: white;
+    text-align: center;
+    margin-bottom: 28px;
+    position: relative; overflow: hidden;
+  }
+  .completion-hero::before {
+    content: ''; position: absolute; top: -50px; left: 50%; transform: translateX(-50%);
+    width: 240px; height: 240px; border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+  }
+  .ch-check {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: rgba(255,255,255,0.12); border: 2px solid rgba(255,255,255,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; margin: 0 auto 16px;
+    position: relative; z-index: 1;
+  }
+  .ch-title { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; position: relative; z-index: 1; }
+  .ch-sub { font-size: 14px; opacity: 0.7; margin-bottom: 20px; position: relative; z-index: 1; }
+  .ch-filename {
+    display: inline-block;
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px; padding: 8px 18px;
+    font-size: 13.5px; font-family: 'DM Mono', monospace;
+    position: relative; z-index: 1;
+  }
+
+  /* ── REPORT SUMMARY ── */
+  .summary-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 22px 24px;
+    margin-bottom: 16px;
+  }
+  .summary-title { font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  @media (max-width: 600px) { .summary-grid { grid-template-columns: 1fr 1fr; } }
+  .sg-item { background: var(--surface2); border-radius: var(--radius-sm); padding: 12px 14px; }
+  .sg-label { font-size: 11.5px; color: var(--text-muted); font-weight: 500; margin-bottom: 3px; }
+  .sg-val { font-size: 17px; font-weight: 700; font-family: 'DM Mono', monospace; }
+  .sg-val.s1 { color: var(--s1); }
+  .sg-val.s2 { color: var(--s2); }
+  .sg-val.s3 { color: var(--s3); }
+  .sg-val.total { color: var(--accent); }
+  .sg-unit { font-size: 11px; color: var(--text-light); }
+
+  /* ── SECTION CHECKLIST ── */
+  .checklist { margin-bottom: 16px; }
+  .cl-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13.5px;
+  }
+  .cl-row:last-child { border-bottom: none; }
+  .cl-icon { font-size: 15px; flex-shrink: 0; }
+  .cl-text { flex: 1; }
+  .cl-status {
+    font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 3px;
+    white-space: nowrap;
+  }
+  .cl-ok { background: var(--green-light); color: var(--green); }
+  .cl-warn { background: var(--amber-light); color: var(--amber); }
+  .cl-skip { background: var(--surface2); color: var(--text-light); }
+
+  /* ── PDF OPTIONS ── */
+  .options-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px 24px; margin-bottom: 16px;
+  }
+  .options-title { font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+  .option-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .option-row:last-child { border-bottom: none; }
+  .or-left {}
+  .or-label { font-size: 13.5px; font-weight: 500; }
+  .or-hint { font-size: 12px; color: var(--text-muted); }
+  .toggle-switch {
+    position: relative; display: inline-flex;
+    width: 40px; height: 22px; cursor: pointer;
+  }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-track {
+    position: absolute; inset: 0;
+    background: var(--border); border-radius: 11px;
+    transition: background 0.2s;
+  }
+  .toggle-thumb {
+    position: absolute; top: 3px; left: 3px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: white; transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .toggle-switch input:checked ~ .toggle-track { background: var(--accent); }
+  .toggle-switch input:checked ~ .toggle-thumb { transform: translateX(18px); }
+
+  /* ── DOWNLOAD ACTIONS ── */
+  .download-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 500px) { .download-row { grid-template-columns: 1fr; } }
+
+  .dl-card {
+    background: var(--surface); border: 2px solid var(--border);
+    border-radius: var(--radius); padding: 20px;
+    cursor: pointer; transition: all 0.15s; text-align: center;
+  }
+  .dl-card:hover { border-color: var(--accent); box-shadow: 0 4px 14px rgba(45,95,63,0.1); }
+  .dl-card.primary { border-color: var(--accent); background: var(--accent-light); }
+  .dl-card.primary:hover { background: #D0E8D8; }
+  .dl-icon { font-size: 28px; margin-bottom: 8px; }
+  .dl-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .dl-sub { font-size: 12px; color: var(--text-muted); }
+  .dl-card.primary .dl-title { color: var(--accent); }
+  .dl-card.primary .dl-sub { color: #3A7A55; }
+
+  /* ── SHARE ── */
+  .share-section {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px 24px; margin-bottom: 16px;
+  }
+  .share-title { font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+  .share-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .share-btn {
+    display: flex; align-items: center; gap: 7px;
+    height: 36px; padding: 0 14px; border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+    cursor: pointer; border: 1px solid var(--border); background: var(--surface);
+    color: var(--text-muted); transition: all 0.15s;
+  }
+  .share-btn:hover { background: var(--surface2); color: var(--text); }
+  .link-copy-wrap { display: flex; gap: 8px; margin-top: 12px; }
+  .link-copy-wrap input {
+    flex: 1; height: 36px; padding: 0 12px;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted);
+    background: var(--surface2); outline: none;
+  }
+  .copy-btn {
+    height: 36px; padding: 0 14px; border-radius: var(--radius-sm);
+    background: var(--accent-light); color: var(--accent);
+    border: 1px solid var(--accent-mid); font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+  }
+  .copy-btn:hover { background: #D0E8D8; }
+
+  /* ── NEXT STEPS ── */
+  .next-steps {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden; margin-bottom: 16px;
+  }
+  .ns-header { padding: 14px 20px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 600; }
+  .ns-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 20px; border-bottom: 1px solid var(--border); cursor: pointer;
+    transition: background 0.12s;
+  }
+  .ns-row:last-child { border-bottom: none; }
+  .ns-row:hover { background: var(--bg); }
+  .ns-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent-light); color: var(--accent);
+    font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .ns-text { flex: 1; }
+  .ns-title { font-size: 13.5px; font-weight: 500; }
+  .ns-sub { font-size: 12px; color: var(--text-muted); }
+  .ns-arrow { font-size: 14px; color: var(--text-light); }
+
+  /* ── UNGC CoP BANNER ── */
+  .ungc-banner {
+    background: linear-gradient(135deg, #1A2F23, #2D5F3F);
+    border-radius: var(--radius); padding: 20px 24px;
+    color: white; margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    flex-wrap: wrap;
+  }
+  .ub-left {}
+  .ub-eyebrow { font-size: 10.5px; opacity: 0.55; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; margin-bottom: 5px; }
+  .ub-title { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
+  .ub-sub { font-size: 12.5px; opacity: 0.7; }
+  .btn-white {
+    background: white; color: var(--accent); font-weight: 600;
+    height: 36px; padding: 0 16px; border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer;
+    border: none; transition: all 0.15s; white-space: nowrap; flex-shrink: 0;
+  }
+  .btn-white:hover { background: #E6F5ED; }
+
+  /* ── GENERATE BUTTON ── */
+  .generate-section { text-align: center; margin-bottom: 24px; }
+  .btn-generate {
+    width: 100%; max-width: 400px;
+    height: 52px; border-radius: var(--radius-sm);
+    background: var(--accent); color: white;
+    font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600;
+    cursor: pointer; border: none; transition: all 0.2s;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    letter-spacing: -0.2px;
+  }
+  .btn-generate:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(45,95,63,0.25); }
+  .btn-generate:active { transform: translateY(0); }
+  .btn-generate.loading { opacity: 0.7; pointer-events: none; }
+
+  .gen-note { font-size: 12.5px; color: var(--text-muted); margin-top: 10px; }
+
+  /* ── PROGRESS BAR ── */
+  .gen-progress { display: none; margin-top: 16px; }
+  .gen-progress.visible { display: block; }
+  .gp-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 8px; }
+  .gp-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; width: 0%; }
+  .gp-label { font-size: 12px; color: var(--text-muted); text-align: center; }
+
+  /* Action bar */
+  .action-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    padding: 14px 24px; display: flex; justify-content: space-between; align-items: center;
+    z-index: 90;
+  }
+  .btn {
+    height: 38px; padding: 0 18px; border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    cursor: pointer; border: none; transition: all 0.15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { filter: brightness(1.1); }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="nav-left">
+    <div class="logo">ZYT<span>.ESG</span></div>
+    <div class="nav-divider"></div>
+    <div class="nav-crumb">Report → <strong>Generate & Download</strong></div>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- ── COMPLETION HERO ── -->
+  <div class="completion-hero">
+    <div class="ch-check">✓</div>
+    <div class="ch-title">Your report is ready to generate</div>
+    <div class="ch-sub">All required sections are complete. Review the summary below before generating your PDF.</div>
+    <div class="ch-filename" id="ch-filename">Sustainability Report — ZYT Solutions Pte Ltd — 2024.pdf</div>
+  </div>
+
+  <!-- ── REPORT SUMMARY ── -->
+  <div class="summary-card">
+    <div class="summary-title">Carbon footprint summary</div>
+    <div class="summary-grid">
+      <div class="sg-item">
+        <div class="sg-label">Scope 1</div>
+        <div class="sg-val s1" id="sg-s1">4.82</div>
+        <div class="sg-unit">tCO₂e · direct</div>
+      </div>
+      <div class="sg-item">
+        <div class="sg-label">Scope 2</div>
+        <div class="sg-val s2" id="sg-s2">31.20</div>
+        <div class="sg-unit">tCO₂e · electricity</div>
+      </div>
+      <div class="sg-item">
+        <div class="sg-label">Scope 3</div>
+        <div class="sg-val s3" id="sg-s3">18.94</div>
+        <div class="sg-unit">tCO₂e · value chain</div>
+      </div>
+      <div class="sg-item">
+        <div class="sg-label">Total</div>
+        <div class="sg-val total" id="sg-total">54.96</div>
+        <div class="sg-unit">tCO₂e</div>
+      </div>
+      <div class="sg-item">
+        <div class="sg-label">Intensity / FTE</div>
+        <div class="sg-val" id="sg-int">1.31</div>
+        <div class="sg-unit">tCO₂e per employee</div>
+      </div>
+      <div class="sg-item">
+        <div class="sg-label">Energy spend</div>
+        <div class="sg-val" id="sg-sgd" style="font-size:14px">52,700</div>
+        <div class="sg-unit">SGD / year</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION CHECKLIST ── -->
+  <div class="summary-card">
+    <div class="summary-title">Report sections</div>
+    <div class="checklist">
+      <div class="cl-row"><span class="cl-icon">🏢</span><span class="cl-text">Company profile & overview</span><span class="cl-status cl-ok">Complete</span></div>
+      <div class="cl-row"><span class="cl-icon">⚡</span><span class="cl-text">Environmental — Scope 1, 2, 3 emissions</span><span class="cl-status cl-ok">Complete</span></div>
+      <div class="cl-row"><span class="cl-icon">🎯</span><span class="cl-text">Targets & commitments</span><span class="cl-status" id="cl-targets">Complete</span></div>
+      <div class="cl-row"><span class="cl-icon">✍️</span><span class="cl-text">Sustainability context & narrative</span><span class="cl-status" id="cl-context">Complete</span></div>
+      <div class="cl-row"><span class="cl-icon">👥</span><span class="cl-text">Social — People & safety</span><span class="cl-status" id="cl-social">Complete</span></div>
+      <div class="cl-row"><span class="cl-icon">🏛️</span><span class="cl-text">Governance</span><span class="cl-status" id="cl-governance">Complete</span></div>
+      <div class="cl-row"><span class="cl-icon">📋</span><span class="cl-text">Appendix — emission factors & exclusions</span><span class="cl-status cl-ok">Auto-generated</span></div>
+      <div class="cl-row" id="cl-ungc-row" style="display:none"><span class="cl-icon">🌐</span><span class="cl-text">UNGC Ten Principles alignment table</span><span class="cl-status cl-ok">Auto-generated</span></div>
+    </div>
+  </div>
+
+  <!-- ── PDF OPTIONS ── -->
+  <div class="options-card">
+    <div class="options-title">Report options</div>
+    <div class="option-row">
+      <div class="or-left">
+        <div class="or-label">Include Carbon Report (1-page extract)</div>
+        <div class="or-hint">A portable one-pager your team can share with buyers separately</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="opt-carbon-report" checked>
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
+    </div>
+    <div class="option-row">
+      <div class="or-left">
+        <div class="or-label">Include UNGC Ten Principles table</div>
+        <div class="or-hint">Required for CoP submission — auto-generated from your data</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="opt-ungc" checked>
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
+    </div>
+    <div class="option-row">
+      <div class="or-left">
+        <div class="or-label">Include emission factors appendix</div>
+        <div class="or-hint">Full SEFR factors table — recommended for buyer submissions</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="opt-appendix" checked>
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
+    </div>
+    <div class="option-row">
+      <div class="or-left">
+        <div class="or-label">Include scope 3 exclusions table</div>
+        <div class="or-hint">GHG Protocol requires disclosure of what is not covered</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="opt-exclusions" checked>
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
+    </div>
+  </div>
+
+  <!-- ── GENERATE BUTTON ── -->
+  <div class="generate-section">
+    <button class="btn-generate" id="gen-btn" onclick="generateReport()">
+      ⬇ Generate Sustainability Report PDF
+    </button>
+    <div class="gen-note">Opens the report in a new browser tab for print-to-PDF. Works on Chrome, Safari, Edge.</div>
+    <div class="gen-progress" id="gen-progress">
+      <div class="gp-bar"><div class="gp-fill" id="gp-fill"></div></div>
+      <div class="gp-label" id="gp-label">Preparing report…</div>
+    </div>
+  </div>
+
+  <!-- ── DOWNLOAD OPTIONS ── -->
+  <div class="download-row">
+    <div class="dl-card primary" onclick="generateReport()">
+      <div class="dl-icon">📄</div>
+      <div class="dl-title">Sustainability Report</div>
+      <div class="dl-sub">Full 11-section report · ~8–12 pages · PDF</div>
+    </div>
+    <div class="dl-card" onclick="generateCarbonReport()">
+      <div class="dl-icon">🌿</div>
+      <div class="dl-title">Carbon Report</div>
+      <div class="dl-sub">1-page carbon summary · Share with buyers · PDF</div>
+    </div>
+  </div>
+
+  <!-- ── UNGC CoP BANNER ── -->
+  <div class="ungc-banner" id="ungc-banner" style="display:none">
+    <div class="ub-left">
+      <div class="ub-eyebrow">UNGC Communication on Progress</div>
+      <div class="ub-title">Ready to submit your CoP to the UN Global Compact</div>
+      <div class="ub-sub">Your report includes the UNGC Ten Principles alignment table in the appendix. Submit it via your UNGC account to fulfil your annual CoP obligation.</div>
+    </div>
+    <button class="btn-white" onclick="window.open('https://www.unglobalcompact.org/participation/report/cop','_blank')">Submit to UNGC →</button>
+  </div>
+
+  <!-- ── SHARE ── -->
+  <div class="share-section">
+    <div class="share-title">Share your report</div>
+    <div class="share-row">
+      <button class="share-btn" onclick="shareEmail()">📧 Email</button>
+      <button class="share-btn" onclick="shareLinkedIn()">💼 LinkedIn</button>
+      <button class="share-btn" onclick="copyReportLink()">🔗 Copy link</button>
+    </div>
+    <div class="link-copy-wrap">
+      <input type="text" id="share-link" value="https://zyt.one/esg/report/demo2024" readonly>
+      <button class="copy-btn" onclick="copyReportLink()" id="copy-btn">Copy</button>
+    </div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:8px">Link sharing requires Supabase report storage — Phase 2 feature. PDF download available now.</div>
+  </div>
+
+  <!-- ── NEXT STEPS ── -->
+  <div class="next-steps">
+    <div class="ns-header">What's next?</div>
+    <div class="ns-row" onclick="window.location.href='/S-19-carbon-overview.html'">
+      <div class="ns-num">1</div>
+      <div class="ns-text">
+        <div class="ns-title">Reduce your footprint — see ZYT's recommendations</div>
+        <div class="ns-sub">Specific actions ranked by SGD payback for your data</div>
+      </div>
+      <span class="ns-arrow">→</span>
+    </div>
+    <div class="ns-row" onclick="window.location.href='S-21-target-setting.html'">
+      <div class="ns-num">2</div>
+      <div class="ns-text">
+        <div class="ns-title">Set or update your reduction targets</div>
+        <div class="ns-sub">Formal target statements for next year's report</div>
+      </div>
+      <span class="ns-arrow">→</span>
+    </div>
+    <div class="ns-row">
+      <div class="ns-num">3</div>
+      <div class="ns-text">
+        <div class="ns-title">Return next year to update your baseline</div>
+        <div class="ns-sub">Year-on-year progress against your targets — 2025 reporting opens Jan 2026</div>
+      </div>
+      <span class="ns-arrow">→</span>
+    </div>
+  </div>
+
+</div>
+
+<div class="action-bar">
+  <div style="font-size:13px;color:var(--text-muted)">Your report data is saved to this browser — sign in to sync to your account.</div>
+  <div style="display:flex;gap:10px">
+    <button class="btn btn-ghost" onclick="window.location.href='S-24-report-preview.html'">← Preview report</button>
+    <button class="btn btn-primary" onclick="generateReport()">⬇ Generate PDF</button>
+  </div>
+</div>
+
+<script>
+// ── Load data ──
+function load() {
+  const profile = JSON.parse(localStorage.getItem('zyt_company_profile') || '{}');
+  const company = profile.companyName || 'Your Company';
+  const year = profile.reportingYear || new Date().getFullYear() - 1;
+
+  document.getElementById('ch-filename').textContent = `Sustainability Report — ${company} — ${year}.pdf`;
+
+  // UNGC
+  const isUNGC = localStorage.getItem('zyt_intent_ungc') === 'true';
+  if (isUNGC) {
+    document.getElementById('cl-ungc-row').style.display = 'flex';
+    document.getElementById('ungc-banner').style.display = 'flex';
+    document.getElementById('opt-ungc').checked = true;
+  }
+
+  // Check section completeness
+  const social = JSON.parse(localStorage.getItem('zyt_social_data') || '{}');
+  const gov = JSON.parse(localStorage.getItem('zyt_governance_data') || '{}');
+  const ctx = JSON.parse(localStorage.getItem('zyt_context_data') || '{}');
+
+  function setStatus(id, ok) {
+    const el = document.getElementById(id);
+    el.textContent = ok ? 'Complete' : 'Incomplete';
+    el.className = 'cl-status ' + (ok ? 'cl-ok' : 'cl-warn');
+  }
+
+  setStatus('cl-social', !!(social.totalEmployees));
+  setStatus('cl-governance', !!(gov.mgmtTotal));
+  setStatus('cl-context', !!(ctx.narrative && ctx.narrative.length > 10));
+}
+
+// ── Generate PDF (browser print) ──
+function generateReport() {
+  const btn = document.getElementById('gen-btn');
+  const progress = document.getElementById('gen-progress');
+  const fill = document.getElementById('gp-fill');
+  const label = document.getElementById('gp-label');
+
+  btn.classList.add('loading');
+  btn.textContent = '⏳ Preparing…';
+  progress.classList.add('visible');
+
+  const steps = [
+    [10, 'Loading report template…'],
+    [30, 'Assembling emissions data…'],
+    [55, 'Building Social & Governance sections…'],
+    [75, 'Generating UNGC alignment table…'],
+    [90, 'Finalising appendix…'],
+    [100, 'Opening print dialog…'],
+  ];
+
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i < steps.length) {
+      fill.style.width = steps[i][0] + '%';
+      label.textContent = steps[i][1];
+      i++;
+    } else {
+      clearInterval(interval);
+      setTimeout(() => {
+        // Open the report preview for printing
+        window.open('S-24-report-preview.html?print=1', '_blank');
+        btn.classList.remove('loading');
+        btn.textContent = '⬇ Generate Sustainability Report PDF';
+        progress.classList.remove('visible');
+        fill.style.width = '0%';
+      }, 400);
+    }
+  }, 350);
+}
+
+function generateCarbonReport() {
+  // In production: generates 1-page Carbon Report extract
+  // For now: open report preview with carbon-only flag
+  // Carbon Report — Phase 2 feature
+  const info = document.createElement('div');
+  info.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1A2F23;color:white;padding:12px 20px;border-radius:8px;font-size:13px;z-index:999;max-width:400px;text-align:center';
+  info.textContent = 'Carbon Report (1-page extract) coming in Phase 2. For now, generate the full report and print pages 4–7.';
+  document.body.appendChild(info);
+  setTimeout(() => info.remove(), 4000);
+}
+
+function shareEmail() {
+  const company = JSON.parse(localStorage.getItem('zyt_company_profile') || '{}').companyName || 'Our company';
+  const year = JSON.parse(localStorage.getItem('zyt_company_profile') || '{}').reportingYear || new Date().getFullYear() - 1;
+  const subject = encodeURIComponent(`${company} — Sustainability Report ${year}`);
+  const body = encodeURIComponent(`Please find attached our ${year} Sustainability Report, prepared using ZYT.ESG.\n\nThe report covers our full Scope 1, 2, and 3 carbon footprint, Social (People & Safety), and Governance disclosures, aligned to SGX Core ESG Metrics and GHG Protocol.\n\nReporting period: 1 January – 31 December ${year}\n\nPrepared using ZYT.ESG (zyt.one/esg)`);
+  window.open(`mailto:?subject=${subject}&body=${body}`);
+}
+
+function shareLinkedIn() {
+  window.open('https://www.linkedin.com/sharing/share-offsite/?url=https://zyt.one/esg', '_blank');
+}
+
+function copyReportLink() {
+  const link = document.getElementById('share-link');
+  link.select();
+  document.execCommand('copy');
+  const btn = document.getElementById('copy-btn');
+  btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = 'Copy', 2000);
+}
+
+// ── Init ──
+load();
+</script>
+
+</body>
+</html>

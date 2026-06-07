@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZYT.ESG — Social: People & Safety</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #F7F6F2;
+    --surface: #FFFFFF;
+    --surface2: #F0EFE9;
+    --border: #E2E0D8;
+    --text: #1A1917;
+    --text-muted: #6B6860;
+    --text-light: #9B9890;
+    --accent-s: #1D6FA4;        /* Social blue */
+    --accent-s-light: #EBF4FB;
+    --accent-s-mid: #B8D9F0;
+    --green: #1A7A4A;
+    --green-light: #E6F5ED;
+    --amber: #B45309;
+    --amber-light: #FEF3C7;
+    --red: #B91C1C;
+    --red-light: #FEE2E2;
+    --pill-h: 28px;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── TOP NAV ── */
+  .topnav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topnav-left { display: flex; align-items: center; gap: 12px; }
+  .logo { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+  .logo span { color: var(--accent-s); }
+  .nav-divider { width: 1px; height: 20px; background: var(--border); }
+  .nav-breadcrumb { font-size: 13px; color: var(--text-muted); }
+  .nav-breadcrumb strong { color: var(--text); font-weight: 500; }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .save-indicator { font-size: 12px; color: var(--text-light); display: flex; align-items: center; gap: 5px; }
+  .save-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+
+  /* ── LAYOUT ── */
+  .page-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  /* ── PILLAR HEADER ── */
+  .pillar-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .pillar-icon {
+    width: 48px; height: 48px;
+    background: var(--accent-s-light);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .pillar-title { font-size: 22px; font-weight: 600; letter-spacing: -0.4px; line-height: 1.2; }
+  .pillar-sub { font-size: 13.5px; color: var(--text-muted); margin-top: 4px; }
+  .pillar-frameworks { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .fw-tag {
+    font-size: 11px; font-weight: 500;
+    padding: 2px 8px; border-radius: 20px;
+    background: var(--accent-s-light);
+    color: var(--accent-s);
+    border: 1px solid var(--accent-s-mid);
+  }
+
+  /* ── PROGRESS STRIP ── */
+  .progress-strip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .ps-label { font-size: 12px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+  .ps-steps { display: flex; gap: 6px; align-items: center; flex: 1; }
+  .ps-step {
+    flex: 1; height: 5px; border-radius: 3px;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+  .ps-step.done { background: var(--accent-s); }
+  .ps-step.active { background: var(--accent-s); opacity: 0.5; }
+  .ps-count { font-size: 12px; color: var(--text-muted); font-family: 'DM Mono', monospace; white-space: nowrap; }
+
+  /* ── SECTION ── */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .section-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+  }
+  .section-header:hover { background: var(--bg); }
+  .sh-left { display: flex; align-items: center; gap: 12px; }
+  .sh-num {
+    width: 26px; height: 26px;
+    background: var(--accent-s-light);
+    color: var(--accent-s);
+    border-radius: 50%;
+    font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .sh-num.done { background: var(--green-light); color: var(--green); }
+  .sh-title { font-size: 15px; font-weight: 600; }
+  .sh-sub { font-size: 12.5px; color: var(--text-muted); }
+  .sh-right { display: flex; align-items: center; gap: 10px; }
+  .sh-badge {
+    font-size: 11px; font-weight: 500;
+    padding: 3px 9px; border-radius: 20px;
+    background: var(--amber-light); color: var(--amber);
+  }
+  .sh-badge.complete { background: var(--green-light); color: var(--green); }
+  .sh-badge.optional { background: var(--surface2); color: var(--text-muted); }
+  .chevron { font-size: 14px; color: var(--text-light); transition: transform 0.2s; }
+  .section.collapsed .chevron { transform: rotate(-90deg); }
+
+  .section-body { padding: 20px; }
+  .section.collapsed .section-body { display: none; }
+
+  /* ── FORM ELEMENTS ── */
+  .form-grid { display: grid; gap: 16px; }
+  .form-grid-2 { grid-template-columns: 1fr 1fr; }
+  .form-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .form-grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+  @media (max-width: 600px) {
+    .form-grid-2, .form-grid-3, .form-grid-4 { grid-template-columns: 1fr; }
+  }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field-label {
+    font-size: 12.5px; font-weight: 500; color: var(--text);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .field-label .opt { font-weight: 400; color: var(--text-light); font-size: 11.5px; }
+  .field-hint { font-size: 11.5px; color: var(--text-muted); }
+
+  input[type="number"], input[type="text"], select, textarea {
+    width: 100%;
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--surface);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    outline: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent-s);
+    box-shadow: 0 0 0 3px rgba(29,111,164,0.1);
+  }
+  textarea { height: auto; min-height: 72px; padding: 10px 12px; resize: vertical; line-height: 1.5; }
+  select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%239B9890' d='M1 1l5 5 5-5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+
+  .input-with-unit {
+    position: relative;
+  }
+  .input-with-unit input { padding-right: 52px; }
+  .input-unit {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    font-size: 12px; color: var(--text-muted); font-family: 'DM Mono', monospace;
+    pointer-events: none;
+  }
+
+  /* ── GENDER SPLIT WIDGET ── */
+  .gender-widget {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+  }
+  .gender-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  @media (max-width: 600px) { .gender-inputs { grid-template-columns: 1fr 1fr; } }
+  .gender-field { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+  .gender-label { font-size: 11.5px; color: var(--text-muted); font-weight: 500; }
+  .gender-field input { text-align: center; height: 38px; }
+
+  .gender-bar-wrap { margin-top: 4px; }
+  .gender-bar {
+    height: 8px; border-radius: 4px;
+    background: var(--border);
+    overflow: hidden;
+    display: flex;
+  }
+  .gender-bar-m { background: #1D6FA4; transition: width 0.3s; }
+  .gender-bar-f { background: #E05A8A; transition: width 0.3s; }
+  .gender-bar-nb { background: #7C5EA3; transition: width 0.3s; }
+  .gender-bar-nd { background: var(--border); transition: width 0.3s; }
+  .gender-pcts { display: flex; gap: 12px; margin-top: 6px; flex-wrap: wrap; }
+  .gender-pct-pill { font-size: 11.5px; display: flex; align-items: center; gap: 4px; }
+  .gender-pct-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .gender-total-note { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+  .gender-total-note.error { color: var(--red); }
+  .gender-total-note.ok { color: var(--green); }
+
+  /* ── OPTIONAL SECTION TOGGLE ── */
+  .opt-toggle {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 14px; margin-bottom: 8px;
+    cursor: pointer;
+  }
+  .opt-toggle input[type="checkbox"] {
+    width: 16px; height: 16px;
+    accent-color: var(--accent-s);
+    cursor: pointer;
+  }
+  .opt-toggle label { font-size: 13px; color: var(--text-muted); cursor: pointer; }
+  .opt-toggle label strong { color: var(--text); }
+  .opt-section { display: none; margin-top: 12px; }
+  .opt-section.visible { display: block; }
+
+  /* ── DIVIDER ── */
+  .form-divider { height: 1px; background: var(--border); margin: 16px 0; }
+  .form-divider-label {
+    display: flex; align-items: center; gap: 10px;
+    margin: 16px 0;
+    color: var(--text-muted); font-size: 12.5px; font-weight: 500;
+  }
+  .form-divider-label::before,
+  .form-divider-label::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* ── INFO BOX ── */
+  .info-box {
+    background: var(--accent-s-light);
+    border: 1px solid var(--accent-s-mid);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: 13px;
+    color: #1A4A6B;
+    margin-bottom: 16px;
+    display: flex; gap: 10px;
+  }
+  .info-box-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .note-box {
+    background: var(--amber-light);
+    border: 1px solid #FDE68A;
+    border-radius: var(--radius-sm);
+    padding: 11px 13px;
+    font-size: 12.5px;
+    color: #92400E;
+    margin-top: 12px;
+  }
+
+  /* ── BIZSAFE CARDS ── */
+  .bizsafe-cards { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+  .bizsafe-card {
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 13px; font-weight: 500;
+    color: var(--text-muted);
+    transition: all 0.15s;
+    background: var(--surface);
+    white-space: nowrap;
+  }
+  .bizsafe-card:hover { border-color: var(--accent-s); color: var(--accent-s); }
+  .bizsafe-card.selected { border-color: var(--accent-s); color: var(--accent-s); background: var(--accent-s-light); }
+  .bizsafe-card.none { }
+
+  /* ── INJURY TABLE ── */
+  .injury-table { width: 100%; border-collapse: collapse; }
+  .injury-table th {
+    font-size: 11.5px; font-weight: 600; color: var(--text-muted);
+    padding: 8px 10px; text-align: left;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    text-transform: uppercase; letter-spacing: 0.4px;
+  }
+  .injury-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .injury-table tr:last-child td { border-bottom: none; }
+  .injury-table td:first-child { font-size: 13.5px; }
+  .injury-table td .gri-ref { font-size: 11px; color: var(--text-light); display: block; }
+  .injury-table td input {
+    height: 34px; font-size: 13px; text-align: center; padding: 0 8px; width: 80px;
+  }
+  .injury-sev {
+    font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 3px;
+  }
+  .sev-critical { background: #FEE2E2; color: #991B1B; }
+  .sev-high { background: #FEF3C7; color: #92400E; }
+  .sev-medium { background: #DBEAFE; color: #1E40AF; }
+
+  /* ── TRAINING TYPES ── */
+  .training-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .tt-tag {
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12.5px;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.15s;
+    background: var(--surface);
+  }
+  .tt-tag:hover { border-color: var(--accent-s); color: var(--accent-s); }
+  .tt-tag.selected { border-color: var(--accent-s); color: var(--accent-s); background: var(--accent-s-light); font-weight: 500; }
+
+  /* ── CALC RESULT ── */
+  .calc-result {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 13px;
+    display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px;
+  }
+  .cr-item { display: flex; gap: 5px; align-items: baseline; }
+  .cr-label { color: var(--text-muted); }
+  .cr-value { font-weight: 600; font-family: 'DM Mono', monospace; color: var(--accent-s); font-size: 14px; }
+
+  /* ── BOTTOM ACTION BAR ── */
+  .action-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 90;
+  }
+  .action-bar-left { font-size: 13px; color: var(--text-muted); }
+  .action-bar-left strong { color: var(--text); }
+  .action-bar-right { display: flex; gap: 10px; }
+
+  .btn {
+    height: 38px; padding: 0 18px;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 500;
+    cursor: pointer; border: none;
+    transition: all 0.15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-primary { background: var(--accent-s); color: #fff; }
+  .btn-primary:hover { background: #1760910; filter: brightness(1.1); }
+  .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+
+  /* ── SGX ALIGNMENT FOOTER ── */
+  .sgx-footer {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin-top: 16px;
+    display: flex; gap: 16px; flex-wrap: wrap;
+  }
+  .sgx-item { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
+  .sgx-item span { color: var(--text); font-weight: 500; }
+
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="topnav-left">
+    <div class="logo">ZYT<span>.ESG</span></div>
+    <div class="nav-divider"></div>
+    <div class="nav-breadcrumb">Data entry → <strong>Social: People & Safety</strong></div>
+  </div>
+  <div class="nav-right">
+    <div class="save-indicator"><div class="save-dot"></div> Auto-saved</div>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- PILLAR HEADER -->
+  <div class="pillar-header">
+    <div class="pillar-icon">👥</div>
+    <div>
+      <div class="pillar-title">Social — People & Safety</div>
+      <div class="pillar-sub">Workforce composition, training hours, and occupational health & safety data for your reporting period.</div>
+      <div class="pillar-frameworks">
+        <span class="fw-tag">SGX Core ESG Metrics</span>
+        <span class="fw-tag">GRI 2-7 · 401-1 · 403-9 · 404-1 · 405-1</span>
+        <span class="fw-tag" id="ungc-tag" style="display:none">UNGC P3–6</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROGRESS STRIP -->
+  <div class="progress-strip">
+    <div class="ps-label">Section</div>
+    <div class="ps-steps">
+      <div class="ps-step done"></div>
+      <div class="ps-step done"></div>
+      <div class="ps-step active" id="ps-s31"></div>
+      <div class="ps-step" id="ps-s32"></div>
+      <div class="ps-step"></div>
+    </div>
+    <div class="ps-count" id="ps-count">Step 3 of 5</div>
+  </div>
+
+  <!-- ══ SECTION 1: WORKFORCE HEADCOUNT ══ -->
+  <div class="section" id="sec-workforce">
+    <div class="section-header" onclick="toggleSection('sec-workforce')">
+      <div class="sh-left">
+        <div class="sh-num" id="n-workforce">1</div>
+        <div>
+          <div class="sh-title">Workforce headcount</div>
+          <div class="sh-sub">Total employees as at end of reporting period</div>
+        </div>
+      </div>
+      <div class="sh-right">
+        <span class="sh-badge" id="b-workforce">Required</span>
+        <span class="chevron">▾</span>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="form-grid form-grid-2" style="margin-bottom:16px">
+        <div class="field">
+          <div class="field-label">Total employees <span style="color:var(--red)">*</span></div>
+          <div class="field-hint">Headcount as at 31 December (or end of your financial year)</div>
+          <div class="input-with-unit">
+            <input type="number" id="total-emp" placeholder="e.g. 42" min="1" oninput="updateGenderBar(); updateCalcs()">
+            <span class="input-unit">pax</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Reporting year <span style="color:var(--red)">*</span></div>
+          <div class="field-hint">The calendar or financial year this data covers</div>
+          <select id="report-year">
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+            <option value="2023">2023</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Gender split widget -->
+      <div class="field-label" style="margin-bottom:8px">Employees by gender <span style="color:var(--red)">*</span></div>
+      <div class="gender-widget">
+        <div class="gender-inputs">
+          <div class="gender-field">
+            <div class="gender-label">♂ Male</div>
+            <input type="number" id="g-male" placeholder="0" min="0" oninput="updateGenderBar()">
+          </div>
+          <div class="gender-field">
+            <div class="gender-label">♀ Female</div>
+            <input type="number" id="g-female" placeholder="0" min="0" oninput="updateGenderBar()">
+          </div>
+          <div class="gender-field">
+            <div class="gender-label">⚧ Non-binary</div>
+            <input type="number" id="g-nb" placeholder="0" min="0" oninput="updateGenderBar()">
+          </div>
+          <div class="gender-field">
+            <div class="gender-label">— Not disclosed</div>
+            <input type="number" id="g-nd" placeholder="0" min="0" oninput="updateGenderBar()">
+          </div>
+        </div>
+        <div class="gender-bar-wrap">
+          <div class="gender-bar" id="gender-bar">
+            <div class="gender-bar-m" id="gbar-m" style="width:50%"></div>
+            <div class="gender-bar-f" id="gbar-f" style="width:50%"></div>
+            <div class="gender-bar-nb" id="gbar-nb" style="width:0%"></div>
+            <div class="gender-bar-nd" id="gbar-nd" style="width:0%"></div>
+          </div>
+          <div class="gender-pcts" id="gender-pcts"></div>
+          <div class="gender-total-note" id="gender-total-note"></div>
+        </div>
+      </div>
+
+      <!-- Optional: age groups -->
+      <div class="opt-toggle">
+        <input type="checkbox" id="show-age" onchange="toggleOpt('age-section', this)">
+        <label for="show-age">Add <strong>age group breakdown</strong> <span style="color:var(--text-light);font-size:12px">(optional — improves SGX alignment)</span></label>
+      </div>
+      <div class="opt-section" id="age-section">
+        <div class="form-grid form-grid-3">
+          <div class="field">
+            <div class="field-label">Under 30 <span class="opt">(optional)</span></div>
+            <div class="input-with-unit">
+              <input type="number" id="age-u30" placeholder="0" min="0">
+              <span class="input-unit">pax</span>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label">30 – 50 <span class="opt">(optional)</span></div>
+            <div class="input-with-unit">
+              <input type="number" id="age-30to50" placeholder="0" min="0">
+              <span class="input-unit">pax</span>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label">Over 50 <span class="opt">(optional)</span></div>
+            <div class="input-with-unit">
+              <input type="number" id="age-o50" placeholder="0" min="0">
+              <span class="input-unit">pax</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Optional: employment type -->
+      <div class="opt-toggle">
+        <input type="checkbox" id="show-emptype" onchange="toggleOpt('emptype-section', this)">
+        <label for="show-emptype">Add <strong>full-time vs part-time split</strong> <span style="color:var(--text-light);font-size:12px">(optional)</span></label>
+      </div>
+      <div class="opt-section" id="emptype-section">
+        <div class="form-grid form-grid-2">
+          <div class="field">
+            <div class="field-label">Full-time <span class="opt">(optional)</span></div>
+            <div class="input-with-unit">
+              <input type="number" id="ft-emp" placeholder="0" min="0">
+              <span class="input-unit">pax</span>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label">Part-time / contract <span class="opt">(optional)</span></div>
+            <div class="input-with-unit">
+              <input type="number" id="pt-emp" placeholder="0" min="0">
+              <span class="input-unit">pax</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ SECTION 2: NEW HIRES & TURNOVER ══ -->
+  <div class="section collapsed" id="sec-hires">
+    <div class="section-header" onclick="toggleSection('sec-hires')">
+      <div class="sh-left">
+        <div class="sh-num" id="n-hires">2</div>
+        <div>
+          <div class="sh-title">New hires & employee turnover</div>
+          <div class="sh-sub">Hiring and departures during the reporting year</div>
+        </div>
+      </div>
+      <div class="sh-right">
+        <span class="sh-badge optional" id="b-hires">Optional</span>
+        <span class="chevron">▾</span>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="info-box">
+        <span class="info-box-icon">💡</span>
+        <div>New hire and turnover data supports GRI 401-1. If your company grew significantly this year, disclosing this strengthens your Social narrative for UNGC CoP submissions and buyer ESG questionnaires.</div>
+      </div>
+      <div class="form-grid form-grid-2" style="margin-bottom:16px">
+        <div class="field">
+          <div class="field-label">New hires (total) <span class="opt">(optional)</span></div>
+          <div class="field-hint">Employees hired during the reporting year</div>
+          <div class="input-with-unit">
+            <input type="number" id="new-hires" placeholder="0" min="0">
+            <span class="input-unit">pax</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Leavers / departures <span class="opt">(optional)</span></div>
+          <div class="field-hint">Voluntary + involuntary departures during the year</div>
+          <div class="input-with-unit">
+            <input type="number" id="leavers" placeholder="0" min="0">
+            <span class="input-unit">pax</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-toggle">
+        <input type="checkbox" id="show-hire-gender" onchange="toggleOpt('hire-gender-section', this)">
+        <label for="show-hire-gender">Break down <strong>new hires by gender</strong></label>
+      </div>
+      <div class="opt-section" id="hire-gender-section">
+        <div class="form-grid form-grid-2" style="margin-top:8px">
+          <div class="field">
+            <div class="field-label">New hires — Male</div>
+            <div class="input-with-unit">
+              <input type="number" id="nh-male" placeholder="0" min="0">
+              <span class="input-unit">pax</span>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label">New hires — Female</div>
+            <div class="input-with-unit">
+              <input type="number" id="nh-female" placeholder="0" min="0">
+              <span class="input-unit">pax</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Auto-calc turnover rate -->
+      <div class="calc-result" id="turnover-calc" style="display:none">
+        <div class="cr-item"><span class="cr-label">Turnover rate:</span> <span class="cr-value" id="turnover-rate">—</span></div>
+        <div class="cr-item"><span class="cr-label">Based on:</span> <span style="font-size:12px;color:var(--text-muted)">Leavers ÷ average headcount × 100</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ SECTION 3: TRAINING ══ -->
+  <div class="section collapsed" id="sec-training">
+    <div class="section-header" onclick="toggleSection('sec-training')">
+      <div class="sh-left">
+        <div class="sh-num" id="n-training">3</div>
+        <div>
+          <div class="sh-title">Training & development</div>
+          <div class="sh-sub">Total training hours and types of training provided</div>
+        </div>
+      </div>
+      <div class="sh-right">
+        <span class="sh-badge" id="b-training">Required</span>
+        <span class="chevron">▾</span>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="form-grid form-grid-2" style="margin-bottom:16px">
+        <div class="field">
+          <div class="field-label">Total training hours (all staff) <span style="color:var(--red)">*</span></div>
+          <div class="field-hint">All structured training, onboarding, upskilling, and WSQ courses</div>
+          <div class="input-with-unit">
+            <input type="number" id="training-total" placeholder="e.g. 480" min="0" oninput="updateCalcs()">
+            <span class="input-unit">hrs</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Average training hours per employee</div>
+          <div class="field-hint">Auto-calculated from total hours ÷ headcount</div>
+          <div class="input-with-unit" style="position:relative">
+            <input type="number" id="training-avg" placeholder="—" readonly style="background:var(--surface2);color:var(--text-muted)">
+            <span class="input-unit">hrs/pax</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Training by gender (optional) -->
+      <div class="opt-toggle">
+        <input type="checkbox" id="show-training-gender" onchange="toggleOpt('training-gender-section', this)">
+        <label for="show-training-gender">Break down <strong>training hours by gender</strong> <span style="color:var(--text-light);font-size:12px">(optional)</span></label>
+      </div>
+      <div class="opt-section" id="training-gender-section">
+        <div class="form-grid form-grid-2" style="margin-top:8px">
+          <div class="field">
+            <div class="field-label">Training hours — Male staff</div>
+            <div class="input-with-unit">
+              <input type="number" id="train-hrs-m" placeholder="0" min="0">
+              <span class="input-unit">hrs</span>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label">Training hours — Female staff</div>
+            <div class="input-with-unit">
+              <input type="number" id="train-hrs-f" placeholder="0" min="0">
+              <span class="input-unit">hrs</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Training types -->
+      <div class="form-divider-label">Types of training provided</div>
+      <div class="field-hint" style="margin-bottom:8px">Select all that apply. These will appear in your report's Social section.</div>
+      <div class="training-tags" id="training-tags">
+        <span class="tt-tag" onclick="toggleTag(this)">Fire safety</span>
+        <span class="tt-tag" onclick="toggleTag(this)">First aid / CPR</span>
+        <span class="tt-tag" onclick="toggleTag(this)">Food hygiene / handling</span>
+        <span class="tt-tag" onclick="toggleTag(this)">WSH / workplace safety</span>
+        <span class="tt-tag" onclick="toggleTag(this)">bizSAFE training</span>
+        <span class="tt-tag" onclick="toggleTag(this)">Anti-corruption / ethics</span>
+        <span class="tt-tag" onclick="toggleTag(this)">Leadership development</span>
+        <span class="tt-tag" onclick="toggleTag(this)">Technical / vocational</span>
+        <span class="tt-tag" onclick="toggleTag(this)">ESG / sustainability</span>
+        <span class="tt-tag" onclick="toggleTag(this)">Customer service</span>
+        <span class="tt-tag" onclick="toggleTag(this)">Digital skills / IT</span>
+        <span class="tt-tag" onclick="toggleTag(this)">Data protection / PDPA</span>
+      </div>
+      <div class="field" style="margin-top:10px">
+        <div class="field-label">Other training types <span class="opt">(optional)</span></div>
+        <input type="text" id="training-other" placeholder="e.g. Halal awareness, supply chain due diligence…">
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ SECTION 4: HEALTH & SAFETY ══ -->
+  <div class="section collapsed" id="sec-ohs">
+    <div class="section-header" onclick="toggleSection('sec-ohs')">
+      <div class="sh-left">
+        <div class="sh-num" id="n-ohs">4</div>
+        <div>
+          <div class="sh-title">Occupational health & safety</div>
+          <div class="sh-sub">Work-related injuries and bizSAFE certification</div>
+        </div>
+      </div>
+      <div class="sh-right">
+        <span class="sh-badge" id="b-ohs">Required</span>
+        <span class="chevron">▾</span>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="info-box">
+        <span class="info-box-icon">ℹ️</span>
+        <div>
+          <strong>MOM injury categories:</strong> These align with Singapore's Workplace Safety and Health (WSH) Act reporting categories. Use your MOM incident log or HR records. A zero-incident year is a valid and positive data point — please report it accurately.
+        </div>
+      </div>
+
+      <table class="injury-table">
+        <thead>
+          <tr>
+            <th>Injury type</th>
+            <th>Severity</th>
+            <th>Count</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              Work-related fatalities
+              <span class="gri-ref">GRI 403-9a(i) · MOM reportable</span>
+            </td>
+            <td><span class="injury-sev sev-critical">Critical</span></td>
+            <td><input type="number" id="inj-fatal" placeholder="0" min="0" value="0"></td>
+          </tr>
+          <tr>
+            <td>
+              High-consequence injuries
+              <span class="gri-ref">GRI 403-9a(ii) · Major injuries (MOM)</span>
+            </td>
+            <td><span class="injury-sev sev-high">High</span></td>
+            <td><input type="number" id="inj-hci" placeholder="0" min="0" value="0"></td>
+          </tr>
+          <tr>
+            <td>
+              Recordable injuries
+              <span class="gri-ref">GRI 403-9a(iii) · MC injuries 3+ days</span>
+            </td>
+            <td><span class="injury-sev sev-medium">Recordable</span></td>
+            <td><input type="number" id="inj-rec" placeholder="0" min="0" value="0"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="opt-toggle" style="margin-top:14px">
+        <input type="checkbox" id="show-illhealth" onchange="toggleOpt('illhealth-section', this)">
+        <label for="show-illhealth">Add <strong>work-related ill health cases</strong> (GRI 403-10) <span style="color:var(--text-light);font-size:12px">(optional)</span></label>
+      </div>
+      <div class="opt-section" id="illhealth-section">
+        <div class="field" style="max-width:200px; margin-top:8px">
+          <div class="field-label">Ill health cases</div>
+          <div class="field-hint">Occupational disease, chronic conditions linked to work</div>
+          <div class="input-with-unit">
+            <input type="number" id="inj-illhealth" placeholder="0" min="0" value="0">
+            <span class="input-unit">cases</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="note-box">
+        ⚠️ If your company had zero incidents this year, enter 0 in all fields. This is the correct disclosure — do not leave fields blank.
+      </div>
+
+      <div class="form-divider-label" style="margin-top:18px">bizSAFE certification level</div>
+      <div class="field-hint" style="margin-bottom:8px">bizSAFE is Singapore's WSH capability building programme. Select your current level. This appears in your Sustainability Report and supports UNGC P4.</div>
+      <div class="bizsafe-cards" id="bizsafe-cards">
+        <div class="bizsafe-card" onclick="selectBizsafe(this, 'none')">Not certified</div>
+        <div class="bizsafe-card" onclick="selectBizsafe(this, '1')">Level 1</div>
+        <div class="bizsafe-card" onclick="selectBizsafe(this, '2')">Level 2</div>
+        <div class="bizsafe-card" onclick="selectBizsafe(this, '3')">Level 3</div>
+        <div class="bizsafe-card" onclick="selectBizsafe(this, 'star')">⭐ Star</div>
+      </div>
+      <input type="hidden" id="bizsafe-value" value="">
+
+    </div>
+  </div>
+
+  <!-- SGX alignment footer -->
+  <div class="sgx-footer">
+    <div class="sgx-item">📋 <span>SGX Core ESG Metrics</span> — Social pillar aligned</div>
+    <div class="sgx-item">📑 <span>GRI 2-7, 401-1, 403-9, 404-1, 405-1</span></div>
+    <div class="sgx-item" id="ungc-footer" style="display:none">🌐 <span>UNGC Principles 3–6</span> — Labour</div>
+  </div>
+
+</div><!-- /page-wrap -->
+
+<!-- ACTION BAR -->
+<div class="action-bar">
+  <div class="action-bar-left">
+    <span id="completion-status">Complete required fields to continue →</span>
+  </div>
+  <div class="action-bar-right">
+    <button class="btn btn-ghost" onclick="window.history.back()">← Back</button>
+    <button class="btn btn-primary" onclick="saveAndContinue()">Save & continue →</button>
+  </div>
+</div>
+
+<script>
+  // ── Toggle section collapse ──
+  function toggleSection(id) {
+    const sec = document.getElementById(id);
+    sec.classList.toggle('collapsed');
+  }
+
+  // ── Toggle optional sub-sections ──
+  function toggleOpt(id, cb) {
+    const sec = document.getElementById(id);
+    if (cb.checked) sec.classList.add('visible');
+    else sec.classList.remove('visible');
+  }
+
+  // ── Gender bar update ──
+  function updateGenderBar() {
+    const m = parseInt(document.getElementById('g-male').value) || 0;
+    const f = parseInt(document.getElementById('g-female').value) || 0;
+    const nb = parseInt(document.getElementById('g-nb').value) || 0;
+    const nd = parseInt(document.getElementById('g-nd').value) || 0;
+    const total = parseInt(document.getElementById('total-emp').value) || (m+f+nb+nd);
+    const sum = m+f+nb+nd;
+
+    if (total === 0) return;
+
+    document.getElementById('gbar-m').style.width = (m/total*100)+'%';
+    document.getElementById('gbar-f').style.width = (f/total*100)+'%';
+    document.getElementById('gbar-nb').style.width = (nb/total*100)+'%';
+    document.getElementById('gbar-nd').style.width = (nd/total*100)+'%';
+
+    const pctEl = document.getElementById('gender-pcts');
+    pctEl.innerHTML = '';
+    const data = [
+      {label:'Male', pct: m/total*100, dot:'#1D6FA4'},
+      {label:'Female', pct: f/total*100, dot:'#E05A8A'},
+      {label:'Non-binary', pct: nb/total*100, dot:'#7C5EA3'},
+      {label:'Not disclosed', pct: nd/total*100, dot:'#C5C3BB'},
+    ];
+    data.forEach(d => {
+      if (d.pct > 0 || d.label === 'Male' || d.label === 'Female') {
+        pctEl.innerHTML += `<span class="gender-pct-pill"><span class="gender-pct-dot" style="background:${d.dot}"></span>${d.label}: <strong>${d.pct.toFixed(0)}%</strong></span>`;
+      }
+    });
+
+    const noteEl = document.getElementById('gender-total-note');
+    if (sum === 0) { noteEl.textContent = ''; noteEl.className = 'gender-total-note'; return; }
+    if (total > 0 && sum !== total) {
+      noteEl.textContent = `⚠ Gender breakdown total (${sum}) doesn't match total employees (${total})`;
+      noteEl.className = 'gender-total-note error';
+    } else {
+      noteEl.textContent = `✓ Gender totals match (${sum} employees)`;
+      noteEl.className = 'gender-total-note ok';
+    }
+
+    updateCalcs();
+  }
+
+  // ── Auto-calc training avg ──
+  function updateCalcs() {
+    const totalEmp = parseInt(document.getElementById('total-emp').value) || 0;
+    const trainHrs = parseFloat(document.getElementById('training-total').value) || 0;
+
+    if (totalEmp > 0 && trainHrs > 0) {
+      document.getElementById('training-avg').value = (trainHrs / totalEmp).toFixed(1);
+    } else {
+      document.getElementById('training-avg').value = '';
+    }
+
+    // Turnover rate
+    const leavers = parseInt(document.getElementById('leavers').value) || 0;
+    const tcDiv = document.getElementById('turnover-calc');
+    if (leavers > 0 && totalEmp > 0) {
+      const rate = (leavers / totalEmp * 100).toFixed(1);
+      document.getElementById('turnover-rate').textContent = rate + '%';
+      tcDiv.style.display = 'flex';
+    } else {
+      tcDiv.style.display = 'none';
+    }
+
+    updateCompletionStatus();
+  }
+
+  // ── Toggle training type tags ──
+  function toggleTag(el) {
+    el.classList.toggle('selected');
+  }
+
+  // ── bizSAFE selection ──
+  function selectBizsafe(el, val) {
+    document.querySelectorAll('.bizsafe-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('bizsafe-value').value = val;
+  }
+
+  // ── Completion status ──
+  function updateCompletionStatus() {
+    const totalEmp = parseInt(document.getElementById('total-emp').value) || 0;
+    const m = parseInt(document.getElementById('g-male').value) || 0;
+    const f = parseInt(document.getElementById('g-female').value) || 0;
+    const trainHrs = parseFloat(document.getElementById('training-total').value) || 0;
+
+    const req = [totalEmp > 0, (m+f) > 0, trainHrs >= 0];
+    const done = req.filter(Boolean).length;
+    const statusEl = document.getElementById('completion-status');
+
+    if (done === req.length) {
+      statusEl.innerHTML = '<span style="color:var(--green)">✓ Required fields complete — you can continue</span>';
+    } else {
+      statusEl.textContent = `${done} of ${req.length} required sections complete`;
+    }
+  }
+
+  // ── UNGC tag (check localStorage / URL param) ──
+  function checkUNGC() {
+    const isUNGC = localStorage.getItem('zyt_intent_ungc') === 'true' || 
+                   new URLSearchParams(window.location.search).get('ungc') === '1';
+    if (isUNGC) {
+      document.getElementById('ungc-tag').style.display = '';
+      document.getElementById('ungc-footer').style.display = '';
+    }
+  }
+  checkUNGC();
+
+  // ── Save & continue ──
+  function saveAndContinue() {
+    const data = {
+      totalEmployees: document.getElementById('total-emp').value,
+      genderM: document.getElementById('g-male').value,
+      genderF: document.getElementById('g-female').value,
+      genderNB: document.getElementById('g-nb').value,
+      genderND: document.getElementById('g-nd').value,
+      newHires: document.getElementById('new-hires').value,
+      leavers: document.getElementById('leavers').value,
+      trainingHrsTotal: document.getElementById('training-total').value,
+      trainingAvgPerEmp: document.getElementById('training-avg').value,
+      injFatal: document.getElementById('inj-fatal').value,
+      injHCI: document.getElementById('inj-hci').value,
+      injRec: document.getElementById('inj-rec').value,
+      bizsafe: document.getElementById('bizsafe-value').value,
+      trainingTypes: [...document.querySelectorAll('.tt-tag.selected')].map(t => t.textContent)
+    };
+    localStorage.setItem('zyt_social_data', JSON.stringify(data));
+    // Navigate to S-33 Governance
+    window.location.href = 'S-33-governance.html';
+  }
+
+  // ── Wire leavers input to calc ──
+  document.getElementById('leavers').addEventListener('input', updateCalcs);
+  document.getElementById('training-total').addEventListener('input', updateCalcs);
+
+  // ── Load saved data on init ──
+  const saved = localStorage.getItem('zyt_social_data');
+  if (saved) {
+    try {
+      const d = JSON.parse(saved);
+      if (d.totalEmployees) document.getElementById('total-emp').value = d.totalEmployees;
+      if (d.genderM) document.getElementById('g-male').value = d.genderM;
+      if (d.genderF) document.getElementById('g-female').value = d.genderF;
+      if (d.genderNB) document.getElementById('g-nb').value = d.genderNB;
+      if (d.genderND) document.getElementById('g-nd').value = d.genderND;
+      if (d.trainingHrsTotal) document.getElementById('training-total').value = d.trainingHrsTotal;
+      if (d.bizsafe) {
+        document.querySelectorAll('.bizsafe-card').forEach(c => {
+          if (c.getAttribute('onclick').includes(`'${d.bizsafe}'`)) c.classList.add('selected');
+        });
+        document.getElementById('bizsafe-value').value = d.bizsafe;
+      }
+      updateGenderBar();
+      updateCalcs();
+    } catch(e) {}
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Entry — ZYT.ESG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:    #17160e;
+  --ink2:   #44423a;
+  --ink3:   #86847a;
+  --ink4:   #c4c1b8;
+  --bg:     #f4f1ea;
+  --card:   #ffffff;
+  --border: #e2ddd4;
+  --border2:#ece8e0;
+
+  --e-hue: #1a6b4a; --e-bg: #eaf4ee; --e-border: #b4d9c4;
+  --s-hue: #1a4a8b; --s-bg: #edf2fc; --s-border: #b4c8f0;
+  --g-hue: #5a1a6b; --g-bg: #f3eaf8; --g-border: #ccb4e0;
+
+  --done-hue: #1a6b4a; --done-bg: #eaf4ee; --done-border: #b4d9c4;
+  --prog-hue: #7a5a0a; --prog-bg: #fdf3e0; --prog-border: #e8c87a;
+  --none-hue: #86847a; --none-bg: #f4f1ea; --none-border: #d8d4ca;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  font-size: 14px;
+}
+
+/* ── NAV ── */
+nav {
+  height: 52px;
+  padding: 0 28px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.logo {
+  font-family: 'Fraunces', serif;
+  font-size: 17px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--e-hue);
+  background: var(--e-bg);
+  border: 1px solid var(--e-border);
+  padding: 2px 7px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+.nav-steps {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+.nav-s {
+  padding: 3px 10px;
+  border-radius: 20px;
+  color: var(--ink3);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.nav-s.done { color: var(--e-hue); }
+.nav-s.done::before { content: '✓'; font-size: 10px; }
+.nav-s.active { background: var(--ink); color: white; font-weight: 500; }
+.nav-sep { color: var(--ink4); font-size: 10px; }
+.nav-save {
+  font-size: 12px;
+  color: var(--ink3);
+  background: transparent;
+  border: 0.5px solid var(--border);
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.nav-save:hover { color: var(--ink); border-color: var(--ink3); }
+
+/* ── TOTALS BAR ── */
+.totals-bar {
+  background: var(--ink);
+  padding: 12px 28px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  position: sticky;
+  top: 52px;
+  z-index: 19;
+}
+.total-item {
+  flex: 1;
+  padding: 0 16px;
+  border-right: 1px solid rgba(255,255,255,0.1);
+}
+.total-item:first-child { padding-left: 0; }
+.total-item:last-child { border-right: none; }
+.total-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 3px;
+}
+.total-val {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 300;
+  color: white;
+  letter-spacing: -0.3px;
+  line-height: 1;
+  transition: all 0.3s ease;
+}
+.total-val.s1 { color: #f4a88a; }
+.total-val.s2 { color: #8ab4f4; }
+.total-val.s3 { color: #a8d4a8; }
+.total-unit {
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  margin-top: 1px;
+}
+.total-sgd {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: rgba(255,255,255,0.4);
+  margin-top: 1px;
+}
+.readiness-pill {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  border: 1px solid;
+  transition: all 0.3s;
+}
+.readiness-pill.not-ready {
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.4);
+  border-color: rgba(255,255,255,0.12);
+}
+.readiness-pill.ready {
+  background: rgba(26,107,74,0.3);
+  color: #a8e4c4;
+  border-color: rgba(26,107,74,0.4);
+}
+
+/* ── PAGE LAYOUT ── */
+.page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 28px 24px 80px;
+}
+
+/* ── PAGE HEADER ── */
+.page-hd {
+  margin-bottom: 28px;
+}
+.page-company {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--ink3);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.page-company span {
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 6px;
+  color: var(--ink2);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 11px;
+}
+.page-title {
+  font-family: 'Fraunces', serif;
+  font-size: 24px;
+  font-weight: 300;
+  letter-spacing: -0.4px;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.page-sub {
+  font-size: 13px;
+  color: var(--ink3);
+  line-height: 1.5;
+}
+
+/* ── PILLAR TABS ── */
+.pillar-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+  width: fit-content;
+}
+.ptab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink3);
+  border: none;
+  background: transparent;
+  transition: all 0.15s;
+}
+.ptab:hover { background: var(--bg); color: var(--ink2); }
+.ptab.active { background: var(--ink); color: white; font-weight: 500; }
+.ptab-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ptab[data-p="E"] .ptab-dot { background: var(--e-hue); }
+.ptab[data-p="S"] .ptab-dot { background: var(--s-hue); }
+.ptab[data-p="G"] .ptab-dot { background: var(--g-hue); }
+.ptab.active .ptab-dot { background: rgba(255,255,255,0.5); }
+.ptab-count {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  padding: 1px 5px;
+  border-radius: 8px;
+  color: var(--ink3);
+  transition: all 0.15s;
+}
+.ptab.active .ptab-count {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.7);
+}
+
+/* ── INDUSTRY PRESET NOTICE ── */
+.preset-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--e-bg);
+  border: 1px solid var(--e-border);
+  border-radius: 8px;
+  padding: 9px 14px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: var(--e-hue);
+}
+.preset-notice svg { width: 14px; height: 14px; flex-shrink: 0; }
+.preset-notice a { color: var(--e-hue); font-weight: 500; cursor: pointer; }
+
+/* ── PILLAR PANEL ── */
+.pillar-panel { display: none; }
+.pillar-panel.active { display: block; }
+
+/* ── CLUSTER GRID ── */
+.cluster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.cluster-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+  position: relative;
+  animation: up 0.35s ease both;
+}
+.cluster-card:hover {
+  border-color: var(--ink3);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
+}
+.cluster-card:active { transform: translateY(0); }
+
+.cluster-card.relevant {
+  border-color: var(--e-border);
+  background: linear-gradient(135deg, #fff 0%, #fafffe 100%);
+}
+.cluster-card.relevant::after {
+  content: 'Relevant for your industry';
+  position: absolute;
+  top: -1px; right: 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--e-hue);
+  background: var(--e-bg);
+  border: 1px solid var(--e-border);
+  border-top: none;
+  padding: 2px 7px;
+  border-radius: 0 0 6px 6px;
+  letter-spacing: 0.3px;
+}
+
+/* Status indicator */
+.cluster-status {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 8px;
+}
+.cluster-status.done {
+  background: var(--done-bg); color: var(--done-hue);
+  border: 1px solid var(--done-border);
+}
+.cluster-status.prog {
+  background: var(--prog-bg); color: var(--prog-hue);
+  border: 1px solid var(--prog-border);
+}
+.cluster-status.none {
+  background: var(--none-bg); color: var(--none-hue);
+  border: 1px solid var(--none-border);
+}
+
+.cluster-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding-right: 60px;
+}
+.cluster-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  background: var(--bg);
+}
+.cluster-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.3;
+  margin-bottom: 2px;
+}
+.cluster-role {
+  font-size: 11px;
+  color: var(--ink3);
+  font-style: italic;
+}
+
+/* Metrics row */
+.cluster-metrics {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.cluster-metric {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--ink3);
+  border: 1px solid var(--border2);
+}
+.cluster-metric.has-data {
+  background: var(--done-bg);
+  color: var(--done-hue);
+  border-color: var(--done-border);
+  font-weight: 500;
+}
+
+/* Progress bar */
+.cluster-progress {
+  height: 3px;
+  background: var(--border2);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.cluster-progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--e-hue);
+  transition: width 0.4s ease;
+}
+
+/* Activities count + enter arrow */
+.cluster-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cluster-count {
+  font-size: 11px;
+  color: var(--ink3);
+}
+.cluster-enter {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink3);
+  transition: color 0.15s;
+}
+.cluster-card:hover .cluster-enter { color: var(--ink); }
+.cluster-enter svg { width: 12px; height: 12px; transition: transform 0.15s; }
+.cluster-card:hover .cluster-enter svg { transform: translateX(3px); }
+
+/* ── SOCIAL + GOVERNANCE CARDS ── */
+.sg-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+  margin-bottom: 10px;
+  animation: up 0.35s ease both;
+}
+.sg-card:hover {
+  border-color: var(--ink3);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
+}
+.sg-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.sg-card.social .sg-icon { background: var(--s-bg); }
+.sg-card.gov .sg-icon { background: var(--g-bg); }
+.sg-body { flex: 1; }
+.sg-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 3px;
+}
+.sg-desc { font-size: 12px; color: var(--ink3); line-height: 1.4; }
+.sg-status {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  padding: 3px 9px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+.sg-status.none {
+  background: var(--none-bg);
+  color: var(--none-hue);
+  border: 1px solid var(--none-border);
+}
+.sg-status.done {
+  background: var(--done-bg);
+  color: var(--done-hue);
+  border: 1px solid var(--done-border);
+}
+.sg-arr { color: var(--ink3); transition: color 0.15s, transform 0.15s; }
+.sg-card:hover .sg-arr { color: var(--ink); transform: translateX(3px); }
+
+/* ── GENERATE BAR ── */
+.generate-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  z-index: 30;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.06);
+}
+.gen-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.gen-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--ink4);
+  transition: background 0.3s;
+}
+.gen-dot.ready { background: var(--e-hue); }
+.gen-text {
+  font-size: 13px;
+  color: var(--ink2);
+}
+.gen-text strong { font-weight: 500; color: var(--ink); }
+.gen-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-review {
+  height: 40px;
+  padding: 0 20px;
+  background: var(--ink);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s, opacity 0.2s;
+  white-space: nowrap;
+}
+.btn-review:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn-review:not(:disabled):hover { background: #262519; }
+.btn-review svg { width: 13px; height: 13px; transition: transform 0.15s; }
+.btn-review:not(:disabled):hover svg { transform: translateX(2px); }
+.btn-save-draft {
+  height: 40px;
+  padding: 0 16px;
+  background: transparent;
+  color: var(--ink2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.btn-save-draft:hover { border-color: var(--ink3); }
+
+@keyframes up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+  .cluster-grid { grid-template-columns: 1fr; }
+  .totals-bar { gap: 0; padding: 10px 16px; overflow-x: auto; }
+  .total-item { min-width: 80px; padding: 0 10px; }
+  nav { padding: 0 16px; }
+  .nav-steps { display: none; }
+  .page { padding: 20px 16px 80px; }
+  .generate-bar { padding: 12px 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">ZYT.ESG <span class="logo-tag">ESG</span></div>
+  <div class="nav-steps">
+    <div class="nav-s done">Profile</div>
+    <div class="nav-sep">›</div>
+    <div class="nav-s active">Data entry</div>
+    <div class="nav-sep">›</div>
+    <div class="nav-s">Results</div>
+    <div class="nav-sep">›</div>
+    <div class="nav-s">Targets</div>
+    <div class="nav-sep">›</div>
+    <div class="nav-s">Report</div>
+  </div>
+  <button class="nav-save" onclick="localStorage.setItem('zyt_draft_saved', Date.now()); this.textContent='Saved ✓'; setTimeout(()=>this.textContent='Save draft',2000)">Save draft</button>
+</nav>
+
+<!-- TOTALS BAR -->
+<div class="totals-bar">
+  <div class="total-item">
+    <div class="total-label">Scope 1 — direct</div>
+    <div class="total-val s1" id="t-s1">0</div>
+    <div class="total-unit">tCO₂e</div>
+    <div class="total-sgd" id="t-s1-sgd">— SGD</div>
+  </div>
+  <div class="total-item">
+    <div class="total-label">Scope 2 — electricity</div>
+    <div class="total-val s2" id="t-s2">0</div>
+    <div class="total-unit">tCO₂e</div>
+    <div class="total-sgd" id="t-s2-sgd">— SGD</div>
+  </div>
+  <div class="total-item">
+    <div class="total-label">Scope 3 — value chain</div>
+    <div class="total-val s3" id="t-s3">0</div>
+    <div class="total-unit">tCO₂e</div>
+    <div class="total-sgd" id="t-s3-sgd">— SGD</div>
+  </div>
+  <div class="total-item">
+    <div class="total-label">Total emissions</div>
+    <div class="total-val" id="t-total" style="color:white">0</div>
+    <div class="total-unit">tCO₂e</div>
+    <div class="total-sgd" id="t-total-sgd">— SGD estimated</div>
+  </div>
+  <div class="total-item" style="flex:0;padding-right:0">
+    <div class="readiness-pill not-ready" id="ready-pill">● Not ready to generate</div>
+  </div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <div class="page-hd">
+    <div class="page-company">
+      Reporting year <span>2024</span>
+      <span>Sunshine Bakery Pte Ltd</span>
+      <span>F&B</span>
+    </div>
+    <h1 class="page-title">Enter your ESG data</h1>
+    <p class="page-sub">Work through each section below. Your data is saved automatically as you go. You can return and update any section at any time.</p>
+  </div>
+
+  <!-- PILLAR TABS -->
+  <div class="pillar-tabs">
+    <button class="ptab active" data-p="E" onclick="switchPillar('E')">
+      <div class="ptab-dot"></div>
+      Environmental
+      <span class="ptab-count" id="pc-E">0 / 8</span>
+    </button>
+    <button class="ptab" data-p="S" onclick="switchPillar('S')">
+      <div class="ptab-dot"></div>
+      Social
+      <span class="ptab-count" id="pc-S">0 / 2</span>
+    </button>
+    <button class="ptab" data-p="G" onclick="switchPillar('G')">
+      <div class="ptab-dot"></div>
+      Governance
+      <span class="ptab-count" id="pc-G">0 / 1</span>
+    </button>
+  </div>
+
+  <!-- ENVIRONMENTAL PANEL -->
+  <div class="pillar-panel active" id="panel-E">
+    <div class="preset-notice">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5l2 1.5"/></svg>
+      Highlighted clusters are most relevant for <strong>F&B</strong> businesses. All clusters are shown — <a onclick="window.location.href='/S-06-company-profile.html'">change industry</a>.
+    </div>
+
+    <div class="cluster-grid" id="cluster-grid">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+
+  <!-- SOCIAL PANEL -->
+  <div class="pillar-panel" id="panel-S">
+    <div class="sg-card social" onclick="openScreen('S-31')" style="animation-delay:0.05s">
+      <div class="sg-icon">👥</div>
+      <div class="sg-body">
+        <div class="sg-title">Workforce & hiring</div>
+        <div class="sg-desc">Employee count, gender split, age groups, new hires, turnover rate. SGX Core ESG Metrics — Social.</div>
+      </div>
+      <div class="sg-status none">Not started</div>
+      <svg class="sg-arr" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+    </div>
+    <div class="sg-card social" onclick="openScreen('S-32')" style="animation-delay:0.10s">
+      <div class="sg-icon">🦺</div>
+      <div class="sg-body">
+        <div class="sg-title">Training & health and safety</div>
+        <div class="sg-desc">Training hours per employee, work-related injuries (MOM categories), bizSAFE level. SGX Core ESG Metrics — Social.</div>
+      </div>
+      <div class="sg-status none">Not started</div>
+      <svg class="sg-arr" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+    </div>
+
+    <div style="margin-top:16px;padding:14px 16px;background:var(--s-bg);border:1px solid var(--s-border);border-radius:10px;font-size:12px;color:var(--s-hue);line-height:1.6">
+      <strong style="display:block;margin-bottom:4px">Why report Social data?</strong>
+      Buyers and banks increasingly ask about labour practices alongside carbon emissions. MOM-aligned safety data is also required for many Singapore tender submissions. Your Social section can be left incomplete — your report will still generate with an explanatory note.
+    </div>
+  </div>
+
+  <!-- GOVERNANCE PANEL -->
+  <div class="pillar-panel" id="panel-G">
+    <div class="sg-card gov" onclick="openScreen('S-33')" style="animation-delay:0.05s">
+      <div class="sg-icon">🏛</div>
+      <div class="sg-body">
+        <div class="sg-title">ESG leadership, ethics & certifications</div>
+        <div class="sg-desc">Named ESG responsible person, management gender split, anti-corruption policy, certifications (bizSAFE, ISO, BCA Green Mark). SGX Core ESG Metrics — Governance.</div>
+      </div>
+      <div class="sg-status none">Not started</div>
+      <svg class="sg-arr" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+    </div>
+
+    <div style="margin-top:16px;padding:14px 16px;background:var(--g-bg);border:1px solid #ccb4e0;border-radius:10px;font-size:12px;color:var(--g-hue);line-height:1.6">
+      <strong style="display:block;margin-bottom:4px">Governance — simplified for SMEs</strong>
+      We've adapted SGX's Governance metrics for SMEs. Board-level disclosures are replaced with management team diversity — more meaningful for your context. Framework alignment and assurance status are auto-completed based on your report.
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- GENERATE BAR -->
+<div class="generate-bar">
+  <div class="gen-status">
+    <div class="gen-dot" id="gen-dot"></div>
+    <div class="gen-text" id="gen-text"><strong>0 of 8</strong> environmental clusters completed — add electricity to generate your report</div>
+  </div>
+  <div class="gen-actions">
+    <button class="btn-save-draft" onclick="localStorage.setItem('zyt_draft_saved', Date.now()); const b=this; b.textContent='Saved ✓'; setTimeout(()=>b.textContent='Save & continue later',2000)">Save & continue later</button>
+    <button class="btn-review" id="btn-review" disabled onclick="goToReview()">
+      Review & calculate
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+// ── CLUSTER DATA ──
+const CLUSTERS = [
+  {
+    id: 'power',
+    icon: '⚡',
+    name: 'Power & energy',
+    role: 'Owner / facilities manager',
+    activities: ['Grid electricity', 'Diesel generator', 'Solar', 'District cooling'],
+    scopes: ['S2','S1'],
+    relevant: true,   // F&B preset
+    status: 'done',
+    co2: 14.2, sgd: 29000,
+    progress: 100,
+    screen: 'S-10'
+  },
+  {
+    id: 'transport',
+    icon: '🚚',
+    name: 'Transport & fleet',
+    role: 'Logistics / operations manager',
+    activities: ['Company vehicles', '3PL freight', 'Business flights'],
+    scopes: ['S1','S3'],
+    relevant: false,
+    status: 'prog',
+    co2: 8.4, sgd: 11200,
+    progress: 60,
+    screen: 'S-11'
+  },
+  {
+    id: 'cooling',
+    icon: '❄',
+    name: 'Cooling & refrigeration',
+    role: 'Facilities manager',
+    activities: ['AC refrigerant', 'Cold room / freezer', 'Reefer units'],
+    scopes: ['S1'],
+    relevant: true,
+    status: 'done',
+    co2: 4.1, sgd: 4200,
+    progress: 100,
+    screen: 'S-12'
+  },
+  {
+    id: 'cooking',
+    icon: '🔥',
+    name: 'Cooking & process heat',
+    role: 'Kitchen supervisor',
+    activities: ['Piped gas', 'LPG cylinders', 'Industrial boiler'],
+    scopes: ['S1'],
+    relevant: true,
+    status: 'done',
+    co2: 6.8, sgd: 8400,
+    progress: 100,
+    screen: 'S-13'
+  },
+  {
+    id: 'waste',
+    icon: '♻',
+    name: 'Waste & water',
+    role: 'Operations / kitchen',
+    activities: ['General waste', 'Food waste', 'Plastics', 'PUB water'],
+    scopes: ['S3'],
+    relevant: true,
+    status: 'none',
+    co2: 0, sgd: 0,
+    progress: 0,
+    screen: 'S-14'
+  },
+  {
+    id: 'people',
+    icon: '🚶',
+    name: 'People & commuting',
+    role: 'HR manager',
+    activities: ['MRT / bus commute', 'Private car commute', 'WFH days'],
+    scopes: ['S3'],
+    relevant: false,
+    status: 'none',
+    co2: 0, sgd: 0,
+    progress: 0,
+    screen: 'S-15'
+  },
+  {
+    id: 'digital',
+    icon: '☁',
+    name: 'Digital & IT',
+    role: 'IT manager / office manager',
+    activities: ['Cloud storage', 'Virtual machines', 'IT equipment'],
+    scopes: ['S3'],
+    relevant: false,
+    status: 'none',
+    co2: 0, sgd: 0,
+    progress: 0,
+    screen: 'S-16'
+  },
+  {
+    id: 'procurement',
+    icon: '📦',
+    name: 'Procurement & supply chain',
+    role: 'Purchasing / admin',
+    activities: ['Packaging', 'Cleaning services', 'Security services', 'Professional services'],
+    scopes: ['S3'],
+    relevant: false,
+    status: 'none',
+    co2: 0, sgd: 0,
+    progress: 0,
+    screen: 'S-17'
+  },
+];
+
+function scopeTag(s) {
+  const cols = { S1:'#f4a88a', S2:'#8ab4f4', S3:'#a8d4a8' };
+  return `<span class="cluster-metric" style="background:${cols[s]}22;color:${cols[s].replace('a8','44').replace('f4','aa').replace('8a','66')};border-color:${cols[s]}44">${s}</span>`;
+}
+
+function buildClusterCard(cl, delay) {
+  const statusLabel = { done:'Complete', prog:'In progress', none:'Not started' }[cl.status];
+  const hasData = cl.co2 > 0;
+
+  return `
+    <div class="cluster-card ${cl.relevant ? 'relevant' : ''}" onclick="openCluster('${cl.screen}', '${cl.name}')"
+         style="animation-delay:${delay}s">
+      <div class="cluster-status ${cl.status}">${statusLabel}</div>
+      <div class="cluster-top">
+        <div class="cluster-icon">${cl.icon}</div>
+        <div>
+          <div class="cluster-name">${cl.name}</div>
+          <div class="cluster-role">${cl.role}</div>
+        </div>
+      </div>
+      <div class="cluster-metrics">
+        ${cl.scopes.map(s => scopeTag(s)).join('')}
+        ${hasData ? `<span class="cluster-metric has-data">↗ ${cl.co2} tCO₂e</span>` : ''}
+        ${hasData ? `<span class="cluster-metric has-data">SGD ${cl.sgd.toLocaleString()}/yr</span>` : ''}
+      </div>
+      <div class="cluster-progress">
+        <div class="cluster-progress-fill" style="width:${cl.progress}%"></div>
+      </div>
+      <div class="cluster-footer">
+        <span class="cluster-count">${cl.activities.length} activities · ${cl.activities.slice(0,2).join(', ')}${cl.activities.length > 2 ? '…' : ''}</span>
+        <span class="cluster-enter">
+          ${cl.status === 'none' ? 'Start entering' : cl.status === 'prog' ? 'Continue' : 'Review'}
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 6h8M6 3l3 3-3 3"/></svg>
+        </span>
+      </div>
+    </div>`;
+}
+
+function renderClusters() {
+  const grid = document.getElementById('cluster-grid');
+  grid.innerHTML = CLUSTERS.map((cl, i) => buildClusterCard(cl, 0.04 * i)).join('');
+}
+
+// ── TOTALS ──
+function computeTotals() {
+  let s1 = 0, s2 = 0, s3 = 0, sgd = 0;
+  CLUSTERS.forEach(cl => {
+    if (cl.co2 === 0) return;
+    cl.scopes.forEach(s => {
+      if (s === 'S1') s1 += cl.co2 * 0.6;
+      else if (s === 'S2') s2 += cl.co2 * 0.8;
+      else s3 += cl.co2 * 0.4;
+    });
+    sgd += cl.sgd;
+  });
+  // Round
+  s1 = +(s1.toFixed(1)); s2 = +(s2.toFixed(1)); s3 = +(s3.toFixed(1));
+  const total = +(s1 + s2 + s3).toFixed(1);
+
+  document.getElementById('t-s1').textContent = s1;
+  document.getElementById('t-s2').textContent = s2;
+  document.getElementById('t-s3').textContent = s3;
+  document.getElementById('t-total').textContent = total;
+  document.getElementById('t-s1-sgd').textContent = s1 > 0 ? 'SGD est.' : '— SGD';
+  document.getElementById('t-s2-sgd').textContent = s2 > 0 ? `SGD ${Math.round(sgd * 0.6).toLocaleString()}` : '— SGD';
+  document.getElementById('t-s3-sgd').textContent = s3 > 0 ? 'SGD est.' : '— SGD';
+  document.getElementById('t-total-sgd').textContent = sgd > 0 ? `≈ SGD ${sgd.toLocaleString()}/yr estimated` : '— SGD estimated';
+  return total;
+}
+
+// ── STATUS ──
+function computeStatus() {
+  const done = CLUSTERS.filter(c => c.status === 'done').length;
+  const hasElec = CLUSTERS.find(c => c.id === 'power')?.status !== 'none';
+  const ready = hasElec;
+
+  // Pillar tab counts
+  document.getElementById('pc-E').textContent = `${done} / 8`;
+
+  // Bottom bar text
+  const btn = document.getElementById('btn-review');
+  const dot = document.getElementById('gen-dot');
+  const txt = document.getElementById('gen-text');
+  const pill = document.getElementById('ready-pill');
+
+  if (ready) {
+    btn.disabled = false;
+    dot.classList.add('ready');
+    pill.className = 'readiness-pill ready';
+    pill.textContent = '✓ Ready to generate';
+    txt.innerHTML = `<strong>${done} of 8</strong> environmental clusters completed — enough data to generate your report`;
+  } else {
+    btn.disabled = true;
+    dot.classList.remove('ready');
+    pill.className = 'readiness-pill not-ready';
+    pill.textContent = '● Not ready to generate';
+    txt.innerHTML = `<strong>${done} of 8</strong> environmental clusters completed — add electricity to generate your report`;
+  }
+}
+
+// ── NAVIGATION ──
+function switchPillar(p) {
+  document.querySelectorAll('.ptab').forEach(t => t.classList.toggle('active', t.dataset.p === p));
+  document.querySelectorAll('.pillar-panel').forEach(panel => panel.classList.toggle('active', panel.id === `panel-${p}`));
+}
+
+function openCluster(screen, name) {
+  const screenMap = {
+    'S-10': '/S-10-power-energy-v3.html',
+    'S-11': '/S-11-transport-fleet.html',
+    'S-12': '/S-12-cooling-refrigeration.html',
+    'S-13': '/S-13-cooking-process-heat.html',
+    'S-14': '/S-14-waste-water.html',
+    'S-15': '/S-15-people-commuting.html',
+    'S-16': '/S-16-digital-it.html',
+    'S-17': '/S-17-procurement.html',
+  };
+  const url = screenMap[screen];
+  if (url) window.location.href = url;
+}
+
+function openScreen(screen) {
+  const screenMap = {
+    'S-31': '/S-31-32-social.html',
+    'S-32': '/S-31-32-social.html',
+    'S-33': '/S-33-governance.html',
+  };
+  const url = screenMap[screen];
+  if (url) window.location.href = url;
+}
+
+function goToReview() {
+  window.location.href = '/S-18-review-confirm.html';
+}
+
+// ── INIT ──
+renderClusters();
+computeTotals();
+computeStatus();
+</script>
+
+</body>
+</html>

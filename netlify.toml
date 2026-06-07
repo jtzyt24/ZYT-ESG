@@ -1,0 +1,53 @@
+# Netlify configuration for ZYT.ESG
+# Deploy: connect this repo in Netlify dashboard → auto-deploys on every push
+
+[build]
+  publish = "."
+
+# ── Redirects ──
+# Pretty URLs — /login instead of /S-05-login.html
+[[redirects]]
+  from = "/login"
+  to   = "/S-05-login.html"
+  status = 200
+
+[[redirects]]
+  from = "/signup"
+  to   = "/S-03-signup.html"
+  status = 200
+
+[[redirects]]
+  from = "/start"
+  to   = "/S-02-intent-selector.html"
+  status = 200
+
+# SPA-style 404 fallback
+[[redirects]]
+  from = "/*"
+  to   = "/index.html"
+  status = 404
+
+# ── Security headers ──
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options         = "DENY"
+    X-Content-Type-Options  = "nosniff"
+    Referrer-Policy         = "strict-origin-when-cross-origin"
+    Permissions-Policy      = "camera=(), microphone=(), geolocation=()"
+
+# Cache JS/CSS aggressively, HTML never
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

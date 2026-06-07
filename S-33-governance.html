@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZYT.ESG — Governance</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #F7F6F2;
+    --surface: #FFFFFF;
+    --surface2: #F0EFE9;
+    --border: #E2E0D8;
+    --text: #1A1917;
+    --text-muted: #6B6860;
+    --text-light: #9B9890;
+    --accent-g: #4A3F8C;       /* Governance purple */
+    --accent-g-light: #F0EEFA;
+    --accent-g-mid: #C9C0EE;
+    --green: #1A7A4A;
+    --green-light: #E6F5ED;
+    --amber: #B45309;
+    --amber-light: #FEF3C7;
+    --red: #B91C1C;
+    --red-light: #FEE2E2;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --border-focus: #4A3F8C;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .topnav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .topnav-left { display: flex; align-items: center; gap: 12px; }
+  .logo { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+  .logo span { color: var(--accent-g); }
+  .nav-divider { width: 1px; height: 20px; background: var(--border); }
+  .nav-breadcrumb { font-size: 13px; color: var(--text-muted); }
+  .nav-breadcrumb strong { color: var(--text); font-weight: 500; }
+  .save-indicator { font-size: 12px; color: var(--text-light); display: flex; align-items: center; gap: 5px; }
+  .save-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+
+  .page-wrap { max-width: 860px; margin: 0 auto; padding: 32px 24px 80px; }
+
+  .pillar-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 28px; }
+  .pillar-icon {
+    width: 48px; height: 48px;
+    background: var(--accent-g-light); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .pillar-title { font-size: 22px; font-weight: 600; letter-spacing: -0.4px; line-height: 1.2; }
+  .pillar-sub { font-size: 13.5px; color: var(--text-muted); margin-top: 4px; }
+  .pillar-frameworks { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .fw-tag {
+    font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px;
+    background: var(--accent-g-light); color: var(--accent-g);
+    border: 1px solid var(--accent-g-mid);
+  }
+
+  /* sections */
+  .section {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); margin-bottom: 16px; overflow: hidden;
+  }
+  .section-header {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; user-select: none;
+  }
+  .section-header:hover { background: var(--bg); }
+  .sh-left { display: flex; align-items: center; gap: 12px; }
+  .sh-num {
+    width: 26px; height: 26px; background: var(--accent-g-light); color: var(--accent-g);
+    border-radius: 50%; font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .sh-title { font-size: 15px; font-weight: 600; }
+  .sh-sub { font-size: 12.5px; color: var(--text-muted); }
+  .sh-right { display: flex; align-items: center; gap: 10px; }
+  .sh-badge {
+    font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px;
+    background: var(--amber-light); color: var(--amber);
+  }
+  .sh-badge.optional { background: var(--surface2); color: var(--text-muted); }
+  .chevron { font-size: 14px; color: var(--text-light); transition: transform 0.2s; }
+  .section.collapsed .chevron { transform: rotate(-90deg); }
+  .section-body { padding: 20px; }
+  .section.collapsed .section-body { display: none; }
+
+  /* form */
+  .form-grid { display: grid; gap: 16px; }
+  .form-grid-2 { grid-template-columns: 1fr 1fr; }
+  .form-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  @media (max-width: 600px) { .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; } }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field-label { font-size: 12.5px; font-weight: 500; color: var(--text); display: flex; align-items: center; gap: 5px; }
+  .field-label .opt { font-weight: 400; color: var(--text-light); font-size: 11.5px; }
+  .field-hint { font-size: 11.5px; color: var(--text-muted); }
+
+  input[type="number"], input[type="text"], select, textarea {
+    width: 100%; height: 38px; padding: 0 12px;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    color: var(--text); background: var(--surface);
+    transition: border-color 0.15s, box-shadow 0.15s; outline: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(74,63,140,0.1);
+  }
+  textarea { height: auto; min-height: 72px; padding: 10px 12px; resize: vertical; line-height: 1.5; }
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%239B9890' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
+  }
+  .input-with-unit { position: relative; }
+  .input-with-unit input { padding-right: 52px; }
+  .input-unit {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    font-size: 12px; color: var(--text-muted); font-family: 'DM Mono', monospace;
+    pointer-events: none;
+  }
+
+  /* Yes/No toggle */
+  .yn-toggle { display: flex; gap: 6px; }
+  .yn-btn {
+    flex: 1; height: 38px;
+    border: 2px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--surface); font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px; font-weight: 500; cursor: pointer; color: var(--text-muted);
+    transition: all 0.15s;
+  }
+  .yn-btn:hover { border-color: var(--accent-g); color: var(--accent-g); }
+  .yn-btn.yes.selected { border-color: var(--green); background: var(--green-light); color: var(--green); }
+  .yn-btn.no.selected { border-color: #C53030; background: var(--red-light); color: var(--red); }
+
+  /* Frequency cards */
+  .freq-cards { display: flex; gap: 8px; flex-wrap: wrap; }
+  .freq-card {
+    border: 2px solid var(--border); border-radius: var(--radius-sm);
+    padding: 8px 14px; cursor: pointer; font-size: 13px; font-weight: 500;
+    color: var(--text-muted); transition: all 0.15s; background: var(--surface);
+  }
+  .freq-card:hover { border-color: var(--accent-g); color: var(--accent-g); }
+  .freq-card.selected { border-color: var(--accent-g); color: var(--accent-g); background: var(--accent-g-light); }
+
+  /* Certification chips */
+  .cert-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .cert-chip {
+    border: 1.5px solid var(--border); border-radius: 20px;
+    padding: 5px 13px; font-size: 12.5px; cursor: pointer;
+    color: var(--text-muted); transition: all 0.15s; background: var(--surface);
+  }
+  .cert-chip:hover { border-color: var(--accent-g); color: var(--accent-g); }
+  .cert-chip.selected { border-color: var(--accent-g); color: var(--accent-g); background: var(--accent-g-light); font-weight: 500; }
+
+  /* Gender bar (small) */
+  .mgmt-bar {
+    height: 6px; border-radius: 3px; background: var(--border);
+    overflow: hidden; display: flex; margin-top: 6px;
+  }
+  .mgmt-bar-m { background: #4A3F8C; transition: width 0.3s; }
+  .mgmt-bar-f { background: #E05A8A; transition: width 0.3s; }
+  .mgmt-result { font-size: 12.5px; color: var(--text-muted); margin-top: 5px; }
+
+  /* Info / note boxes */
+  .info-box {
+    background: var(--accent-g-light); border: 1px solid var(--accent-g-mid);
+    border-radius: var(--radius-sm); padding: 12px 14px;
+    font-size: 13px; color: #2D2560; margin-bottom: 16px;
+    display: flex; gap: 10px;
+  }
+  .info-box-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .note-box {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 11px 13px;
+    font-size: 12.5px; color: var(--text-muted); margin-top: 12px;
+  }
+
+  /* Divider label */
+  .form-divider-label {
+    display: flex; align-items: center; gap: 10px;
+    margin: 18px 0 10px; color: var(--text-muted); font-size: 12.5px; font-weight: 500;
+  }
+  .form-divider-label::before, .form-divider-label::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* opt toggle */
+  .opt-toggle { display: flex; align-items: center; gap: 8px; margin-top: 14px; margin-bottom: 8px; cursor: pointer; }
+  .opt-toggle input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent-g); cursor: pointer; }
+  .opt-toggle label { font-size: 13px; color: var(--text-muted); cursor: pointer; }
+  .opt-toggle label strong { color: var(--text); }
+  .opt-section { display: none; margin-top: 8px; }
+  .opt-section.visible { display: block; }
+
+  /* auto-tag */
+  .auto-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--accent-g-light); color: var(--accent-g);
+    border: 1px solid var(--accent-g-mid); border-radius: 4px;
+    font-size: 11px; font-weight: 500; padding: 2px 7px;
+  }
+
+  /* SGX footer */
+  .sgx-footer {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 18px;
+    margin-top: 16px; display: flex; gap: 16px; flex-wrap: wrap;
+  }
+  .sgx-item { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
+  .sgx-item span { color: var(--text); font-weight: 500; }
+
+  /* action bar */
+  .action-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    padding: 14px 24px; display: flex; justify-content: space-between; align-items: center;
+    z-index: 90;
+  }
+  .action-bar-left { font-size: 13px; color: var(--text-muted); }
+  .action-bar-right { display: flex; gap: 10px; }
+  .btn {
+    height: 38px; padding: 0 18px; border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    cursor: pointer; border: none; transition: all 0.15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-primary { background: var(--accent-g); color: #fff; }
+  .btn-primary:hover { filter: brightness(1.15); }
+  .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-left">
+    <div class="logo">ZYT<span>.ESG</span></div>
+    <div class="nav-divider"></div>
+    <div class="nav-breadcrumb">Data entry → <strong>Governance</strong></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="save-indicator"><div class="save-dot"></div> Auto-saved</div>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <div class="pillar-header">
+    <div class="pillar-icon">🏛️</div>
+    <div>
+      <div class="pillar-title">Governance</div>
+      <div class="pillar-sub">Leadership, ethics, certifications, and ESG oversight — SGX Core ESG Metrics (SME-adapted).</div>
+      <div class="pillar-frameworks">
+        <span class="fw-tag">SGX Core ESG Metrics</span>
+        <span class="fw-tag">GRI 2-9 · 2-16 · 205-2</span>
+        <span class="fw-tag" id="ungc-tag" style="display:none">UNGC P10 — Anti-Corruption</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 1: ESG LEADERSHIP ══ -->
+  <div class="section" id="sec-leadership">
+    <div class="section-header" onclick="toggleSection('sec-leadership')">
+      <div class="sh-left">
+        <div class="sh-num">1</div>
+        <div>
+          <div class="sh-title">ESG leadership & management</div>
+          <div class="sh-sub">Who owns ESG in your organisation, and how often is it reviewed</div>
+        </div>
+      </div>
+      <div class="sh-right">
+        <span class="sh-badge">Required</span>
+        <span class="chevron">▾</span>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="info-box">
+        <span class="info-box-icon">💡</span>
+        <div>
+          The named ESG responsible person was set in your Company Profile. This section captures how ESG is <strong>governed</strong> — the cadence, the team, and the accountability structure.
+        </div>
+      </div>
+
+      <!-- Responsible person (read-only from S-06) -->
+      <div class="form-grid form-grid-2" style="margin-bottom:16px">
+        <div class="field">
+          <div class="field-label">ESG responsible person <span class="auto-tag">from Company Profile</span></div>
+          <input type="text" id="esg-person-display" placeholder="Set in Company Profile (S-06)" readonly style="background:var(--surface2);color:var(--text-muted)">
+        </div>
+        <div class="field">
+          <div class="field-label">Role / title</div>
+          <input type="text" id="esg-person-role" placeholder="e.g. Director, Operations Manager" readonly style="background:var(--surface2);color:var(--text-muted)">
+        </div>
+      </div>
+
+      <!-- ESG review frequency -->
+      <div class="field-label" style="margin-bottom:8px">ESG review frequency <span class="opt">(optional — strengthens governance disclosure)</span></div>
+      <div class="field-hint" style="margin-bottom:8px">How often does leadership formally review ESG performance, targets, and this report?</div>
+      <div class="freq-cards" id="freq-cards">
+        <div class="freq-card" onclick="selectFreq(this,'monthly')">Monthly</div>
+        <div class="freq-card" onclick="selectFreq(this,'quarterly')">Quarterly</div>
+        <div class="freq-card" onclick="selectFreq(this,'annually')">Annually</div>
+        <div class="freq-card" onclick="selectFreq(this,'ad_hoc')">Ad hoc</div>
+      </div>
+      <input type="hidden" id="esg-freq" value="">
+
+    </div>
+  </div>
+
+  <!-- ══ SECTION 2: MANAGEMENT TEAM GENDER ══ -->
+  <div class="section" id="sec-mgmt-gender">
+    <div class="section-header" onclick="toggleSection('sec-mgmt-gender')">
+      <div class="sh-left">
+        <div class="sh-num">2</div>
+        <div>
+          <div class="sh-title">Management team gender</div>
+          <div class="sh-sub">SGX Core Governance metric — adapted from board-level to management team for SMEs</div>
+        </div>
+      </div>
+      <div class="sh-right">
+        <span class="sh-badge">Required</span>
+        <span class="chevron">▾</span>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="info-box">
+        <span class="info-box-icon">📋</span>
+        <div>
+          SGX Core ESG Metrics asks for <em>women on the board</em> and <em>women in management</em>. For SMEs without a formal board, ZYT.ESG captures the <strong>management team gender split</strong> — the same intent, more honestly reported.
+        </div>
+      </div>
+
+      <div class="form-grid form-grid-3">
+        <div class="field">
+          <div class="field-label">Total management team <span style="color:var(--red)">*</span></div>
+          <div class="field-hint">Directors, partners, senior managers</div>
+          <div class="input-with-unit">
+            <input type="number" id="mgmt-total" placeholder="e.g. 4" min="1" oninput="updateMgmtBar()">
+            <span class="input-unit">pax</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Male</div>
+          <div class="input-with-unit">
+            <input type="number" id="mgmt-male" placeholder="0" min="0" oninput="updateMgmtBar()">
+            <span class="input-unit">pax</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Female</div>
+          <div class="input-with-unit">
+            <input type="number" id="mgmt-female" placeholder="0" min="0" oninput="updateMgmtBar()">
+            <span class="input-unit">pax</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mgmt-bar" id="mgmt-bar">
+        <div class="mgmt-bar-m" id="mbar-m" style="width:50%"></div>
+        <div class="mgmt-bar-f" id="mbar-f" style="width:50%"></div>
+      </div>
+      <div class="mgmt-result" id="mgmt-result"></div>
+
+    </div>
+  </div>
+
+  <!-- ══ SECTION 3: ANTI-CORRUPTION ══ -->
+  <div class="section" id="sec-anticorrupt">
+    <div class="section-header" onclick="toggleSection('sec-anticorrupt')">
+      <div class="sh-left">
+        <div class="sh-num">3</div>
+        <div>
+          <div class="sh-title">Anti-corruption policy</div>
+          <div class="sh-sub">Ethics, compliance, and whistleblowing</div>
+        </div>
+      </div>
+      <div class="sh-right">
+        <span class="sh-badge">Required</span>
+        <span class="chevron">▾</span>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="info-box">
+        <span class="info-box-icon">🌐</span>
+        <div id="ungc-ac-info">
+          SGX Core ESG Metrics requires disclosure on anti-corruption policies and training. This also maps to <strong>UNGC Principle 10</strong> — "Businesses should work against corruption in all its forms."
+        </div>
+      </div>
+
+      <div class="field" style="margin-bottom:16px">
+        <div class="field-label">Does your company have a formal anti-corruption or anti-bribery policy? <span style="color:var(--red)">*</span></div>
+        <div class="field-hint" style="margin-bottom:8px">Includes any documented code of conduct, gifts policy, or conflict of interest declaration</div>
+        <div class="yn-toggle">
+          <button class="yn-btn yes" onclick="selectYN('ac-policy', true, this)">✓ Yes</button>
+          <button class="yn-btn no" onclick="selectYN('ac-policy', false, this)">✗ No</button>
+        </div>
+        <input type="hidden" id="ac-policy" value="">
+      </div>
+
+      <div class="field" id="ac-desc-field" style="display:none;margin-bottom:16px">
+        <div class="field-label">Brief description <span class="opt">(optional — appears in report)</span></div>
+        <div class="field-hint">1–2 sentences on what your policy covers</div>
+        <textarea id="ac-desc" placeholder="e.g. Our staff code of conduct prohibits gifts exceeding SGD 50 and requires declaration of all potential conflicts of interest. Annual acknowledgement is required from all staff."></textarea>
+      </div>
+
+      <!-- Anti-corruption training (optional) -->
+      <div class="opt-toggle">
+        <input type="checkbox" id="show-ac-training" onchange="toggleOpt('ac-training-section', this)">
+        <label for="show-ac-training">Add <strong>anti-corruption training data</strong> <span style="color:var(--text-light);font-size:12px">(GRI 205-2 — optional)</span></label>
+      </div>
+      <div class="opt-section" id="ac-training-section">
+        <div class="form-grid form-grid-2" style="margin-top:8px">
+          <div class="field">
+            <div class="field-label">Staff trained on anti-corruption <span class="opt">(optional)</span></div>
+            <div class="input-with-unit">
+              <input type="number" id="ac-staff-trained" placeholder="0" min="0">
+              <span class="input-unit">pax</span>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label">% of total staff</div>
+            <div class="input-with-unit" style="position:relative">
+              <input type="number" id="ac-staff-pct" placeholder="—" readonly style="background:var(--surface2);color:var(--text-muted)">
+              <span class="input-unit">%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Whistleblowing (optional) -->
+      <div class="opt-toggle">
+        <input type="checkbox" id="show-whistle" onchange="toggleOpt('whistle-section', this)">
+        <label for="show-whistle">Disclose <strong>whistleblowing channel</strong> <span style="color:var(--text-light);font-size:12px">(optional)</span></label>
+      </div>
+      <div class="opt-section" id="whistle-section">
+        <div class="field" style="margin-top:8px">
+          <div class="field-label">Does your company have a whistleblowing or speak-up channel?</div>
+          <div class="yn-toggle">
+            <button class="yn-btn yes" onclick="selectYN('whistle-policy', true, this)">✓ Yes</button>
+            <button class="yn-btn no" onclick="selectYN('whistle-policy', false, this)">✗ No</button>
+          </div>
+          <input type="hidden" id="whistle-policy" value="">
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ SECTION 4: CERTIFICATIONS ══ -->
+  <div class="section" id="sec-certs">
+    <div class="section-header" onclick="toggleSection('sec-certs')">
+      <div class="sh-left">
+        <div class="sh-num">4</div>
+        <div>
+          <div class="sh-title">Certifications & standards held</div>
+          <div class="sh-sub">Industry, safety, and sustainability certifications</div>
+        </div>
+      </div>
+      <div class="sh-right">
+        <span class="sh-badge optional">Optional</span>
+        <span class="chevron">▾</span>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="field-hint" style="margin-bottom:10px">Select all that apply. These appear in your report and strengthen Governance and Social disclosures.</div>
+
+      <div class="form-divider-label">Environmental</div>
+      <div class="cert-chips" id="cert-env">
+        <span class="cert-chip" onclick="toggleCert(this)">ISO 14001</span>
+        <span class="cert-chip" onclick="toggleCert(this)">BCA Green Mark</span>
+        <span class="cert-chip" onclick="toggleCert(this)">SS ISO 50001 (Energy)</span>
+        <span class="cert-chip" onclick="toggleCert(this)">SolarNova participant</span>
+        <span class="cert-chip" onclick="toggleCert(this)">NEA Waste Management</span>
+      </div>
+
+      <div class="form-divider-label">Safety</div>
+      <div class="cert-chips" id="cert-safety">
+        <span class="cert-chip" onclick="toggleCert(this)">bizSAFE Level 3</span>
+        <span class="cert-chip" onclick="toggleCert(this)">bizSAFE Star ⭐</span>
+        <span class="cert-chip" onclick="toggleCert(this)">ISO 45001</span>
+        <span class="cert-chip" onclick="toggleCert(this)">SPIDB accredited</span>
+      </div>
+
+      <div class="form-divider-label">Quality & management</div>
+      <div class="cert-chips" id="cert-quality">
+        <span class="cert-chip" onclick="toggleCert(this)">ISO 9001</span>
+        <span class="cert-chip" onclick="toggleCert(this)">ISO 27001 (InfoSec)</span>
+        <span class="cert-chip" onclick="toggleCert(this)">PDPA-compliant (DPO appointed)</span>
+        <span class="cert-chip" onclick="toggleCert(this)">HACCP</span>
+        <span class="cert-chip" onclick="toggleCert(this)">Singapore Quality Class (SQC)</span>
+      </div>
+
+      <div class="form-divider-label">Food & hospitality</div>
+      <div class="cert-chips" id="cert-food">
+        <span class="cert-chip" onclick="toggleCert(this)">Halal (MUIS)</span>
+        <span class="cert-chip" onclick="toggleCert(this)">SFA food licence</span>
+        <span class="cert-chip" onclick="toggleCert(this)">Clean Mark (NEA)</span>
+        <span class="cert-chip" onclick="toggleCert(this)">Healthy Meals in Schools</span>
+      </div>
+
+      <div class="form-divider-label">Sustainability & ESG</div>
+      <div class="cert-chips" id="cert-esg">
+        <span class="cert-chip" onclick="toggleCert(this)">UNGC signatory</span>
+        <span class="cert-chip" onclick="toggleCert(this)">EnterpriseSG Sustainability Index</span>
+        <span class="cert-chip" onclick="toggleCert(this)">LowCarbonSG</span>
+        <span class="cert-chip" onclick="toggleCert(this)">B Corp</span>
+      </div>
+
+      <div class="field" style="margin-top:12px">
+        <div class="field-label">Other certifications <span class="opt">(optional)</span></div>
+        <input type="text" id="cert-other" placeholder="e.g. MOM Fair Employment, OHSAS 18001 (legacy)…">
+      </div>
+
+      <div class="note-box">
+        💡 These certifications are listed in your Sustainability Report appendix and in Section 12 (How we manage ESG). They are not verified by ZYT.ESG — you are responsible for their accuracy.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ SECTION 5: FRAMEWORK ALIGNMENT (AUTO) ══ -->
+  <div class="section" id="sec-frameworks">
+    <div class="section-header" onclick="toggleSection('sec-frameworks')">
+      <div class="sh-left">
+        <div class="sh-num">5</div>
+        <div>
+          <div class="sh-title">Reporting framework alignment</div>
+          <div class="sh-sub">Auto-generated — appears in report appendix</div>
+        </div>
+      </div>
+      <div class="sh-right">
+        <span class="auto-tag">Auto</span>
+        <span class="chevron">▾</span>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="info-box">
+        <span class="info-box-icon">⚙️</span>
+        <div>These fields are auto-populated based on your data entry and intent selections. They appear in the report appendix. You may change the assurance level if you have had your report reviewed.</div>
+      </div>
+
+      <div class="form-grid form-grid-2">
+        <div class="field">
+          <div class="field-label">Frameworks declared</div>
+          <input type="text" value="SGX Core ESG Metrics (Apr 2023) · GHG Protocol Corporate Standard" readonly style="background:var(--surface2);color:var(--text-muted);font-size:13px">
+        </div>
+        <div class="field">
+          <div class="field-label">Reporting boundary</div>
+          <input type="text" value="Operational control · Singapore operations" readonly style="background:var(--surface2);color:var(--text-muted);font-size:13px">
+        </div>
+      </div>
+
+      <div class="form-grid form-grid-2" style="margin-top:12px">
+        <div class="field">
+          <div class="field-label">Assurance status</div>
+          <div class="field-hint">Has this report been independently reviewed?</div>
+          <select id="assurance-type">
+            <option value="none">None (self-declared)</option>
+            <option value="internal">Internal review</option>
+            <option value="external">External assurance (limited)</option>
+            <option value="external_reasonable">External assurance (reasonable)</option>
+          </select>
+        </div>
+        <div class="field">
+          <div class="field-label">Emission factor source</div>
+          <input type="text" value="SEFR, NEA Singapore — January 2026" readonly style="background:var(--surface2);color:var(--text-muted);font-size:13px">
+        </div>
+      </div>
+
+      <div id="ungc-framework-row" style="display:none;margin-top:12px">
+        <div class="field">
+          <div class="field-label">UNGC CoP alignment</div>
+          <input type="text" value="UNGC Ten Principles — auto-generated alignment table in appendix" readonly style="background:var(--surface2);color:var(--text-muted);font-size:13px">
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="sgx-footer">
+    <div class="sgx-item">📋 <span>SGX Core ESG Metrics</span> — Governance pillar</div>
+    <div class="sgx-item">📑 <span>GRI 2-9 · 2-16 · 205-2</span></div>
+    <div class="sgx-item" id="ungc-footer" style="display:none">🌐 <span>UNGC Principle 10</span> — Anti-Corruption</div>
+  </div>
+
+</div>
+
+<!-- ACTION BAR -->
+<div class="action-bar">
+  <div class="action-bar-left" id="completion-status">Complete required fields to continue →</div>
+  <div class="action-bar-right">
+    <button class="btn btn-ghost" onclick="window.location.href='S-31-32-social.html'">← Back to Social</button>
+    <button class="btn btn-primary" onclick="saveAndContinue()">Save & view results →</button>
+  </div>
+</div>
+
+<script>
+  function toggleSection(id) {
+    document.getElementById(id).classList.toggle('collapsed');
+  }
+  function toggleOpt(id, cb) {
+    const s = document.getElementById(id);
+    cb.checked ? s.classList.add('visible') : s.classList.remove('visible');
+  }
+
+  function selectFreq(el, val) {
+    document.querySelectorAll('.freq-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('esg-freq').value = val;
+  }
+
+  function selectYN(fieldId, val, btn) {
+    const parent = btn.closest('.yn-toggle');
+    parent.querySelectorAll('.yn-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById(fieldId).value = val ? 'yes' : 'no';
+
+    if (fieldId === 'ac-policy') {
+      document.getElementById('ac-desc-field').style.display = val ? 'block' : 'none';
+    }
+    updateCompletionStatus();
+  }
+
+  function updateMgmtBar() {
+    const total = parseInt(document.getElementById('mgmt-total').value) || 0;
+    const m = parseInt(document.getElementById('mgmt-male').value) || 0;
+    const f = parseInt(document.getElementById('mgmt-female').value) || 0;
+    if (total === 0) { document.getElementById('mgmt-result').textContent = ''; return; }
+    const mPct = (m/total*100).toFixed(0);
+    const fPct = (f/total*100).toFixed(0);
+    document.getElementById('mbar-m').style.width = mPct+'%';
+    document.getElementById('mbar-f').style.width = fPct+'%';
+    document.getElementById('mgmt-result').textContent = `${fPct}% female · ${mPct}% male leadership`;
+    updateCompletionStatus();
+  }
+
+  function toggleCert(el) {
+    el.classList.toggle('selected');
+  }
+
+  // AC training % auto-calc
+  document.addEventListener('input', function(e) {
+    if (e.target.id === 'ac-staff-trained') {
+      const socialData = JSON.parse(localStorage.getItem('zyt_social_data') || '{}');
+      const total = parseInt(socialData.totalEmployees) || 0;
+      const trained = parseInt(e.target.value) || 0;
+      if (total > 0 && trained > 0) {
+        document.getElementById('ac-staff-pct').value = (trained/total*100).toFixed(0);
+      }
+    }
+  });
+
+  function updateCompletionStatus() {
+    const mgmtTotal = parseInt(document.getElementById('mgmt-total').value) || 0;
+    const acPolicy = document.getElementById('ac-policy').value;
+    const done = [mgmtTotal > 0, acPolicy !== ''].filter(Boolean).length;
+    const statusEl = document.getElementById('completion-status');
+    if (done === 2) {
+      statusEl.innerHTML = '<span style="color:var(--green)">✓ Required fields complete</span>';
+    } else {
+      statusEl.textContent = `${done} of 2 required fields complete`;
+    }
+  }
+
+  // UNGC display
+  function checkUNGC() {
+    const isUNGC = localStorage.getItem('zyt_intent_ungc') === 'true' ||
+                   new URLSearchParams(window.location.search).get('ungc') === '1';
+    if (isUNGC) {
+      document.getElementById('ungc-tag').style.display = '';
+      document.getElementById('ungc-footer').style.display = '';
+      document.getElementById('ungc-framework-row').style.display = 'block';
+    }
+  }
+  checkUNGC();
+
+  // Load profile data (ESG person from S-06)
+  const profileData = JSON.parse(localStorage.getItem('zyt_company_profile') || '{}');
+  if (profileData.responsiblePerson) {
+    document.getElementById('esg-person-display').value = profileData.responsiblePerson;
+    document.getElementById('esg-person-role').value = profileData.responsiblePersonRole || '';
+  }
+
+  function saveAndContinue() {
+    const certs = [...document.querySelectorAll('.cert-chip.selected')].map(c => c.textContent);
+    if (document.getElementById('cert-other').value) {
+      certs.push(document.getElementById('cert-other').value);
+    }
+    const data = {
+      esgFrequency: document.getElementById('esg-freq').value,
+      mgmtTotal: document.getElementById('mgmt-total').value,
+      mgmtMale: document.getElementById('mgmt-male').value,
+      mgmtFemale: document.getElementById('mgmt-female').value,
+      acPolicy: document.getElementById('ac-policy').value,
+      acDesc: document.getElementById('ac-desc').value,
+      whistlePolicy: document.getElementById('whistle-policy').value,
+      certifications: certs,
+      assuranceType: document.getElementById('assurance-type').value,
+    };
+    localStorage.setItem('zyt_governance_data', JSON.stringify(data));
+    window.location.href = 'S-19-carbon-overview.html';
+  }
+
+  // Load saved governance data
+  const savedG = localStorage.getItem('zyt_governance_data');
+  if (savedG) {
+    try {
+      const d = JSON.parse(savedG);
+      if (d.mgmtTotal) document.getElementById('mgmt-total').value = d.mgmtTotal;
+      if (d.mgmtMale) document.getElementById('mgmt-male').value = d.mgmtMale;
+      if (d.mgmtFemale) document.getElementById('mgmt-female').value = d.mgmtFemale;
+      if (d.assuranceType) document.getElementById('assurance-type').value = d.assuranceType;
+      if (d.certifications) {
+        d.certifications.forEach(cert => {
+          document.querySelectorAll('.cert-chip').forEach(c => {
+            if (c.textContent === cert) c.classList.add('selected');
+          });
+        });
+      }
+      updateMgmtBar();
+    } catch(e) {}
+  }
+</script>
+</body>
+</html>

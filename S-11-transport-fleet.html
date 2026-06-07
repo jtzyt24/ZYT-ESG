@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transport & Fleet — ZYT.ESG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#15140d;--ink2:#42403a;--ink3:#84827a;--ink4:#c2bfb6;
+  --bg:#f3f0e9;--card:#ffffff;--b1:#e0dbd2;--b2:#eae6de;
+  --s1c:#b04020;--s1b:#fdf0ec;--s1d:#f0c4b4;
+  --s2c:#1a4a8b;--s2b:#edf2fc;--s2d:#b4c8f0;
+  --s3c:#27500a;--s3b:#eaf4ee;--s3d:#b4d9c4;
+  --gc:#1a6b4a;--gb:#eaf4ee;--gd:#b4d9c4;
+  --ac:#7a5a0a;--ab:#fdf3e0;--ad:#e8c87a;
+  --wc:#7a1a1a;--wb:#fdf0ec;--wd:#f0b4b4;
+  --r:10px;--rl:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:14px}
+
+nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30}
+.logo{font-family:'Fraunces',serif;font-size:17px;font-weight:300;display:flex;align-items:center;gap:8px}
+.logo-tag{font-family:'DM Mono',monospace;font-size:10px;color:var(--gc);background:var(--gb);border:1px solid var(--gd);padding:2px 7px;border-radius:20px;letter-spacing:.5px}
+.nav-steps{display:flex;align-items:center;gap:4px;font-size:12px}
+.ns{padding:3px 10px;border-radius:20px;color:var(--ink3)}
+.ns.done{color:var(--gc)}.ns.done::before{content:'✓ ';font-size:10px}
+.ns.active{background:var(--ink);color:white;font-weight:500}
+.ns-sep{color:var(--ink4);font-size:10px}
+.btn-back{font-size:12px;color:var(--ink3);background:transparent;border:.5px solid var(--b1);padding:5px 12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:color .15s,border-color .15s}
+.btn-back:hover{color:var(--ink);border-color:var(--ink3)}
+
+.layout{display:grid;grid-template-columns:1fr 300px;gap:20px;max-width:1060px;margin:0 auto;padding:28px 24px 100px;align-items:start}
+
+/* CLUSTER HEADER */
+.cluster-hdr{background:var(--card);border:1px solid var(--b1);border-radius:var(--rl);padding:20px 22px;margin-bottom:16px;display:flex;align-items:flex-start;gap:14px}
+.hdr-icon{font-size:26px;width:50px;height:50px;background:var(--bg);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hdr-body{flex:1}
+.hdr-name{font-family:'Fraunces',serif;font-size:22px;font-weight:300;letter-spacing:-.3px;margin-bottom:3px}
+.hdr-sub{font-size:12px;color:var(--ink3);line-height:1.5;margin-bottom:8px}
+.hdr-roles{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.hdr-role{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3);background:var(--bg);border:1px solid var(--b2);padding:3px 9px;border-radius:20px}
+.prog-bar{height:3px;background:var(--b2);border-radius:2px;overflow:hidden;margin-top:10px}
+.prog-fill{height:100%;background:var(--gc);border-radius:2px;transition:width .5s ease}
+.prog-label{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);margin-top:4px}
+
+/* SECTION */
+.section{margin-bottom:12px}
+.sec-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card);border:1px solid var(--b1);border-radius:10px 10px 0 0;cursor:pointer;user-select:none}
+.sec-hdr:hover{background:var(--bg)}
+.scope-pill{font-size:10px;font-family:'DM Mono',monospace;font-weight:500;padding:2px 8px;border-radius:8px;white-space:nowrap}
+.s1-pill{background:var(--s1b);color:var(--s1c);border:1px solid var(--s1d)}
+.s2-pill{background:var(--s2b);color:var(--s2c);border:1px solid var(--s2d)}
+.s3-pill{background:var(--s3b);color:var(--s3c);border:1px solid var(--s3d)}
+.sec-title{font-size:13px;font-weight:500;color:var(--ink);flex:1}
+.sec-total{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);transition:color .3s}
+.sec-total.live{color:var(--gc);font-weight:500}
+.sec-chev{width:12px;height:12px;color:var(--ink3);transition:transform .2s;flex-shrink:0}
+.sec-chev.open{transform:rotate(90deg)}
+.sec-body{display:none;background:var(--card);border:1px solid var(--b1);border-top:none;border-radius:0 0 10px 10px;overflow:hidden}
+.sec-body.open{display:block}
+
+/* ACTIVITY */
+.activity{padding:16px;border-bottom:1px solid var(--b2)}
+.activity:last-child{border-bottom:none}
+.act-name-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.act-name{font-size:13px;font-weight:500;color:var(--ink)}
+.opt-tag{font-size:9px;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:6px;background:var(--ab);color:var(--ac);border:1px solid var(--ad)}
+.tip-btn{width:16px;height:16px;border-radius:50%;background:var(--bg);border:1px solid var(--b1);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;color:var(--ink3);font-family:'DM Mono',monospace;font-weight:500;flex-shrink:0;transition:background .15s,color .15s}
+.tip-btn:hover{background:var(--ink);color:white;border-color:var(--ink)}
+.act-sub{font-size:11px;color:var(--ink3);margin-bottom:10px;line-height:1.4}
+.tip-panel{display:none;background:var(--ink);color:white;border-radius:8px;padding:12px 14px;font-size:11px;line-height:1.6;margin-bottom:10px}
+.tip-panel.open{display:block;animation:fadein .15s ease}
+.tip-analogy{margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.15);font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.65)}
+.tip-ef{margin-top:4px;font-size:10px;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace}
+
+/* VEHICLE ENTRIES */
+.vehicle-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.vehicle-entry{background:var(--bg);border:1px solid var(--b1);border-radius:var(--r);padding:12px 14px;position:relative}
+.vehicle-entry.has-data{background:var(--gb);border-color:var(--gd)}
+.ve-top{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:8px}
+.ve-remove{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:transparent;border:.5px solid var(--b1);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:10px;transition:all .15s}
+.ve-remove:hover{background:var(--wb);border-color:var(--wd);color:var(--wc)}
+.ve-result{font-family:'DM Mono',monospace;font-size:11px;color:var(--gc);font-weight:500}
+.ve-result.empty{color:var(--ink4);font-weight:400}
+.add-vehicle-btn{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gc);background:transparent;border:1px dashed var(--gd);padding:8px 14px;border-radius:var(--r);cursor:pointer;width:100%;justify-content:center;transition:all .15s;margin-bottom:10px}
+.add-vehicle-btn:hover{background:var(--gb)}
+.add-vehicle-btn svg{width:12px;height:12px}
+
+/* INPUT MODES */
+.mode-tabs{display:flex;gap:3px;background:var(--bg);border:1px solid var(--b1);border-radius:8px;padding:3px;width:fit-content;margin-bottom:10px}
+.mtab{font-size:11px;padding:5px 11px;border-radius:6px;border:none;background:transparent;color:var(--ink3);cursor:pointer;transition:all .15s;white-space:nowrap}
+.mtab.active{background:var(--card);color:var(--ink);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.mode-panel{display:none}
+.mode-panel.active{display:block}
+
+/* MONTHLY GRID */
+.month-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px}
+.mcell label{display:block;font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);margin-bottom:3px}
+.minp{width:100%;height:32px;border:.5px solid var(--b1);border-radius:6px;background:var(--card);padding:0 7px;font-size:12px;color:var(--ink);outline:none;transition:border-color .15s}
+.minp:focus{border-color:var(--gc)}
+.minp.filled{background:var(--gb);border-color:var(--gd)}
+.month-summary{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:7px 10px;background:var(--bg);border-radius:7px;font-size:11px;color:var(--ink2);margin-bottom:6px}
+.ms-val{font-family:'DM Mono',monospace;font-weight:500;color:var(--ink)}
+.comp-wrap{display:flex;align-items:center;gap:5px;margin-left:auto}
+.comp-bar{width:50px;height:3px;background:var(--b2);border-radius:2px;overflow:hidden}
+.comp-fill{height:100%;background:var(--gc);border-radius:2px;transition:width .3s}
+.comp-lbl{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3)}
+
+/* FIELDS */
+.field-row{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:8px}
+.fwrap{flex:1;min-width:90px}
+.fwrap label{display:block;font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.inp{width:100%;height:36px;border:.5px solid var(--b1);border-radius:7px;background:var(--card);padding:0 10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .15s}
+.inp:focus{border-color:var(--gc)}
+.inp.small{height:32px;font-size:12px}
+.sel{width:100%;height:36px;border:.5px solid var(--b1);border-radius:7px;background:var(--card);padding:0 10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;cursor:pointer;transition:border-color .15s}
+.sel:focus{border-color:var(--gc)}
+.sel.small{height:32px;font-size:12px}
+.unit-box{height:36px;padding:0 10px;background:var(--bg);border:.5px solid var(--b2);border-radius:7px;font-size:11px;color:var(--ink3);display:flex;align-items:center;white-space:nowrap;font-family:'DM Mono',monospace}
+
+/* RESULT PILLS */
+.result-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:.5px solid var(--b2);align-items:center}
+.rpill{display:flex;align-items:center;gap:4px;font-size:11px;padding:3px 9px;border-radius:16px;border:.5px solid;white-space:nowrap}
+.rpill.co2{background:var(--gb);color:var(--gc);border-color:var(--gd)}
+.rpill.cost{background:var(--ab);color:var(--ac);border-color:var(--ad)}
+.rpill.empty{background:var(--bg);color:var(--ink4);border-color:var(--b2)}
+.rpill-val{font-family:'DM Mono',monospace;font-weight:500}
+.acc-tag{font-size:9px;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:6px}
+.acc-h{background:var(--gb);color:var(--gc)}
+.acc-m{background:var(--ab);color:var(--ac)}
+.acc-l{background:var(--wb);color:var(--wc)}
+
+/* COST CONTEXT */
+.cost-context{display:none;margin-top:6px;font-size:11px;color:var(--ac);line-height:1.5;padding:7px 10px;background:var(--ab);border:.5px solid var(--ad);border-radius:7px}
+.cost-context.show{display:block}
+
+/* NA */
+.na-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.na-cb{width:14px;height:14px;cursor:pointer;accent-color:var(--ink3)}
+.na-lbl{font-size:11px;color:var(--ink3);cursor:pointer}
+
+/* CAT LABEL */
+.cat-label{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-family:'DM Mono',monospace;padding:2px 7px;border-radius:6px;margin-bottom:8px}
+.cat4{background:#e8f4e8;color:#1a5a2a;border:.5px solid #a8d8a8}
+.cat6{background:#e8eaf8;color:#2a1a5a;border:.5px solid #a8aad8}
+.cat9{background:#f8e8f4;color:#5a1a4a;border:.5px solid #d8a8cc}
+
+/* ATTACH */
+.attach-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.attach-btn{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3);background:transparent;border:.5px solid var(--b1);padding:4px 10px;border-radius:6px;cursor:pointer;transition:all .15s}
+.attach-btn:hover{color:var(--ink);border-color:var(--ink3)}
+.attach-btn svg{width:12px;height:12px}
+.attach-info{font-size:10px;color:var(--ink3);font-style:italic}
+
+/* SPLIT NOTE */
+.split-note{padding:10px 12px;background:var(--s3b);border:.5px solid var(--s3d);border-radius:8px;font-size:11px;color:var(--s3c);line-height:1.5;margin:0 16px 12px}
+
+/* SUMMARY PANEL */
+.summary-col{position:sticky;top:72px}
+.sum-card{background:var(--ink);border-radius:var(--rl);overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.12)}
+.sum-hdr{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-hdr-title{font-family:'Fraunces',serif;font-size:15px;font-weight:300;color:white;margin-bottom:2px}
+.sum-hdr-sub{font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.35)}
+.sum-scopes{padding:14px 18px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid rgba(255,255,255,.1)}
+.scope-row{display:flex;align-items:flex-start;justify-content:space-between}
+.scope-lbl{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,.55)}
+.scope-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.scope-val{text-align:right}
+.scope-co2{font-family:'Fraunces',serif;font-size:17px;font-weight:300;color:white;line-height:1;transition:all .3s}
+.scope-sgd{font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.35);margin-top:2px}
+.sum-total{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-est-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.3);margin-bottom:5px}
+.sum-total-val{font-family:'Fraunces',serif;font-size:26px;font-weight:300;color:white;line-height:1;letter-spacing:-.5px;transition:all .3s}
+.sum-total-unit{font-size:11px;color:rgba(255,255,255,.4);margin-top:2px}
+.sum-cost-block{margin-top:10px;padding:10px 12px;background:rgba(255,255,255,.06);border-radius:8px;border:.5px solid rgba(255,255,255,.1)}
+.sum-cost-label{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.3);margin-bottom:4px}
+.sum-cost-val{font-family:'Fraunces',serif;font-size:18px;font-weight:300;color:#f0d090;line-height:1;transition:all .3s}
+.sum-cost-desc{font-size:10px;color:rgba(255,255,255,.4);margin-top:3px;line-height:1.4}
+.sum-saving{margin-top:6px;padding:7px 10px;background:rgba(26,107,74,.25);border-radius:6px;font-size:11px;color:#a8e4c4;line-height:1.4}
+.sum-analogy{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-anal-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.25);margin-bottom:5px}
+.sum-anal-text{font-size:11px;color:rgba(255,255,255,.6);line-height:1.55;font-style:italic;min-height:32px;transition:all .3s}
+.sum-ef{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-ef-lbl{font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.25);margin-bottom:6px}
+.ef-row{display:flex;justify-content:space-between;font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.4);margin-bottom:3px}
+.ef-row span:last-child{color:rgba(255,255,255,.6)}
+.sum-actions{padding:14px 18px;display:flex;flex-direction:column;gap:8px}
+.btn-next{width:100%;height:40px;background:white;color:var(--ink);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
+.btn-next:hover{background:#f0ede6}
+.btn-next svg{width:13px;height:13px;transition:transform .15s}
+.btn-next:hover svg{transform:translateX(2px)}
+.btn-save-draft{width:100%;height:36px;background:transparent;color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.12);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s}
+.btn-save-draft:hover{color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.3)}
+
+@keyframes fadein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:768px){.layout{grid-template-columns:1fr}.summary-col{position:static}.nav-steps{display:none}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">ZYT.ESG <span class="logo-tag">ESG</span></div>
+  <div class="nav-steps">
+    <div class="ns done">Profile</div><div class="ns-sep">›</div>
+    <div class="ns active">Data entry</div><div class="ns-sep">›</div>
+    <div class="ns">Results</div><div class="ns-sep">›</div>
+    <div class="ns">Targets</div><div class="ns-sep">›</div>
+    <div class="ns">Report</div>
+  </div>
+  <button class="btn-back">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 2L4 6l4 4"/></svg>
+    Back to hub
+  </button>
+</nav>
+
+<div class="layout">
+<div class="form-col">
+
+<!-- CLUSTER HEADER -->
+<div class="cluster-hdr">
+  <div class="hdr-icon">🚚</div>
+  <div class="hdr-body">
+    <div class="hdr-name">Transport & fleet</div>
+    <div class="hdr-sub">Company vehicles, outsourced freight, business travel, and delivery operations. Covers Scope 1 (company-owned vehicles), Scope 3 Cat 4 (inbound freight), Cat 6 (business travel), and Cat 9 (outbound delivery).</div>
+    <div class="hdr-roles">
+      <div class="hdr-role">
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="6" cy="4" r="2.5"/><path d="M2 11c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>
+        Logistics / operations manager
+      </div>
+      <div class="hdr-role">
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="6" cy="4" r="2.5"/><path d="M2 11c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>
+        Admin / travel booker
+      </div>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="prog-label" id="prog-label">0 of 4 sections completed</div>
+  </div>
+</div>
+
+<!-- ══ SECTION 1: COMPANY VEHICLES (Scope 1) ══ -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('vehicles')">
+    <svg class="sec-chev open" id="chev-vehicles" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s1-pill">Scope 1</span>
+    <span class="sec-title">Company vehicles</span>
+    <span class="sec-total" id="st-vehicles">—</span>
+  </div>
+  <div class="sec-body open" id="body-vehicles">
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">Fuel consumed by company-owned or operated vehicles</div>
+        <span class="tip-btn" onclick="toggleTip('tip-veh')">?</span>
+      </div>
+      <div class="act-sub">Petrol and diesel burned in vehicles your business owns or operates. Add each vehicle type separately for the most accurate calculation.</div>
+      <div class="tip-panel" id="tip-veh">
+        Fuel burned in your company vehicles is a direct (Scope 1) emission — you control the source. If a vehicle is leased and you pay for the fuel, it is still Scope 1. If you reimburse employees for using their personal vehicles for business, that is Scope 3 Cat 6 (business travel).
+        <div class="tip-analogy">🚗 1 litre of petrol ≈ 13 km in a typical Singapore sedan · 1 litre diesel ≈ 12 km in a van</div>
+        <div class="tip-ef">SEFR: Fuel → Combustion → Motor Gasoline: 2.295 kgCO₂/L · Gas/Diesel Oil: 2.660 kgCO₂/L · Source: NEA Singapore</div>
+      </div>
+
+      <div class="vehicle-list" id="vehicle-list"></div>
+
+      <button class="add-vehicle-btn" onclick="addVehicle()">
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 2v8M2 6h8"/></svg>
+        Add vehicle type
+      </button>
+
+      <div class="result-row" id="result-vehicles">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual fuel cost</span></div>
+      </div>
+      <div class="cost-context" id="cost-ctx-veh">
+        💡 This is your annual fuel spend. Route optimisation and driver behaviour coaching can reduce fuel use by 15–20% with zero capital investment.
+      </div>
+
+      <div class="attach-row">
+        <button class="attach-btn" onclick="attachFile('vehicles')">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 1H3a1 1 0 00-1 1v8a1 1 0 001 1h6a1 1 0 001-1V4L8 1z"/><path d="M8 1v3h3"/></svg>
+          Attach fuel card statements / receipts
+        </button>
+        <span class="attach-info">For audit reference — data not extracted</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 2: INBOUND FREIGHT (Scope 3 Cat 4) ══ -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('inbound')">
+    <svg class="sec-chev" id="chev-inbound" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s3-pill">Scope 3</span>
+    <span class="sec-title">Inbound freight — goods coming to you</span>
+    <span class="sec-total" id="st-inbound">—</span>
+  </div>
+  <div class="sec-body" id="body-inbound">
+    <div class="activity">
+      <span class="cat-label cat4">GHG Protocol: Cat 4 — Upstream transportation</span>
+      <div class="act-name-row">
+        <div class="act-name">Third-party logistics / freight (inbound) <span class="opt-tag">optional</span></div>
+        <span class="tip-btn" onclick="toggleTip('tip-inbound')">?</span>
+      </div>
+      <div class="act-sub">Freight your suppliers or a 3PL provider ships to your premises — raw materials, stock, packaging. You don't own the vehicles but you generate the demand.</div>
+      <div class="tip-panel" id="tip-inbound">
+        Upstream transport covers emissions from moving goods to your premises using third-party vehicles. This includes supplier deliveries, import freight, and inbound courier services. You don't control the vehicle, but you create the demand for the trip.
+        <div class="tip-analogy">🚛 Moving 1 tonne of goods 100 km by diesel truck ≈ 10 kg CO₂ (GHG Protocol road freight default)</div>
+        <div class="tip-ef">GHG Protocol default: road freight ~0.1 kgCO₂/tonne-km · No Singapore-specific SEFR factor yet — international default applied</div>
+      </div>
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="inbound-na" onchange="toggleNA('inbound-inputs',this,'inbound')">
+        <label class="na-lbl" for="inbound-na">We don't use third-party freight (we collect our own stock)</label>
+      </div>
+      <div id="inbound-inputs">
+        <div class="mode-tabs" id="inbound-mode-tabs">
+          <button class="mtab active" data-m="inbound-spend" onclick="switchMode('inbound',['inbound-spend','inbound-weight'],'inbound-spend',this)">By annual freight spend</button>
+          <button class="mtab" data-m="inbound-weight" onclick="switchMode('inbound',['inbound-spend','inbound-weight'],'inbound-weight',this)">By weight × distance</button>
+        </div>
+        <div class="mode-panel active" id="inbound-spend">
+          <div class="field-row">
+            <div class="fwrap"><label>Annual freight spend (SGD)</label><input class="inp" type="number" id="inb-sgd" placeholder="e.g. 24,000" oninput="calcInbound()"></div>
+            <div class="unit-box">SGD / yr</div>
+          </div>
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">Spend-based estimate using PACT-3.0 methodology. Check your freight invoices or accounts for annual total.</div>
+        </div>
+        <div class="mode-panel" id="inbound-weight">
+          <div class="field-row">
+            <div class="fwrap"><label>Average shipment weight</label><input class="inp" type="number" id="inb-tonnes" placeholder="e.g. 2" oninput="calcInbound()"></div>
+            <div class="unit-box">tonnes</div>
+            <div class="fwrap"><label>Avg distance per shipment</label><input class="inp" type="number" id="inb-km" placeholder="e.g. 50" oninput="calcInbound()"></div>
+            <div class="unit-box">km</div>
+            <div class="fwrap"><label>Shipments per year</label><input class="inp" type="number" id="inb-trips" placeholder="e.g. 48" oninput="calcInbound()"></div>
+          </div>
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">Tonne-km method — more accurate than spend-based. Multiply weight × distance × trips to get annual tonne-km.</div>
+        </div>
+      </div>
+      <div class="result-row" id="result-inbound">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr (estimated)</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual freight spend</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 3: OUTBOUND DELIVERY (Scope 3 Cat 9) ══ -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('outbound')">
+    <svg class="sec-chev" id="chev-outbound" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s3-pill">Scope 3</span>
+    <span class="sec-title">Outbound delivery — goods going to customers</span>
+    <span class="sec-total" id="st-outbound">—</span>
+  </div>
+  <div class="sec-body" id="body-outbound">
+    <div class="activity">
+      <span class="cat-label cat9">GHG Protocol: Cat 9 — Downstream transportation</span>
+      <div class="act-name-row">
+        <div class="act-name">Delivery to customers (3PL or outsourced) <span class="opt-tag">optional</span></div>
+        <span class="tip-btn" onclick="toggleTip('tip-outbound')">?</span>
+      </div>
+      <div class="act-sub">Freight from your premises to your customers using third-party couriers or delivery services. Separate from inbound freight — this is the downstream leg.</div>
+      <div class="tip-panel" id="tip-outbound">
+        Downstream transport (Cat 9) covers emissions from delivering your goods to customers. This is separate from Cat 4 (inbound) because the responsibility allocation differs — Cat 9 emissions are caused by your sales, not your purchasing.
+        <div class="tip-analogy">📦 1 parcel delivered by van ≈ 0.3–0.7 kg CO₂ depending on distance and van load factor</div>
+        <div class="tip-ef">GHG Protocol default: road freight ~0.1 kgCO₂/tonne-km · Last-mile delivery ~0.15–0.25 kgCO₂/km for small van</div>
+      </div>
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="outbound-na" onchange="toggleNA('outbound-inputs',this,'outbound')">
+        <label class="na-lbl" for="outbound-na">We don't do outbound delivery (customers collect themselves)</label>
+      </div>
+      <div id="outbound-inputs">
+        <div class="mode-tabs" id="outbound-mode-tabs">
+          <button class="mtab active" onclick="switchMode('outbound',['outbound-parcels','outbound-spend'],'outbound-parcels',this)">By number of deliveries</button>
+          <button class="mtab" onclick="switchMode('outbound',['outbound-parcels','outbound-spend'],'outbound-spend',this)">By delivery spend</button>
+        </div>
+        <div class="mode-panel active" id="outbound-parcels">
+          <div class="field-row">
+            <div class="fwrap"><label>Deliveries per month</label><input class="inp" type="number" id="out-parcels" placeholder="e.g. 200" oninput="calcOutbound()"></div>
+            <div class="fwrap"><label>Avg distance per delivery</label><input class="inp" type="number" id="out-km" placeholder="e.g. 8" oninput="calcOutbound()"></div>
+            <div class="unit-box">km</div>
+          </div>
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">Average Singapore last-mile delivery: 5–15 km. Check with your courier provider for route data.</div>
+        </div>
+        <div class="mode-panel" id="outbound-spend">
+          <div class="field-row">
+            <div class="fwrap"><label>Monthly delivery spend (SGD)</label><input class="inp" type="number" id="out-sgd" placeholder="e.g. 2,000" oninput="calcOutbound()"></div>
+            <div class="unit-box">SGD / month</div>
+          </div>
+        </div>
+      </div>
+      <div class="result-row" id="result-outbound">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr (estimated)</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual delivery cost</span></div>
+      </div>
+    </div>
+    <div class="split-note">
+      <strong>Why are inbound and outbound separate?</strong> GHG Protocol assigns inbound freight (Cat 4) to your purchasing activities, and outbound delivery (Cat 9) to your sales. They appear in different sections of your Sustainability Report. Most buyers' Scope 3 requests focus on Cat 4 from their suppliers — your outbound is their inbound.
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 4: BUSINESS TRAVEL (Scope 3 Cat 6) ══ -->
+<div class="section">
+  <div class="sec-hdr" onclick="toggleSec('travel')">
+    <svg class="sec-chev" id="chev-travel" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="scope-pill s3-pill">Scope 3</span>
+    <span class="sec-title">Business travel — flights, ground transport, hotels</span>
+    <span class="sec-total" id="st-travel">—</span>
+  </div>
+  <div class="sec-body" id="body-travel">
+    <span class="cat-label cat6" style="display:block;margin:12px 16px 0">GHG Protocol: Cat 6 — Business travel</span>
+
+    <!-- Flights -->
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">Business flights <span class="opt-tag">optional</span></div>
+        <span class="tip-btn" onclick="toggleTip('tip-flights')">?</span>
+      </div>
+      <div class="act-sub">Flights taken by any staff member for business purposes during the reporting year.</div>
+      <div class="tip-panel" id="tip-flights">
+        Aviation has a high climate impact per km compared to ground transport. Flying business or first class has a higher footprint than economy due to more space per seat. For Singapore-based businesses, short-haul SEA routes are most common.
+        <div class="tip-analogy">✈️ SIN→KUL return economy: ~80 kg CO₂ · SIN→BKK return: ~200 kg · SIN→LHR return: ~2,000 kg per person</div>
+        <div class="tip-ef">ICAO Carbon Emissions Calculator methodology · Radiative forcing multiplier ×2 applied for high-altitude emissions</div>
+      </div>
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="flights-na" onchange="toggleNA('flights-inputs',this,'flights')">
+        <label class="na-lbl" for="flights-na">No business flights this year</label>
+      </div>
+      <div id="flights-inputs">
+        <div class="flight-list" id="flight-list"></div>
+        <button class="add-vehicle-btn" onclick="addFlight()" style="border-color:var(--s3d)">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 2v8M2 6h8"/></svg>
+          Add flight route
+        </button>
+      </div>
+      <div class="result-row" id="result-flights">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>approx. airfare spend</span></div>
+      </div>
+    </div>
+
+    <!-- Ground transport -->
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">Grab, taxi & ground transport (business use) <span class="opt-tag">optional</span></div>
+        <span class="tip-btn" onclick="toggleTip('tip-grab')">?</span>
+      </div>
+      <div class="act-sub">Grab, taxi, or car hire taken for business purposes — client visits, airport transfers, site visits. Not personal commuting.</div>
+      <div class="tip-panel" id="tip-grab">
+        Business ground transport is Scope 3 Cat 6. Grab and taxi rides in Singapore use ICE cars (mostly petrol) — the emission factor per km is similar to a private car. EV Grabs have a lower footprint using Singapore's grid factor.
+        <div class="tip-analogy">🚕 1 km by Grab/taxi (ICE) ≈ 0.173 kg CO₂ · 1 km by EV Grab ≈ 0.062 kg CO₂</div>
+        <div class="tip-ef">SEFR: Land Transport → ICE Car: 0.1732 kgCO₂/person-km · Battery Electric Car: 0.0618 kgCO₂/person-km</div>
+      </div>
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="grab-na" onchange="toggleNA('grab-inputs',this,'grab')">
+        <label class="na-lbl" for="grab-na">No business Grab/taxi this year</label>
+      </div>
+      <div id="grab-inputs">
+        <div class="field-row">
+          <div class="fwrap"><label>Monthly business km (Grab/taxi)</label><input class="inp" type="number" id="grab-km" placeholder="e.g. 200" oninput="calcGrab()"></div>
+          <div class="unit-box">km / month</div>
+          <div class="fwrap"><label>Or annual spend (SGD)</label><input class="inp" type="number" id="grab-sgd" placeholder="SGD / yr" oninput="calcGrabBill()"></div>
+        </div>
+      </div>
+      <div class="result-row" id="result-grab">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual transport spend</span></div>
+      </div>
+    </div>
+
+    <!-- Personal vehicle for business -->
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">Personal vehicle — employee-owned, used for business <span class="opt-tag">optional</span></div>
+        <span class="tip-btn" onclick="toggleTip('tip-personal-veh')">?</span>
+      </div>
+      <div class="act-sub">Staff who use their own cars for client visits, site surveys, deliveries, or other business activities. Covers sales staff, field technicians, and any employee who submits mileage claims.</div>
+      <div class="tip-panel" id="tip-personal-veh">
+        When employees use personal vehicles for business, those emissions are Scope 3 Cat 6 — not Scope 1. The company doesn't own the car, but the business activity creates the trip. If you reimburse mileage, the reimbursement records are your best data source.
+        <div class="tip-analogy">🚗 A sales executive doing 8 client visits/week at 10 km average ≈ 80 km/week × 48 weeks = 3,840 km/year ≈ 0.66 tCO₂e</div>
+        <div class="tip-ef">SEFR: Land Transport → ICE Car: 0.1732 kgCO₂/person-km · EV: 0.0618 kgCO₂/person-km · Source: MOT Singapore</div>
+      </div>
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="pv-na" onchange="toggleNA('pv-inputs',this,'pv')">
+        <label class="na-lbl" for="pv-na">No staff use personal vehicles for business</label>
+      </div>
+      <div id="pv-inputs">
+        <div class="mode-tabs" id="pv-mode-tabs">
+          <button class="mtab active" onclick="switchMode('pv',['pv-reimburse','pv-km'],'pv-reimburse',this)">By mileage reimbursement (SGD)</button>
+          <button class="mtab" onclick="switchMode('pv',['pv-reimburse','pv-km'],'pv-km',this)">By km driven</button>
+        </div>
+        <div class="mode-panel active" id="pv-reimburse">
+          <div class="field-row">
+            <div class="fwrap">
+              <label>Total annual mileage reimbursement paid (SGD)</label>
+              <input class="inp" type="number" id="pv-sgd" placeholder="e.g. 4,800" oninput="calcPersonalVeh()">
+            </div>
+            <div class="unit-box">SGD / yr</div>
+            <div class="fwrap" style="flex:.6;min-width:80px">
+              <label>Rate per km</label>
+              <input class="inp" type="number" id="pv-rate" value="0.60" step="0.05" oninput="calcPersonalVeh()">
+            </div>
+            <div class="unit-box">SGD / km</div>
+          </div>
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">Typical Singapore rate: SGD 0.55–0.65/km. Check your expense claim records or HR reimbursement policy. Total km = reimbursement ÷ rate.</div>
+        </div>
+        <div class="mode-panel" id="pv-km">
+          <div class="field-row">
+            <div class="fwrap">
+              <label>Number of staff using personal vehicles</label>
+              <input class="inp" type="number" id="pv-staff" placeholder="e.g. 3" oninput="calcPersonalVehKm()">
+            </div>
+            <div class="fwrap">
+              <label>Average business km per week per staff</label>
+              <input class="inp" type="number" id="pv-km-pw" placeholder="e.g. 80" oninput="calcPersonalVehKm()">
+            </div>
+            <div class="unit-box">km / week</div>
+          </div>
+          <div class="field-row">
+            <div class="fwrap" style="flex:.5">
+              <label>Vehicle type (most common)</label>
+              <select class="sel" id="pv-fuel-type" onchange="calcPersonalVehKm()">
+                <option value="0.1732">Petrol / ICE car (0.173 kgCO₂/km)</option>
+                <option value="0.1343">Hybrid car (0.134 kgCO₂/km)</option>
+                <option value="0.0618">Electric car (0.062 kgCO₂/km)</option>
+              </select>
+            </div>
+            <div class="fwrap" style="flex:.4;min-width:80px">
+              <label>Working weeks / yr</label>
+              <input class="inp" type="number" id="pv-weeks" value="48" min="1" max="52" oninput="calcPersonalVehKm()">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="result-row" id="result-personal-veh">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>annual mileage reimbursement</span></div>
+      </div>
+    </div>
+
+    <!-- Hotels -->
+    <div class="activity">
+      <div class="act-name-row">
+        <div class="act-name">Hotel stays (business travel) <span class="opt-tag">optional</span></div>
+        <span class="tip-btn" onclick="toggleTip('tip-hotels')">?</span>
+      </div>
+      <div class="act-sub">Nights stayed in hotels during business travel by any staff member.</div>
+      <div class="tip-panel" id="tip-hotels">
+        Hotel stays generate emissions from electricity, heating/cooling, and other hotel operations. The emission factor varies significantly by hotel type and location. We use an average global estimate.
+        <div class="tip-analogy">🏨 1 night in a standard hotel ≈ 20–40 kg CO₂ depending on hotel type and location</div>
+        <div class="tip-ef">GHG Protocol: ~20 kgCO₂e/night (budget/standard) to ~60 kgCO₂e/night (luxury) · Using 30 kgCO₂e/night default</div>
+      </div>
+      <div class="na-row">
+        <input type="checkbox" class="na-cb" id="hotels-na" onchange="toggleNA('hotels-inputs',this,'hotels')">
+        <label class="na-lbl" for="hotels-na">No hotel stays for business this year</label>
+      </div>
+      <div id="hotels-inputs">
+        <div class="field-row">
+          <div class="fwrap"><label>Total hotel nights per year</label><input class="inp" type="number" id="hotel-nights" placeholder="e.g. 30" oninput="calcHotels()"></div>
+          <div class="unit-box">nights / yr</div>
+          <div class="fwrap"><label>Hotel type</label>
+            <select class="sel" id="hotel-type" onchange="calcHotels()">
+              <option value="20">Budget / 2-star (~20 kg CO₂/night)</option>
+              <option value="30" selected>Standard / 3-star (~30 kg CO₂/night)</option>
+              <option value="50">Business / 4-star (~50 kg CO₂/night)</option>
+              <option value="70">Luxury / 5-star (~70 kg CO₂/night)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="result-row" id="result-hotels">
+        <div class="rpill empty"><span class="rpill-val">—</span><span>tCO₂e / yr</span></div>
+        <div class="rpill empty"><span class="rpill-val">—</span><span>approx. hotel spend</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- /form-col -->
+
+<!-- ══ SUMMARY PANEL ══ -->
+<div class="summary-col">
+<div class="sum-card">
+  <div class="sum-hdr">
+    <div class="sum-hdr-title">Estimated cluster total</div>
+    <div class="sum-hdr-sub">Transport & fleet · 2024</div>
+  </div>
+  <div class="sum-scopes">
+    <div class="scope-row">
+      <div class="scope-lbl"><div class="scope-dot" style="background:#f4a88a"></div>Scope 1 — company vehicles</div>
+      <div class="scope-val"><div class="scope-co2" id="sum-s1">0</div><div class="scope-sgd" id="sum-s1-sgd">—</div></div>
+    </div>
+    <div class="scope-row">
+      <div class="scope-lbl"><div class="scope-dot" style="background:#a8d4a8"></div>Scope 3 Cat 4 — inbound freight</div>
+      <div class="scope-val"><div class="scope-co2" id="sum-s3c4">0</div><div class="scope-sgd" id="sum-s3c4-sgd">—</div></div>
+    </div>
+    <div class="scope-row">
+      <div class="scope-lbl"><div class="scope-dot" style="background:#c4a8d4"></div>Scope 3 Cat 6 — business travel</div>
+      <div class="scope-val"><div class="scope-co2" id="sum-s3c6">0</div><div class="scope-sgd" id="sum-s3c6-sgd">—</div></div>
+    </div>
+    <div class="scope-row">
+      <div class="scope-lbl"><div class="scope-dot" style="background:#d4c8a8"></div>Scope 3 Cat 9 — outbound delivery</div>
+      <div class="scope-val"><div class="scope-co2" id="sum-s3c9">0</div><div class="scope-sgd" id="sum-s3c9-sgd">—</div></div>
+    </div>
+  </div>
+  <div class="sum-total">
+    <div class="sum-est-lbl">Estimated total</div>
+    <div class="sum-total-val" id="sum-total">0</div>
+    <div class="sum-total-unit">tCO₂e / year</div>
+    <div class="sum-cost-block">
+      <div class="sum-cost-label">What you spend on transport</div>
+      <div class="sum-cost-val" id="sum-cost">—</div>
+      <div class="sum-cost-desc">Actual annual fuel + freight + travel spend. Reducing emissions reduces these operating costs directly.</div>
+      <div class="sum-saving" id="sum-saving" style="display:none">
+        💡 A 15% fuel reduction could save approximately <strong id="sum-saving-val">—</strong>/year
+      </div>
+    </div>
+  </div>
+  <div class="sum-analogy">
+    <div class="sum-anal-lbl">What this means</div>
+    <div class="sum-anal-text" id="sum-analogy">Enter your vehicle or freight data to see your transport carbon footprint.</div>
+  </div>
+  <div class="sum-ef">
+    <div class="sum-ef-lbl">Emission factors used</div>
+    <div class="ef-row"><span>Petrol (NEA/SEFR)</span><span>2.295 kgCO₂/litre</span></div>
+    <div class="ef-row"><span>Diesel (NEA/SEFR)</span><span>2.660 kgCO₂/litre</span></div>
+    <div class="ef-row"><span>Road freight (GHG Protocol)</span><span>~0.1 kgCO₂/tonne-km</span></div>
+    <div class="ef-row"><span>Grab/taxi ICE (SEFR MOT)</span><span>0.173 kgCO₂/person-km</span></div>
+    <div class="ef-row"><span>Hotel stay (GHG Protocol)</span><span>20–70 kgCO₂/night</span></div>
+  </div>
+  <div class="sum-actions">
+    <button class="btn-next" onclick="saveAndNext()">
+      Save & go to Cooling & refrigeration
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg>
+    </button>
+    <button class="btn-save-draft">Save & exit</button>
+  </div>
+</div>
+</div>
+
+</div><!-- /layout -->
+
+<script>
+// ── CONSTANTS ──
+const EF = {
+  petrol: 2.295,    // kgCO₂/litre (3080.755 × 0.745 / 1000)
+  diesel: 2.660,    // kgCO₂/litre (3196.749 × 0.832 / 1000)
+  lpg: 1.644,       // kgCO₂/litre (2987.208 × 0.55 / 1000)
+  cng_kg: 2.163,    // kgCO₂/kg (IPCC default)
+  freight_road: 0.1, // kgCO₂/tonne-km (GHG Protocol default)
+  grab_ice: 0.1732, // kgCO₂/person-km (SEFR MOT)
+  grab_ev: 0.0618,  // kgCO₂/person-km (SEFR MOT)
+  // Flight EFs (kgCO₂/passenger-km, economy, incl radiative forcing ×2)
+  flight_short: 0.255, // <3000 km
+  flight_medium: 0.195, // 3000-6000 km
+  flight_long: 0.150,   // >6000 km
+};
+
+const PRICE = {
+  petrol: 3.20,    // SGD/litre (Singapore pump Q2 2026)
+  diesel: 2.80,    // SGD/litre
+  lpg: 1.50,       // SGD/litre
+  freight_per_sgd: 1.0,  // spend is direct
+  grab_per_km: 1.20,     // SGD/km estimate
+  hotel_per_night: { 20: 100, 30: 180, 50: 280, 70: 450 }, // SGD/night
+};
+
+// Flight routes lookup (km one-way from Singapore)
+const ROUTES = {
+  'SIN-KUL (Kuala Lumpur)': 315,
+  'SIN-JKT (Jakarta)': 895,
+  'SIN-BKK (Bangkok)': 1430,
+  'SIN-MNL (Manila)': 2400,
+  'SIN-HKG (Hong Kong)': 2570,
+  'SIN-CGK (Jakarta)': 895,
+  'SIN-ICN (Seoul)': 4700,
+  'SIN-NRT (Tokyo)': 5300,
+  'SIN-SYD (Sydney)': 6300,
+  'SIN-LHR (London)': 10840,
+  'SIN-FRA (Frankfurt)': 10250,
+  'SIN-JFK (New York)': 15340,
+  'SIN-LAX (Los Angeles)': 14100,
+  'Custom route': 0,
+};
+
+// ── STATE ──
+const S = {
+  personal_veh: 0, personal_veh_sgd: 0,
+  vehicles: [],   // [{fuel, litres_yr, cost_yr, co2}]
+  inbound: 0, inbound_sgd: 0,
+  outbound: 0, outbound_sgd: 0,
+  flights: [],    // [{km, pax, co2, cost}]
+  grab: 0, grab_sgd: 0,
+  hotels: 0, hotel_sgd: 0,
+};
+
+let vehicleCount = 0;
+let flightCount = 0;
+
+// ── VEHICLE ENTRY ──
+const FUEL_TYPES = [
+  { val:'petrol', label:'Petrol', ef:EF.petrol, price:PRICE.petrol, unit:'litres' },
+  { val:'diesel', label:'Diesel', ef:EF.diesel, price:PRICE.diesel, unit:'litres' },
+  { val:'lpg',    label:'LPG',    ef:EF.lpg,    price:PRICE.lpg,    unit:'litres' },
+  { val:'cng',    label:'CNG',    ef:EF.cng_kg, price:2.50,         unit:'kg' },
+  { val:'ev',     label:'Electric (EV)', ef:0, price:0, unit:'kWh' },
+];
+
+function addVehicle() {
+  vehicleCount++;
+  const id = 'v' + vehicleCount;
+  const div = document.createElement('div');
+  div.className = 'vehicle-entry';
+  div.id = 'entry-' + id;
+  div.innerHTML = `
+    <button class="ve-remove" onclick="removeVehicle('${id}')" title="Remove">✕</button>
+    <div class="ve-top">
+      <div class="fwrap" style="min-width:110px">
+        <label style="font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:block">Vehicle type / name</label>
+        <input class="inp small" type="text" id="${id}-name" placeholder="e.g. Delivery van 1" style="height:32px;font-size:12px">
+      </div>
+      <div class="fwrap" style="min-width:100px">
+        <label style="font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:block">Fuel type</label>
+        <select class="sel small" id="${id}-fuel" onchange="calcVehicleEntry('${id}')">
+          ${FUEL_TYPES.map(f=>`<option value="${f.val}">${f.label}</option>`).join('')}
+        </select>
+      </div>
+      <div class="fwrap" style="min-width:80px">
+        <label style="font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:block">Monthly fuel</label>
+        <input class="inp small" type="number" id="${id}-litres" placeholder="litres" oninput="calcVehicleEntry('${id}')">
+      </div>
+      <div class="unit-box" id="${id}-unit" style="height:32px;font-size:11px">L/mo</div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div class="ve-result empty" id="${id}-result">Enter monthly fuel to calculate</div>
+      <div style="display:flex;gap:4px;align-items:center;margin-left:auto">
+        <span style="font-size:10px;color:var(--ink3)">Or enter by km/month:</span>
+        <input class="inp" type="number" id="${id}-km" placeholder="km" oninput="calcVehicleFromKm('${id}')" style="height:28px;width:70px;font-size:11px">
+        <input class="inp" type="number" id="${id}-eff" placeholder="km/L" oninput="calcVehicleFromKm('${id}')" style="height:28px;width:55px;font-size:11px">
+      </div>
+    </div>`;
+  document.getElementById('vehicle-list').appendChild(div);
+  S.vehicles.push({ id, co2:0, cost:0, litres_yr:0 });
+}
+
+function removeVehicle(id) {
+  document.getElementById('entry-' + id).remove();
+  const idx = S.vehicles.findIndex(v=>v.id===id);
+  if (idx>-1) S.vehicles.splice(idx,1);
+  updateVehicleTotals();
+}
+
+function calcVehicleEntry(id) {
+  const fuel = document.getElementById(id+'-fuel').value;
+  const fuelData = FUEL_TYPES.find(f=>f.val===fuel);
+  const litres = parseFloat(document.getElementById(id+'-litres').value)||0;
+  const unitEl = document.getElementById(id+'-unit');
+  if (unitEl) unitEl.textContent = fuelData.unit+'/mo';
+  const litres_yr = litres * 12;
+  const co2 = fuel==='ev' ? 0 : litres_yr * fuelData.ef / 1000;
+  const cost = litres_yr * fuelData.price;
+  const resEl = document.getElementById(id+'-result');
+  const entry = document.getElementById('entry-'+id);
+  if (litres > 0) {
+    resEl.className = 've-result';
+    resEl.textContent = `~ ${co2.toFixed(2)} tCO₂e/yr · ≈ SGD ${Math.round(cost).toLocaleString()}/yr fuel cost`;
+    entry.classList.add('has-data');
+  } else {
+    resEl.className = 've-result empty';
+    resEl.textContent = 'Enter monthly fuel to calculate';
+    entry.classList.remove('has-data');
+  }
+  const v = S.vehicles.find(v=>v.id===id);
+  if (v) { v.co2=co2; v.cost=cost; v.litres_yr=litres_yr; }
+  updateVehicleTotals();
+}
+
+function calcVehicleFromKm(id) {
+  const km = parseFloat(document.getElementById(id+'-km').value)||0;
+  const eff = parseFloat(document.getElementById(id+'-eff').value)||0;
+  if (km>0 && eff>0) {
+    const litres = km/eff;
+    document.getElementById(id+'-litres').value = litres.toFixed(1);
+    calcVehicleEntry(id);
+  }
+}
+
+function updateVehicleTotals() {
+  const totalCo2 = S.vehicles.reduce((a,v)=>a+v.co2, 0);
+  const totalCost = S.vehicles.reduce((a,v)=>a+v.cost, 0);
+  const r = document.getElementById('result-vehicles').querySelectorAll('.rpill');
+  if (totalCo2 > 0) {
+    r[0].className='rpill co2'; r[0].innerHTML=`<span class="rpill-val">~ ${totalCo2.toFixed(2)}</span><span>tCO₂e / yr</span>`;
+    r[1].className='rpill cost'; r[1].innerHTML=`<span class="rpill-val">≈ SGD ${Math.round(totalCost).toLocaleString()}</span><span>annual fuel cost</span>`;
+    document.getElementById('cost-ctx-veh').className='cost-context show';
+    document.getElementById('st-vehicles').textContent=`~ ${totalCo2.toFixed(1)} tCO₂e`;
+    document.getElementById('st-vehicles').className='sec-total live';
+  } else {
+    r[0].className='rpill empty'; r[0].innerHTML='<span class="rpill-val">—</span><span>tCO₂e / yr</span>';
+    r[1].className='rpill empty'; r[1].innerHTML='<span class="rpill-val">—</span><span>annual fuel cost</span>';
+    document.getElementById('st-vehicles').textContent='—'; document.getElementById('st-vehicles').className='sec-total';
+  }
+  S.s1_co2 = totalCo2; S.s1_sgd = totalCost;
+  updateSummary();
+}
+
+// ── FLIGHT ENTRY ──
+function addFlight() {
+  flightCount++;
+  const id = 'f' + flightCount;
+  const div = document.createElement('div');
+  div.className = 'vehicle-entry';
+  div.id = 'fentry-' + id;
+  const routeOptions = Object.keys(ROUTES).map(r=>`<option value="${r}">${r}</option>`).join('');
+  div.innerHTML = `
+    <button class="ve-remove" onclick="removeFlight('${id}')" title="Remove">✕</button>
+    <div class="ve-top">
+      <div class="fwrap" style="min-width:160px">
+        <label style="font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:block">Route</label>
+        <select class="sel small" id="${id}-route" onchange="calcFlightEntry('${id}')">
+          ${routeOptions}
+        </select>
+      </div>
+      <div id="${id}-custom-km-wrap" style="display:none">
+        <div class="fwrap" style="min-width:80px">
+          <label style="font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:block">Distance (km)</label>
+          <input class="inp small" type="number" id="${id}-custom-km" placeholder="one-way km" oninput="calcFlightEntry('${id}')">
+        </div>
+      </div>
+      <div class="fwrap" style="min-width:80px">
+        <label style="font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:block">Return trips</label>
+        <input class="inp small" type="number" id="${id}-trips" placeholder="e.g. 4" min="1" oninput="calcFlightEntry('${id}')">
+      </div>
+      <div class="fwrap" style="min-width:60px">
+        <label style="font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:block">Pax</label>
+        <input class="inp small" type="number" id="${id}-pax" value="1" min="1" oninput="calcFlightEntry('${id}')">
+      </div>
+      <div class="fwrap" style="min-width:80px">
+        <label style="font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:block">Cabin</label>
+        <select class="sel small" id="${id}-cabin" onchange="calcFlightEntry('${id}')">
+          <option value="1.0">Economy</option>
+          <option value="1.5">Business</option>
+          <option value="2.0">First</option>
+        </select>
+      </div>
+    </div>
+    <div class="ve-result empty" id="${id}-result">Enter route and trip count</div>`;
+  document.getElementById('flight-list').appendChild(div);
+  S.flights.push({ id, co2:0, cost:0 });
+  // Watch for custom route
+  document.getElementById(id+'-route').addEventListener('change', function() {
+    document.getElementById(id+'-custom-km-wrap').style.display = this.value==='Custom route' ? 'block' : 'none';
+  });
+}
+
+function removeFlight(id) {
+  document.getElementById('fentry-'+id).remove();
+  const idx = S.flights.findIndex(f=>f.id===id);
+  if (idx>-1) S.flights.splice(idx,1);
+  updateFlightTotals();
+}
+
+function calcFlightEntry(id) {
+  const routeKey = document.getElementById(id+'-route').value;
+  let km = ROUTES[routeKey];
+  if (routeKey==='Custom route') km = parseFloat(document.getElementById(id+'-custom-km').value)||0;
+  const trips = parseFloat(document.getElementById(id+'-trips').value)||0;
+  const pax = parseFloat(document.getElementById(id+'-pax').value)||1;
+  const cabinMult = parseFloat(document.getElementById(id+'-cabin').value)||1.0;
+  if (!km||!trips) return;
+  const totalKm = km * 2 * trips * pax; // return trip × number of trips × passengers
+  const efPerKm = km < 3000 ? EF.flight_short : km < 6000 ? EF.flight_medium : EF.flight_long;
+  const co2 = totalKm * efPerKm * cabinMult / 1000;
+  const cost = trips * pax * km * 0.12; // very rough: ~SGD 0.12/km as average fare proxy
+  const f = S.flights.find(f=>f.id===id);
+  if (f) { f.co2=co2; f.cost=cost; }
+  const resEl = document.getElementById(id+'-result');
+  resEl.className = 've-result';
+  resEl.textContent = `~ ${co2.toFixed(2)} tCO₂e · ${trips} return trip${trips>1?'s':''} × ${pax} pax`;
+  document.getElementById('fentry-'+id).classList.add('has-data');
+  updateFlightTotals();
+}
+
+function updateFlightTotals() {
+  const totalCo2 = S.flights.reduce((a,f)=>a+f.co2,0)+S.grab+S.hotels+(S.personal_veh||0);
+  const totalCost = S.flights.reduce((a,f)=>a+f.cost,0)+S.grab_sgd+S.hotel_sgd+(S.personal_veh_sgd||0);
+  const r = document.getElementById('result-flights').querySelectorAll('.rpill');
+  const flightCo2 = S.flights.reduce((a,f)=>a+f.co2,0);
+  if (flightCo2>0) {
+    r[0].className='rpill co2'; r[0].innerHTML=`<span class="rpill-val">~ ${flightCo2.toFixed(2)}</span><span>tCO₂e / yr</span>`;
+    r[1].className='rpill cost'; r[1].innerHTML=`<span class="rpill-val">≈ SGD ${Math.round(S.flights.reduce((a,f)=>a+f.cost,0)).toLocaleString()}</span><span>approx. airfare</span>`;
+    document.getElementById('st-travel').textContent=`~ ${totalCo2.toFixed(1)} tCO₂e`;
+    document.getElementById('st-travel').className='sec-total live';
+  }
+  S.s3c6_co2 = totalCo2; S.s3c6_sgd = totalCost;
+  updateSummary();
+}
+
+// ── INBOUND FREIGHT ──
+function calcInbound() {
+  const mode = document.querySelector('#inbound-mode-tabs .mtab.active').dataset.m;
+  let co2=0, sgd=0;
+  if (mode==='inbound-spend') {
+    sgd = parseFloat(document.getElementById('inb-sgd').value)||0;
+    // Spend-based: rough EF for road freight SGD → tonne-km. Assume SGD 500/tonne as proxy → then × 0.1 kgCO₂/tonne-km × avg 100km
+    co2 = sgd * 0.00002; // very rough spend-based
+  } else {
+    const t = parseFloat(document.getElementById('inb-tonnes').value)||0;
+    const km = parseFloat(document.getElementById('inb-km').value)||0;
+    const trips = parseFloat(document.getElementById('inb-trips').value)||0;
+    co2 = t * km * trips * EF.freight_road / 1000;
+    sgd = 0; // no cost data in this mode
+  }
+  S.inbound=co2; S.inbound_sgd=sgd;
+  const r=document.getElementById('result-inbound').querySelectorAll('.rpill');
+  if (co2>0) {
+    r[0].className='rpill co2'; r[0].innerHTML=`<span class="rpill-val">~ ${co2.toFixed(2)}</span><span>tCO₂e / yr (estimated)</span>`;
+    if (sgd>0) { r[1].className='rpill cost'; r[1].innerHTML=`<span class="rpill-val">≈ SGD ${Math.round(sgd).toLocaleString()}</span><span>annual freight spend</span>`; }
+    document.getElementById('st-inbound').textContent=`~ ${co2.toFixed(2)} tCO₂e`;
+    document.getElementById('st-inbound').className='sec-total live';
+  }
+  updateSummary();
+}
+
+// ── OUTBOUND DELIVERY ──
+function calcOutbound() {
+  const mode = document.querySelector('#outbound-mode-tabs .mtab.active').dataset.m || 'outbound-parcels';
+  let co2=0, sgd=0;
+  const parcels = parseFloat(document.getElementById('out-parcels').value)||0;
+  const km = parseFloat(document.getElementById('out-km').value)||0;
+  const spd = parseFloat(document.getElementById('out-sgd').value)||0;
+  if (mode==='outbound-parcels' && parcels && km) {
+    // Van last-mile: 0.2 kgCO₂/km (small diesel van, partial load)
+    co2 = parcels * 12 * km * 0.0002;
+    sgd = parcels * 12 * 3.50; // rough SGD 3.50/delivery
+  } else if (spd) {
+    co2 = spd * 12 * 0.00002; sgd = spd * 12;
+  }
+  S.outbound=co2; S.outbound_sgd=sgd;
+  const r=document.getElementById('result-outbound').querySelectorAll('.rpill');
+  if (co2>0) {
+    r[0].className='rpill co2'; r[0].innerHTML=`<span class="rpill-val">~ ${co2.toFixed(2)}</span><span>tCO₂e / yr (estimated)</span>`;
+    if (sgd>0) { r[1].className='rpill cost'; r[1].innerHTML=`<span class="rpill-val">≈ SGD ${Math.round(sgd).toLocaleString()}</span><span>annual delivery cost</span>`; }
+    document.getElementById('st-outbound').textContent=`~ ${co2.toFixed(2)} tCO₂e`;
+    document.getElementById('st-outbound').className='sec-total live';
+  }
+  updateSummary();
+}
+
+// ── GRAB ──
+function calcGrab() {
+  const km = (parseFloat(document.getElementById('grab-km').value)||0)*12;
+  S.grab = km * EF.grab_ice / 1000;
+  S.grab_sgd = km * PRICE.grab_per_km;
+  document.getElementById('grab-sgd').value='';
+  updateGrabResult();
+}
+function calcGrabBill() {
+  const sgd = (parseFloat(document.getElementById('grab-sgd').value)||0);
+  S.grab_sgd = sgd;
+  const km = sgd / PRICE.grab_per_km;
+  S.grab = km * EF.grab_ice / 1000;
+  updateGrabResult();
+}
+function updateGrabResult() {
+  const r=document.getElementById('result-grab').querySelectorAll('.rpill');
+  if (S.grab>0) {
+    r[0].className='rpill co2'; r[0].innerHTML=`<span class="rpill-val">~ ${S.grab.toFixed(3)}</span><span>tCO₂e / yr</span>`;
+    r[1].className='rpill cost'; r[1].innerHTML=`<span class="rpill-val">≈ SGD ${Math.round(S.grab_sgd).toLocaleString()}</span><span>annual transport spend</span>`;
+  }
+  updateFlightTotals();
+}
+
+// ── HOTELS ──
+function calcHotels() {
+  const nights = parseFloat(document.getElementById('hotel-nights').value)||0;
+  const efPerNight = parseFloat(document.getElementById('hotel-type').value)||30;
+  S.hotels = nights * efPerNight / 1000;
+  S.hotel_sgd = nights * (PRICE.hotel_per_night[efPerNight]||180);
+  const r=document.getElementById('result-hotels').querySelectorAll('.rpill');
+  if (S.hotels>0) {
+    r[0].className='rpill co2'; r[0].innerHTML=`<span class="rpill-val">~ ${S.hotels.toFixed(3)}</span><span>tCO₂e / yr</span>`;
+    r[1].className='rpill cost'; r[1].innerHTML=`<span class="rpill-val">≈ SGD ${Math.round(S.hotel_sgd).toLocaleString()}</span><span>approx. hotel spend</span>`;
+  }
+  updateFlightTotals();
+}
+
+// ── TOGGLE / TOGGLE NA / MODE SWITCH ──
+function toggleSec(id) {
+  const body=document.getElementById('body-'+id);
+  const chev=document.getElementById('chev-'+id);
+  const open=body.classList.contains('open');
+  body.classList.toggle('open',!open);
+  chev.classList.toggle('open',!open);
+}
+function toggleTip(id) { document.getElementById(id).classList.toggle('open'); }
+function toggleNA(inputId, cb, key) {
+  const el=document.getElementById(inputId);
+  el.style.opacity=cb.checked?'0.3':'1';
+  el.style.pointerEvents=cb.checked?'none':'';
+  updateSummary();
+}
+function switchMode(group, panels, activeId, btn) {
+  const tabParent=btn.parentElement;
+  tabParent.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  panels.forEach(p=>document.getElementById(p).classList.toggle('active',p===activeId));
+}
+
+// ── SUMMARY ──
+S.s1_co2=0; S.s1_sgd=0; S.s3c6_co2=0; S.s3c6_sgd=0;
+function updateSummary() {
+  const s1 = S.vehicles?.reduce ? S.vehicles.reduce((a,v)=>a+v.co2,0) : 0;
+  const s1sgd = S.vehicles?.reduce ? S.vehicles.reduce((a,v)=>a+v.cost,0) : 0;
+  const flightsCo2 = S.flights?.reduce ? S.flights.reduce((a,f)=>a+f.co2,0) : 0;
+  const flightsSgd = S.flights?.reduce ? S.flights.reduce((a,f)=>a+f.cost,0) : 0;
+  const s3c6 = flightsCo2 + S.grab + S.hotels;
+  const s3c6sgd = flightsSgd + S.grab_sgd + S.hotel_sgd;
+  const total = s1 + S.inbound + s3c6 + S.outbound;
+  const totalSgd = s1sgd + S.inbound_sgd + s3c6sgd + S.outbound_sgd;
+
+  document.getElementById('sum-s1').textContent = s1.toFixed(2);
+  document.getElementById('sum-s3c4').textContent = S.inbound.toFixed(2);
+  document.getElementById('sum-s3c6').textContent = s3c6.toFixed(2);
+  document.getElementById('sum-s3c9').textContent = S.outbound.toFixed(2);
+  document.getElementById('sum-total').textContent = total.toFixed(2);
+  document.getElementById('sum-s1-sgd').textContent = s1sgd>0 ? '≈ SGD '+Math.round(s1sgd).toLocaleString() : '—';
+  document.getElementById('sum-s3c4-sgd').textContent = S.inbound_sgd>0 ? '≈ SGD '+Math.round(S.inbound_sgd).toLocaleString() : '—';
+  document.getElementById('sum-s3c6-sgd').textContent = s3c6sgd>0 ? '≈ SGD '+Math.round(s3c6sgd).toLocaleString() : '—';
+  document.getElementById('sum-s3c9-sgd').textContent = S.outbound_sgd>0 ? '≈ SGD '+Math.round(S.outbound_sgd).toLocaleString() : '—';
+
+  if (totalSgd>0) {
+    document.getElementById('sum-cost').textContent='≈ SGD '+Math.round(totalSgd).toLocaleString()+' / yr';
+    document.getElementById('sum-saving').style.display='block';
+    document.getElementById('sum-saving-val').textContent='SGD '+Math.round(s1sgd*0.15).toLocaleString();
+  } else {
+    document.getElementById('sum-cost').textContent='—';
+    document.getElementById('sum-saving').style.display='none';
+  }
+  if (total>0) {
+    const carKm=Math.round(total*1000/0.173);
+    document.getElementById('sum-analogy').textContent=`${total.toFixed(1)} tCO₂e is equivalent to a petrol car driving ${carKm.toLocaleString()} km, or taking ${Math.round(total*1000/80)} return flights Singapore–Kuala Lumpur.`;
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  let done=0;
+  if(S.vehicles&&S.vehicles.length>0&&S.vehicles.some(v=>v.co2>0)) done++;
+  else if(S.vehicles&&S.vehicles.length===0) done=0;
+  if(document.getElementById('inbound-na')?.checked||S.inbound>0) done++;
+  if(document.getElementById('outbound-na')?.checked||S.outbound>0) done++;
+  const travelDone=document.getElementById('flights-na')?.checked&&document.getElementById('grab-na')?.checked&&document.getElementById('hotels-na')?.checked;
+  if(travelDone||(S.flights&&S.flights.some(f=>f.co2>0))||S.grab>0||S.hotels>0) done++;
+  document.getElementById('prog-fill').style.width=Math.round(done/4*100)+'%';
+  document.getElementById('prog-label').textContent=done+' of 4 sections completed';
+}
+
+function attachFile(section) {
+  alert(`Attaching documentation for ${section}.\n\nIn production: opens file picker → stores in Supabase Storage → listed in report appendix.`);
+}
+// ── PERSONAL VEHICLE ──
+function calcPersonalVeh() {
+  const sgd = parseFloat(document.getElementById('pv-sgd').value) || 0;
+  const rate = parseFloat(document.getElementById('pv-rate').value) || 0.60;
+  if (!sgd) { clearPersonalVeh(); return; }
+  const km = sgd / rate;
+  const co2 = km * 0.1732 / 1000; // default ICE
+  S.personal_veh = co2; S.personal_veh_sgd = sgd;
+  showPersonalVehResult(co2, sgd, `${Math.round(km).toLocaleString()} km derived from reimbursement`);
+}
+
+function calcPersonalVehKm() {
+  const staff = parseFloat(document.getElementById('pv-staff').value) || 0;
+  const kmPw = parseFloat(document.getElementById('pv-km-pw').value) || 0;
+  const weeks = parseFloat(document.getElementById('pv-weeks').value) || 48;
+  const ef = parseFloat(document.getElementById('pv-fuel-type').value) || 0.1732;
+  const totalKm = staff * kmPw * weeks;
+  const co2 = totalKm * ef / 1000;
+  const sgd = totalKm * 0.60; // reference reimbursement at SGD 0.60/km
+  S.personal_veh = co2; S.personal_veh_sgd = sgd;
+  showPersonalVehResult(co2, sgd, `${Math.round(totalKm).toLocaleString()} km/yr across ${staff} staff`);
+}
+
+function showPersonalVehResult(co2, sgd, note) {
+  const r = document.getElementById('result-personal-veh').querySelectorAll('.rpill');
+  r[0].className='rpill co2'; r[0].innerHTML=`<span class="rpill-val">~ ${co2.toFixed(3)}</span><span>tCO₂e / yr</span>`;
+  r[1].className='rpill cost'; r[1].innerHTML=`<span class="rpill-val">≈ SGD ${Math.round(sgd).toLocaleString()}</span><span>mileage reimbursement / yr</span>`;
+  updateFlightTotals();
+}
+
+function clearPersonalVeh() {
+  S.personal_veh=0; S.personal_veh_sgd=0;
+  const r = document.getElementById('result-personal-veh').querySelectorAll('.rpill');
+  r[0].className='rpill empty'; r[0].innerHTML='<span class="rpill-val">—</span><span>tCO₂e / yr</span>';
+  r[1].className='rpill empty'; r[1].innerHTML='<span class="rpill-val">—</span><span>annual mileage reimbursement</span>';
+}
+
+function saveAndNext() {
+  localStorage.setItem('zyt_transport_data', JSON.stringify({saved:true}));
+  window.location.href = '/S-12-cooling-refrigeration.html';
+}
+
+// ── INIT: add one demo vehicle ──
+window.addEventListener('load', () => {
+  addVehicle();
+  document.getElementById('v1-name').value='Delivery van';
+  document.getElementById('v1-fuel').value='diesel';
+  document.getElementById('v1-litres').value='80';
+  calcVehicleEntry('v1');
+  updateProgress();
+});
+</script>
+
+</body>
+</html>

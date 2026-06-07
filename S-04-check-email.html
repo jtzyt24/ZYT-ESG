@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZYT.ESG — Check your email</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#F7F6F2; --surface:#FFFFFF; --border:#E2E0D8; --text:#1A1917; --text-muted:#6B6860; --accent:#2D5F3F; --accent-light:#E6F0EA; --radius:10px; --radius-sm:6px; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+  .topnav { background:var(--surface); border-bottom:1px solid var(--border); padding:0 24px; height:52px; display:flex; align-items:center; }
+  .logo { font-size:15px; font-weight:600; color:var(--text); text-decoration:none; }
+  .logo span { color:var(--accent); }
+  .wrap { max-width:460px; margin:0 auto; padding:64px 24px; text-align:center; }
+  .icon { font-size:56px; margin-bottom:20px; }
+  .title { font-size:22px; font-weight:700; letter-spacing:-0.4px; margin-bottom:8px; }
+  .sub { font-size:14px; color:var(--text-muted); line-height:1.6; margin-bottom:28px; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; height:42px; padding:0 24px; border-radius:var(--radius-sm); background:var(--accent); color:white; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; cursor:pointer; border:none; width:100%; transition:filter 0.15s; }
+  .btn:hover { filter:brightness(1.1); }
+  .resend { font-size:13px; color:var(--text-muted); margin-top:16px; }
+  .resend a { color:var(--accent); cursor:pointer; font-weight:500; }
+</style>
+</head>
+<body>
+<nav class="topnav"><a href="/index.html" class="logo">ZYT<span>.ESG</span></a></nav>
+<div class="wrap">
+  <div class="icon">📧</div>
+  <div class="title">Check your email</div>
+  <div class="sub">
+    We sent a confirmation link to <strong id="email-display">your email address</strong>.<br>
+    Click the link to activate your account, then return here to continue.
+  </div>
+  <button class="btn" onclick="window.location.href='/S-06-company-profile.html'">
+    I've confirmed — continue to my report →
+  </button>
+  <div class="resend">Didn't receive it? <a onclick="resendEmail()">Resend confirmation email</a></div>
+</div>
+<script type="module">
+  import { supabase, loadLocal } from '/js/supabase.js';
+  const email = loadLocal('zyt_signup_email');
+  if (email) document.getElementById('email-display').textContent = email;
+  window.resendEmail = async () => {
+    if (!email) return alert('Email address not found. Please sign up again.');
+    const { error } = await supabase.auth.resend({ type: 'signup', email });
+    if (error) alert(error.message);
+    else alert('Confirmation email resent to ' + email);
+  };
+</script>
+</body>
+</html>
