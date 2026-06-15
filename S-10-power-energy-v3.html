@@ -649,16 +649,26 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
       Save & go to Transport & fleet
       <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg>
     </button>
-    <button class="btn-save-draft">Save & exit</button>
+    <button class="btn-save-draft" onclick="saveAndExit()">Save & exit</button>
   </div>
 </div>
 </div>
 
 </div><!-- /layout -->
 
-<script>
+<script type="module">
+import { createClusterData, createEmissionEntry, saveClusterData, loadClusterData } from '/js/zyt-core/schema.js';
+import { goTo } from '/js/zyt-core/config.js';
+
+const CLUSTER_ID = 'power';
+
 // ── CONSTANTS ──
 const EF = { grid:0.412, upstream:0.00212, diesel:2.6597 };
+const EF_SOURCE = {
+  grid: 'EMA Grid EF 2023 (EMA_GRID_2023)',
+  upstream: 'SEFR Jan 2026 — Grid upstream Cat 3 (SEFR_ELEC_UPSTREAM)',
+  diesel: 'NEA/SEFR Jan 2026 — Diesel combustion (SEFR_DIESEL_L)',
+};
 const PRICE = { elec:0.2972, diesel:2.80 }; // incl GST
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -1073,18 +1083,224 @@ function attachFile(section) {
   alert(`File attachment for ${section}\n\nIn production:\n→ Opens file picker (PDF/JPG/PNG, max 10MB)\n→ Stored in Supabase Storage: /docs/{company_id}/{period_id}/${section}/\n→ Linked to emissions_data record\n→ Listed in report appendix as supporting documentation`);
 }
 
-function saveAndNext() {
-  localStorage.setItem('zyt_power_data', JSON.stringify({saved:true}));
-  window.location.href = '/S-11-transport-fleet.html';
+// ── BUILD EMISSION ENTRIES FROM STATE (for persistence) ──
+function buildEntriesFromState() {
+  const entries = [];
+
+  // Grid electricity (Scope 2) — route-dependent kWh source
+  const elecKwh = S.route === 'home' ? S.wfh_kwh_yr
+                : S.route === 'serviced' ? S.serv_kwh_yr
+                : S.elec_kwh_yr;
+  const elecSgd = S.route === 'home' ? S.wfh_kwh_yr * PRICE.elec
+                : S.route === 'serviced' ? 0
+                : S.elec_sgd_yr;
+  if (elecKwh > 0) {
+    const e = createEmissionEntry();
+    e.activityName = S.route === 'home' ? 'Grid electricity (home office — business share)'
+                    : S.route === 'serviced' ? 'Grid electricity (serviced office — BCA estimate)'
+                    : 'Grid electricity';
+    e.activityKey = 'grid_electricity_kwh';
+    e.quantity = +elecKwh.toFixed(2);
+    e.unit = 'kWh';
+    e.efValue = EF.grid;
+    e.efUnit = 'kgCO2e/kWh';
+    e.efSource = EF_SOURCE.grid;
+    e.emissionsKgCo2e = +(elecKwh * EF.grid).toFixed(3);
+    e.scope = 2;
+    e.costSgd = +elecSgd.toFixed(2);
+    e.costBasis = S.route === 'serviced' ? 'estimated' : 'user_entered';
+    e.dataQuality = S.elec_acc === 'h' ? 'measured' : S.elec_acc === 'm' ? 'calculated' : 'estimated';
+    entries.push(e);
+
+    // Upstream Cat 3 (auto-calculated, Scope 3)
+    const u = createEmissionEntry();
+    u.activityName = 'Upstream electricity (T&D losses) — auto-calculated';
+    u.activityKey = 'grid_electricity_upstream_kwh';
+    u.quantity = +elecKwh.toFixed(2);
+    u.unit = 'kWh';
+    u.efValue = EF.upstream;
+    u.efUnit = 'kgCO2e/kWh';
+    u.efSource = EF_SOURCE.upstream;
+    u.emissionsKgCo2e = +(elecKwh * EF.upstream).toFixed(4);
+    u.scope = 3;
+    u.scope3Category = 3;
+    u.costBasis = 'estimated';
+    u.dataQuality = 'calculated';
+    entries.push(u);
+  }
+
+  // Solar generation offset (Scope 2, negative)
+  if (S.solar_kwh_yr > 0) {
+    const e = createEmissionEntry();
+    e.activityName = 'On-site solar generation (offset)';
+    e.activityKey = 'solar_generation_kwh';
+    e.quantity = -(+S.solar_kwh_yr.toFixed(2));
+    e.unit = 'kWh';
+    e.efValue = EF.grid;
+    e.efUnit = 'kgCO2e/kWh';
+    e.efSource = EF_SOURCE.grid + ' (offset)';
+    e.emissionsKgCo2e = -(+(S.solar_kwh_yr * EF.grid).toFixed(3));
+    e.scope = 2;
+    e.costBasis = 'estimated';
+    e.dataQuality = 'estimated';
+    e.notes = 'Market-based Scope 2 offset from on-site solar self-consumption';
+    entries.push(e);
+  }
+
+  // District cooling (Scope 2)
+  if (S.dc_kwh_yr > 0) {
+    const e = createEmissionEntry();
+    e.activityName = 'District cooling (electricity-equivalent)';
+    e.activityKey = 'district_cooling_kwh_equiv';
+    e.quantity = +S.dc_kwh_yr.toFixed(2);
+    e.unit = 'kWh';
+    e.efValue = EF.grid;
+    e.efUnit = 'kgCO2e/kWh';
+    e.efSource = EF_SOURCE.grid;
+    e.emissionsKgCo2e = +(S.dc_kwh_yr * EF.grid).toFixed(3);
+    e.scope = 2;
+    e.costBasis = 'estimated';
+    e.dataQuality = 'estimated';
+    entries.push(e);
+  }
+
+  // Diesel generator (Scope 1)
+  if (S.gen_litres_yr > 0) {
+    const e = createEmissionEntry();
+    e.activityName = 'Diesel generator';
+    e.activityKey = 'diesel_generator_litres';
+    e.quantity = +S.gen_litres_yr.toFixed(1);
+    e.unit = 'L';
+    e.efValue = EF.diesel;
+    e.efUnit = 'kgCO2e/L';
+    e.efSource = EF_SOURCE.diesel;
+    e.emissionsKgCo2e = +(S.gen_litres_yr * EF.diesel).toFixed(3);
+    e.scope = 1;
+    e.costSgd = +(S.gen_litres_yr * PRICE.diesel).toFixed(2);
+    e.costBasis = 'reference_price';
+    e.dataQuality = 'estimated';
+    entries.push(e);
+  }
+
+  return entries;
 }
 
-// ── INIT: pre-fill with demo data ──
+// ── RESTORE STATE FROM SAVED ENTRIES ──
+function restoreFromSaved() {
+  const saved = loadClusterData(CLUSTER_ID);
+  if (!saved || !saved.entries || !saved.entries.length) return;
+
+  saved.entries.forEach(entry => {
+    switch (entry.activityKey) {
+      case 'grid_electricity_kwh':
+        if (entry.activityName.includes('home office')) {
+          // restore via WFH route — leave detailed inputs blank, but set state + route
+          setRoute('home', document.querySelector('[data-r="home"]'));
+          S.wfh_kwh_yr = entry.quantity;
+        } else if (entry.activityName.includes('serviced office')) {
+          setRoute('serviced', document.querySelector('[data-r="serviced"]'));
+          S.serv_kwh_yr = entry.quantity;
+        } else {
+          // restore via Annual mode — most lossless representation
+          document.querySelectorAll('#elec-mode-tabs .mtab').forEach(t => t.classList.remove('active'));
+          document.querySelector('#elec-mode-tabs [data-m="annual"]').classList.add('active');
+          ['elec-monthly','elec-annual','elec-single'].forEach(id => {
+            document.getElementById(id).classList.toggle('active', id === 'elec-annual');
+          });
+          document.getElementById('ea-kwh').value = entry.quantity;
+          calcElecAnnual();
+          // calcElecAnnual sets elec_acc='m' regardless of original accuracy;
+          // restore the original accuracy tag if it was 'measured'
+          if (entry.dataQuality === 'measured') S.elec_acc = 'h';
+        }
+        break;
+
+      case 'solar_generation_kwh':
+        document.getElementById('solar-na').checked = false;
+        toggleNA('solar-inputs', document.getElementById('solar-na'), 'solar');
+        document.getElementById('solar-kwh').value = +(Math.abs(entry.quantity) / 12).toFixed(1);
+        calcSolar();
+        break;
+
+      case 'district_cooling_kwh_equiv':
+        // District cooling restore is approximate: the original RT-hr/kWh-thermal
+        // input is not stored, only the electricity-equivalent kWh. We restore
+        // the state value directly so totals are correct, uncheck N/A, and
+        // leave the detailed input for the user to re-enter if they want to edit.
+        document.getElementById('dc-na').checked = false;
+        toggleNA('dc-inputs', document.getElementById('dc-na'), 'dc');
+        S.dc_kwh_yr = entry.quantity;
+        showDCResult();
+        break;
+
+      case 'diesel_generator_litres':
+        document.getElementById('gen-na').checked = false;
+        toggleNA('gen-inputs', document.getElementById('gen-na'), 'gen');
+        document.querySelectorAll('#gen-mode-tabs .mtab').forEach(t => t.classList.remove('active'));
+        document.querySelector('#gen-mode-tabs [data-m="gen-annual"]').classList.add('active');
+        ['gen-monthly','gen-annual'].forEach(id => {
+          document.getElementById(id).classList.toggle('active', id === 'gen-annual');
+        });
+        document.getElementById('gen-litres-yr').value = entry.quantity;
+        calcGenAnnual();
+        break;
+    }
+  });
+
+  updateSummary();
+}
+
+// ── SAVE & EXIT / SAVE & NEXT ──
+function persist() {
+  const data = createClusterData(CLUSTER_ID);
+  data.saved = true;
+  data.entries = buildEntriesFromState();
+  saveClusterData(CLUSTER_ID, data);
+}
+
+function saveAndNext() {
+  persist();
+  goTo('S-11');
+}
+
+function saveAndExit() {
+  persist();
+  goTo('S-09');
+}
+
+// expose for inline onclick handlers
+window.setRoute = setRoute;
+window.toggleSec = toggleSec;
+window.toggleTip = toggleTip;
+window.switchElecMode = switchElecMode;
+window.switchGenMode = switchGenMode;
+window.switchDCUnit = switchDCUnit;
+window.toggleNA = toggleNA;
+window.calcElecMonthly = calcElecMonthly;
+window.calcElecAnnual = calcElecAnnual;
+window.calcElecAnnualBill = calcElecAnnualBill;
+window.calcElecSingle = calcElecSingle;
+window.calcElecSingleBill = calcElecSingleBill;
+window.calcWFH = calcWFH;
+window.calcServiced = calcServiced;
+window.calcServicedDesks = calcServicedDesks;
+window.calcSolar = calcSolar;
+window.handleDCProvider = handleDCProvider;
+window.calcDC = calcDC;
+window.calcDCkwht = calcDCkwht;
+window.calcDCfromCOP = calcDCfromCOP;
+window.calcGen = calcGen;
+window.calcGenAnnual = calcGenAnnual;
+window.calcGenMonthly = calcGenMonthly;
+window.attachFile = attachFile;
+window.attachMonthFile = attachMonthFile;
+window.saveAndNext = saveAndNext;
+window.saveAndExit = saveAndExit;
+
+// ── INIT ──
 window.addEventListener('load', () => {
-  document.getElementById('es-kwh').value = 360;
-  document.getElementById('es-bill').value = 94.68;
-  calcElecSingle();
-  // Show tenant solar note by default (own/rented premises)
   updateSolarContext('own');
+  restoreFromSaved();
   updateProgress();
 });
 </script>

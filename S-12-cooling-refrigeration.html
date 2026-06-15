@@ -668,14 +668,40 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
       Save & go to Cooking & process heat
       <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg>
     </button>
-    <button class="btn-save-draft">Save & exit</button>
+    <button class="btn-save-draft" onclick="saveAndExit()">Save & exit</button>
   </div>
 </div>
 </div>
 
 </div><!-- /layout -->
 
-<script>
+<script type="module">
+import { createClusterData, createEmissionEntry, saveClusterData, loadClusterData } from '/js/zyt-core/schema.js';
+import { goTo } from '/js/zyt-core/config.js';
+
+const CLUSTER_ID = 'cooling';
+
+const REF_EF_SOURCE = {
+  'R-410A': 'SEFR Jan 2026 — R-410A leakage (SEFR_R410A_GWP)',
+  'R-32': 'SEFR Jan 2026 — R-32 leakage (SEFR_R32_GWP)',
+  'R-22': 'SEFR Jan 2026 — R-22 leakage (SEFR_R22_GWP)',
+  'R-407C': 'SEFR Jan 2026 — R-407C leakage (SEFR_R407C_GWP)',
+  'R-134a': 'SEFR Jan 2026 — R-134a leakage (SEFR_R134A_GWP)',
+  'R-404A': 'SEFR Jan 2026 — R-404A leakage (SEFR_R404A_GWP)',
+};
+function refEfSource(ref) {
+  return REF_EF_SOURCE[ref] || 'IPCC AR5 — refrigerant GWP value';
+}
+function parseNotes(notes) {
+  const out = {};
+  if (!notes) return out;
+  notes.split(';').forEach(pair => {
+    const [k, v] = pair.split('=');
+    out[k] = v;
+  });
+  return out;
+}
+
 // ── STATE ──
 const S = {
   ac: { ref:'R-410A', gwp:2088, kg:0, co2:0, sgd:0 },
@@ -871,15 +897,189 @@ function updateProgress() {
 function attachFile(section) {
   alert(`Attaching documentation for ${section}.\n\nIn production: opens file picker → stores in Supabase Storage → listed in report appendix.`);
 }
-function saveAndNext() {
-localStorage.setItem('zyt_s12_cooling_refrigeration_data', JSON.stringify({saved:true}));
-  window.location.href = '/S-13-cooking-process-heat.html';
+// ── BUILD EMISSION ENTRIES FROM STATE ──
+function buildEntriesFromState() {
+  const entries = [];
+
+  // Air-conditioning (always-present section)
+  if (S.ac.kg > 0 && S.ac.gwp > 0) {
+    const mode = document.getElementById('ac-kg').classList.contains('active') ? 'kg' : 'visits';
+    const e = createEmissionEntry();
+    e.activityName = `Refrigerant top-up — air-conditioning (${S.ac.ref})`;
+    e.activityKey = 'refrigerant_ac';
+    e.quantity = +S.ac.kg.toFixed(2);
+    e.unit = 'kg';
+    e.efValue = S.ac.gwp;
+    e.efUnit = 'kgCO2e/kg';
+    e.efSource = refEfSource(S.ac.ref);
+    e.emissionsKgCo2e = +(S.ac.co2 * 1000).toFixed(3);
+    e.scope = 1;
+    e.costSgd = +S.ac.sgd.toFixed(2);
+    e.costBasis = 'estimated';
+    e.dataQuality = 'measured';
+    if (mode === 'visits') {
+      e.notes = `ref=${S.ac.ref};mode=visits;visits=${document.getElementById('ac-visits-count').value};kgPerVisit=${document.getElementById('ac-kg-per-visit').value}`;
+    } else {
+      e.notes = `ref=${S.ac.ref};mode=kg`;
+    }
+    if (S.ac.ref.startsWith('other')) {
+      e.notes += `;manualGwp=${S.ac.gwp};manualName=${document.getElementById('ac-manual-name')?.value || ''}`;
+    }
+    entries.push(e);
+  }
+
+  // Cold room / freezer (optional)
+  if (!document.getElementById('coldroom-na').checked && S.cr.kg > 0 && S.cr.gwp > 0) {
+    const mode = document.getElementById('cr-kg').classList.contains('active') ? 'kg' : 'visits';
+    const e = createEmissionEntry();
+    e.activityName = `Refrigerant top-up — cold room/freezer (${S.cr.ref})`;
+    e.activityKey = 'refrigerant_coldroom';
+    e.quantity = +S.cr.kg.toFixed(2);
+    e.unit = 'kg';
+    e.efValue = S.cr.gwp;
+    e.efUnit = 'kgCO2e/kg';
+    e.efSource = refEfSource(S.cr.ref);
+    e.emissionsKgCo2e = +(S.cr.co2 * 1000).toFixed(3);
+    e.scope = 1;
+    e.costSgd = +S.cr.sgd.toFixed(2);
+    e.costBasis = 'estimated';
+    e.dataQuality = 'measured';
+    if (mode === 'visits') {
+      e.notes = `ref=${S.cr.ref};mode=visits;visits=${document.getElementById('cr-visits-count').value};kgPerVisit=${document.getElementById('cr-kg-per-visit').value}`;
+    } else {
+      e.notes = `ref=${S.cr.ref};mode=kg`;
+    }
+    if (S.cr.ref.startsWith('other')) e.notes += `;manualGwp=${S.cr.gwp}`;
+    entries.push(e);
+  }
+
+  // Reefer vehicles (optional)
+  if (!document.getElementById('reefer-na').checked && S.rf.kg > 0 && S.rf.gwp > 0) {
+    const e = createEmissionEntry();
+    e.activityName = `Refrigerant top-up — reefer vehicles (${S.rf.ref})`;
+    e.activityKey = 'refrigerant_reefer';
+    e.quantity = +S.rf.kg.toFixed(2);
+    e.unit = 'kg';
+    e.efValue = S.rf.gwp;
+    e.efUnit = 'kgCO2e/kg';
+    e.efSource = refEfSource(S.rf.ref);
+    e.emissionsKgCo2e = +(S.rf.co2 * 1000).toFixed(3);
+    e.scope = 1;
+    e.costSgd = +S.rf.sgd.toFixed(2);
+    e.costBasis = 'estimated';
+    e.dataQuality = 'measured';
+    e.notes = `ref=${S.rf.ref};vehicles=${document.getElementById('rf-vehicles').value};kgPerVehicle=${document.getElementById('rf-kg').value}`;
+    if (S.rf.ref.startsWith('other')) e.notes += `;manualGwp=${S.rf.gwp}`;
+    entries.push(e);
+  }
+
+  return entries;
 }
+
+// ── RESTORE STATE FROM SAVED ENTRIES ──
+function selectRefByName(section, ref, manualGwp) {
+  const grid = document.getElementById(section + '-ref-grid');
+  if (!grid) return;
+  let btn = grid.querySelector(`[data-ref="${ref}"]`);
+  if (!btn) btn = grid.querySelector(`[data-ref="other-${section}"]`);
+  if (btn) selectRef(section, btn);
+  if (ref && ref.startsWith('other') && manualGwp) {
+    document.getElementById(section + '-manual-gwp').value = manualGwp;
+    updateManualGWP(section);
+  }
+}
+
+function restoreFromSaved() {
+  const saved = loadClusterData(CLUSTER_ID);
+  if (!saved || !saved.entries || !saved.entries.length) return;
+
+  saved.entries.forEach(entry => {
+    const p = parseNotes(entry.notes);
+    switch (entry.activityKey) {
+      case 'refrigerant_ac':
+        selectRefByName('ac', p.ref, p.manualGwp);
+        if (p.mode === 'visits') {
+          const btns = document.querySelectorAll('#ac-mode-tabs .mtab');
+          switchMode('ac', ['ac-kg', 'ac-visits'], 'ac-visits', btns[1]);
+          document.getElementById('ac-visits-count').value = p.visits;
+          document.getElementById('ac-kg-per-visit').value = p.kgPerVisit;
+          calcACVisits();
+        } else {
+          document.getElementById('ac-kg-val').value = entry.quantity;
+          calcAC();
+        }
+        if (p.manualName) document.getElementById('ac-manual-name').value = p.manualName;
+        break;
+
+      case 'refrigerant_coldroom':
+        document.getElementById('coldroom-na').checked = false;
+        toggleNA('coldroom-inputs', document.getElementById('coldroom-na'), 'cr');
+        selectRefByName('cr', p.ref, p.manualGwp);
+        if (p.mode === 'visits') {
+          const btns = document.querySelectorAll('#cr-mode-tabs .mtab');
+          switchMode('cr', ['cr-kg', 'cr-visits'], 'cr-visits', btns[1]);
+          document.getElementById('cr-visits-count').value = p.visits;
+          document.getElementById('cr-kg-per-visit').value = p.kgPerVisit;
+          calcColdroomVisits();
+        } else {
+          document.getElementById('cr-kg-val').value = entry.quantity;
+          calcColdroom();
+        }
+        break;
+
+      case 'refrigerant_reefer':
+        document.getElementById('reefer-na').checked = false;
+        toggleNA('reefer-inputs', document.getElementById('reefer-na'), 'rf');
+        selectRefByName('rf', p.ref, p.manualGwp);
+        document.getElementById('rf-vehicles').value = p.vehicles;
+        document.getElementById('rf-kg').value = p.kgPerVehicle;
+        calcReefer();
+        break;
+    }
+  });
+
+  updateSummary();
+}
+
+// ── SAVE / EXIT ──
+function persist() {
+  const data = createClusterData(CLUSTER_ID);
+  data.saved = true;
+  data.entries = buildEntriesFromState();
+  saveClusterData(CLUSTER_ID, data);
+}
+
+function saveAndNext() {
+  persist();
+  goTo('S-13');
+}
+
+function saveAndExit() {
+  persist();
+  goTo('S-09');
+}
+
+// expose for inline onclick handlers
+window.toggleSec = toggleSec;
+window.toggleTip = toggleTip;
+window.switchMode = switchMode;
+window.toggleNA = toggleNA;
+window.toggleNoTopup = toggleNoTopup;
+window.selectRef = selectRef;
+window.updateManualGWP = updateManualGWP;
+window.calcAC = calcAC;
+window.calcACVisits = calcACVisits;
+window.calcColdroom = calcColdroom;
+window.calcColdroomVisits = calcColdroomVisits;
+window.calcReefer = calcReefer;
+window.attachFile = attachFile;
+window.saveAndNext = saveAndNext;
+window.saveAndExit = saveAndExit;
 
 // ── INIT ──
 window.addEventListener('load', () => {
-  // Pre-show GWP impact for default R-410A selection
   showGWPImpact('ac', 2088, 'R-410A', false);
+  restoreFromSaved();
   updateProgress();
 });
 </script>

@@ -263,14 +263,37 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
     <div class="ef-row"><span>Source</span><span>IMDA/NUS ESI · IEA</span></div>
   </div>
   <div class="sum-actions">
-    <button class="btn-next" onclick="localStorage.setItem('zyt_digital_data', JSON.stringify({saved:true})); window.location.href='/S-17-procurement.html'">Save & go to Procurement <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg></button>
-    <button class="btn-save-draft">Save & exit</button>
+    <button class="btn-next" onclick="saveAndNext()">Save & go to Procurement <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg></button>
+    <button class="btn-save-draft" onclick="saveAndExit()">Save & exit</button>
   </div>
 </div>
 </div>
 </div>
 
-<script>
+<script type="module">
+import { createClusterData, createEmissionEntry, saveClusterData, loadClusterData } from '/js/zyt-core/schema.js';
+import { goTo } from '/js/zyt-core/config.js';
+
+const CLUSTER_ID = 'digital';
+
+const EF_SOURCE = {
+  cloud_spend: 'IMDA/NUS ESI — spend-based EEIO proxy (~0.0002 tCO2e/SGD)',
+  cloud_provider: 'Provider carbon footprint tool',
+  colocation: 'EMA Grid EF 2023 (EMA_GRID_2023) × PUE',
+  hardware: 'GHG Protocol Cat 2 — manufacturer EPDs / IEA lifecycle data',
+};
+const HW_LABEL = { laptop:'Laptop', desktop:'Desktop', server:'Server', phone:'Smartphone', tablet:'Tablet', monitor:'Monitor', printer:'Printer', other:'Other equipment' };
+function parseNotes(notes) {
+  const out = {};
+  if (!notes) return out;
+  notes.split(';').forEach(pair => {
+    const [k, v] = pair.split('=');
+    out[k] = v;
+  });
+  return out;
+}
+const val = id => document.getElementById(id)?.value || '';
+
 const S={cloud:{co2:0,sgd:0},hw:{co2:0,sgd:0},dc2:{co2:0}};
 const HW_EF={laptop:0.350,desktop:0.500,server:1.200,phone:0.070,tablet:0.100,printer:0.150,monitor:0.200,other:0.300};
 const HW_PRICE={laptop:1800,desktop:1500,server:8000,phone:1200,tablet:800,printer:400,monitor:500,other:1000};
@@ -384,6 +407,163 @@ function updateSummary(){
 // mtab style
 document.querySelectorAll('.mtab').forEach(t=>t.style.cssText='font-size:11px;padding:5px 11px;border-radius:6px;border:none;background:transparent;color:var(--ink3);cursor:pointer;white-space:nowrap');
 document.querySelectorAll('.mtab.active').forEach(t=>t.style.cssText+='background:var(--card);color:var(--ink);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.08)');
+
+// ── BUILD EMISSION ENTRIES FROM STATE ──
+function buildEntriesFromState() {
+  const entries = [];
+
+  // Cloud services (Scope 3, Cat 1)
+  const cloudMode = document.getElementById('cloud-tab-spend').classList.contains('active') ? 'spend' : 'provider';
+  if (S.cloud.co2 > 0) {
+    const e = createEmissionEntry();
+    if (cloudMode === 'spend') {
+      e.activityName = 'Cloud services (spend-based estimate)';
+      e.activityKey = 'cloud_services_spend';
+      e.quantity = +S.cloud.sgd.toFixed(2);
+      e.unit = 'SGD/yr';
+      e.efValue = 0.2;
+      e.efUnit = 'kgCO2e/SGD';
+      e.efSource = EF_SOURCE.cloud_spend;
+      e.costSgd = +S.cloud.sgd.toFixed(2);
+      e.costBasis = 'user_entered';
+      e.dataQuality = 'estimated';
+      e.notes = `mode=spend;monthlySgd=${val('cloud-sgd')}`;
+    } else {
+      const provider = val('cloud-provider-sel');
+      e.activityName = `Cloud services — ${provider} carbon footprint report`;
+      e.activityKey = 'cloud_services_provider_report';
+      e.efSource = `${EF_SOURCE.cloud_provider} (${provider})`;
+      e.costBasis = 'estimated';
+      e.dataQuality = 'measured';
+      e.notes = `mode=provider;provider=${provider};tco2=${val('cloud-tco2')}`;
+    }
+    e.emissionsKgCo2e = +(S.cloud.co2 * 1000).toFixed(3);
+    e.scope = 3; e.scope3Category = 1;
+    entries.push(e);
+  }
+
+  // IT hardware purchases (Scope 3, Cat 2)
+  if (!document.getElementById('hw-na').checked) {
+    document.querySelectorAll('#hw-list > div').forEach(div => {
+      const id = div.id;
+      const type = document.getElementById(id + '-type')?.value || 'laptop';
+      const qty = parseFloat(document.getElementById(id + '-qty')?.value) || 0;
+      if (qty > 0) {
+        const e = createEmissionEntry();
+        e.activityName = `IT hardware — ${HW_LABEL[type]} ×${qty}`;
+        e.activityKey = 'it_hardware_' + type;
+        e.quantity = qty;
+        e.unit = 'units';
+        e.efValue = +(HW_EF[type] * 1000).toFixed(1);
+        e.efUnit = 'kgCO2e/unit';
+        e.efSource = EF_SOURCE.hardware;
+        e.emissionsKgCo2e = +(qty * HW_EF[type] * 1000).toFixed(3);
+        e.scope = 3; e.scope3Category = 2;
+        e.costSgd = +(qty * HW_PRICE[type]).toFixed(2);
+        e.costBasis = 'reference_price';
+        e.dataQuality = 'estimated';
+        e.notes = `type=${type};qty=${qty}`;
+        entries.push(e);
+      }
+    });
+  }
+
+  // Co-location / hosted servers (Scope 3, Cat 1)
+  if (!document.getElementById('dc-na2').checked && S.dc2.co2 > 0) {
+    const kwhMonth = parseFloat(val('dc-kwh')) || 0;
+    const pue = parseFloat(val('dc-pue')) || 1.4;
+    const e = createEmissionEntry();
+    e.activityName = 'Co-located/hosted servers (electricity-equivalent)';
+    e.activityKey = 'colocation_servers_kwh';
+    e.quantity = +(kwhMonth * 12).toFixed(1);
+    e.unit = 'kWh';
+    e.efValue = +(0.412 * pue).toFixed(4);
+    e.efUnit = 'kgCO2e/kWh';
+    e.efSource = `${EF_SOURCE.colocation} (PUE=${pue})`;
+    e.emissionsKgCo2e = +(S.dc2.co2 * 1000).toFixed(3);
+    e.scope = 3; e.scope3Category = 1;
+    e.costBasis = 'estimated';
+    e.dataQuality = 'estimated';
+    e.notes = `kwhMonth=${kwhMonth};pue=${pue}`;
+    entries.push(e);
+  }
+
+  return entries;
+}
+
+// ── RESTORE STATE FROM SAVED ENTRIES ──
+function restoreFromSaved() {
+  const saved = loadClusterData(CLUSTER_ID);
+  if (!saved || !saved.entries || !saved.entries.length) return;
+
+  saved.entries.forEach(entry => {
+    const p = parseNotes(entry.notes);
+
+    if (entry.activityKey === 'cloud_services_spend') {
+      switchCloudMode('spend', document.getElementById('cloud-tab-spend'));
+      document.getElementById('cloud-sgd').value = p.monthlySgd;
+      calcCloud();
+    } else if (entry.activityKey === 'cloud_services_provider_report') {
+      switchCloudMode('provider', document.getElementById('cloud-tab-provider'));
+      if (p.provider) document.getElementById('cloud-provider-sel').value = p.provider;
+      document.getElementById('cloud-tco2').value = p.tco2;
+      calcCloudDirect();
+    } else if (entry.activityKey.startsWith('it_hardware_')) {
+      document.getElementById('hw-na').checked = false;
+      toggleNA('hw-inputs', document.getElementById('hw-na'), 'hw');
+      addHWItem();
+      const id = hwItems[hwItems.length - 1];
+      document.getElementById(id + '-type').value = p.type;
+      document.getElementById(id + '-qty').value = p.qty;
+      calcHW();
+    } else if (entry.activityKey === 'colocation_servers_kwh') {
+      document.getElementById('dc-na2').checked = false;
+      toggleNA('dc2-inputs', document.getElementById('dc-na2'), 'dc2');
+      document.getElementById('dc-kwh').value = p.kwhMonth;
+      document.getElementById('dc-pue').value = p.pue;
+      calcDC2();
+    }
+  });
+
+  updateSummary();
+}
+
+// ── SAVE / EXIT ──
+function persist() {
+  const data = createClusterData(CLUSTER_ID);
+  data.saved = true;
+  data.entries = buildEntriesFromState();
+  saveClusterData(CLUSTER_ID, data);
+}
+
+function saveAndNext() {
+  persist();
+  goTo('S-17');
+}
+
+function saveAndExit() {
+  persist();
+  goTo('S-09');
+}
+
+// expose for inline onclick handlers
+window.toggleSec = toggleSec;
+window.toggleTip = toggleTip;
+window.toggleNA = toggleNA;
+window.switchCloudMode = switchCloudMode;
+window.calcCloud = calcCloud;
+window.calcCloudDirect = calcCloudDirect;
+window.addHWItem = addHWItem;
+window.calcHW = calcHW;
+window.calcDC2 = calcDC2;
+window.saveAndNext = saveAndNext;
+window.saveAndExit = saveAndExit;
+
+// ── INIT ──
+window.addEventListener('load', () => {
+  restoreFromSaved();
+  updateSummary();
+});
 </script>
 </body>
 </html>

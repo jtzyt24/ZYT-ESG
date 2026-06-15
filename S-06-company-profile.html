@@ -480,6 +480,7 @@ function saveProfile() {
   const profileData = {
     companyName: name,
     uen: document.getElementById('uen')?.value || '',
+    companySize: document.getElementById('company-size')?.value || '',
     industry: selectedIndustry,
     reportingYear: document.getElementById('report-year').value,
     responsiblePerson: esgName,
@@ -489,20 +490,39 @@ function saveProfile() {
   window.location.href = '/S-09-data-entry-hub.html';
 }
 
-// Pre-fill demo data
+// Load saved profile, or pre-fill demo data for first-time visitors
 window.addEventListener('load', () => {
-  document.getElementById('company-name').value = 'ZYT Sustainability Consultancy Pte Ltd';
-  document.getElementById('uen').value = '202312345A';
-  document.getElementById('company-size').value = '11-50';
-  document.getElementById('esg-name').value = 'Joel Tsi';
-  document.getElementById('esg-role').value = 'Director';
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem('zyt_company_profile') || 'null'); } catch(e) {}
+
+  if (saved) {
+    // Returning user — load their saved profile
+    document.getElementById('company-name').value = saved.companyName || '';
+    document.getElementById('uen').value = saved.uen || '';
+    document.getElementById('company-size').value = saved.companySize || '11-50';
+    document.getElementById('esg-name').value = saved.responsiblePerson || '';
+    document.getElementById('esg-role').value = saved.responsiblePersonRole || '';
+    if (saved.reportingYear) document.getElementById('report-year').value = saved.reportingYear;
+
+    if (saved.industry) {
+      const indBtn = document.querySelector(`[data-ind="${saved.industry}"]`);
+      if (indBtn) selectIndustry(saved.industry, indBtn);
+    }
+  } else {
+    // First-time visitor — demo pre-fill to show what a completed profile looks like
+    document.getElementById('company-name').value = 'ZYT Sustainability Consultancy Pte Ltd';
+    document.getElementById('uen').value = '202312345A';
+    document.getElementById('company-size').value = '11-50';
+    document.getElementById('esg-name').value = 'Joel Tsi';
+    document.getElementById('esg-role').value = 'Director';
+    // Pre-select ICT industry
+    const ictBtn = document.querySelector('[data-ind="ict"]');
+    if (ictBtn) selectIndustry('ict', ictBtn);
+    // Pre-select CoP intent
+    const copBtn = document.querySelector('[data-intent="cop"]');
+    if (copBtn) { copBtn.classList.add('active'); selectedIntents.add('cop'); document.getElementById('cop-note').style.display = 'block'; }
+  }
   updatePreview();
-  // Pre-select ICT industry
-  const ictBtn = document.querySelector('[data-ind="ict"]');
-  if (ictBtn) selectIndustry('ict', ictBtn);
-  // Pre-select CoP intent
-  const copBtn = document.querySelector('[data-intent="cop"]');
-  if (copBtn) { copBtn.classList.add('active'); selectedIntents.add('cop'); document.getElementById('cop-note').style.display = 'block'; }
 });
 </script>
 </body>

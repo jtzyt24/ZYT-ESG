@@ -290,14 +290,38 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
     <div class="ef-row"><span>Source</span><span>PACT-3.0 · EEIO SEA</span></div>
   </div>
   <div class="sum-actions">
-    <button class="btn-next" onclick="localStorage.setItem('zyt_procurement_data', JSON.stringify({saved:true})); window.location.href='/S-18-review-confirm.html'">Save & Review all clusters <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg></button>
-    <button class="btn-save-draft">Save & exit</button>
+    <button class="btn-next" onclick="saveAndNext()">Save & Review all clusters <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg></button>
+    <button class="btn-save-draft" onclick="saveAndExit()">Save & exit</button>
   </div>
 </div>
 </div>
 </div>
 
-<script>
+<script type="module">
+import { createClusterData, createEmissionEntry, saveClusterData, loadClusterData } from '/js/zyt-core/schema.js';
+import { goTo } from '/js/zyt-core/config.js';
+
+const CLUSTER_ID = 'procurement';
+
+const EF_SOURCE = {
+  pkg: 'PACT-3.0 / EEIO SEA — Packaging materials (spend-based)',
+  clean: 'PACT-3.0 / EEIO SEA — Cleaning & facility services (spend-based)',
+  prof: 'PACT-3.0 / EEIO SEA — Professional & business services (spend-based)',
+  other: 'PACT-3.0 / EEIO SEA — Purchased goods (spend-based)',
+};
+const PKG_LABEL = {0.45:'Cardboard/paper packaging',0.60:'Plastic packaging',0.50:'Mixed packaging',0.30:'Compostable/recycled packaging'};
+const OTHER_LABEL = {0.35:'Food ingredients / F&B supplies',0.55:'Manufacturing materials',0.40:'Retail merchandise',0.20:'Office supplies / stationery',0.45:'General goods (mixed)'};
+function parseNotes(notes) {
+  const out = {};
+  if (!notes) return out;
+  notes.split(';').forEach(pair => {
+    const [k, v] = pair.split('=');
+    out[k] = v;
+  });
+  return out;
+}
+const val = id => document.getElementById(id)?.value || '';
+
 const S={pkg:{co2:0,sgd:0},clean:{co2:0,sgd:0},prof:{co2:0,sgd:0},other:{co2:0,sgd:0}};
 
 function toggleSec(id){const b=document.getElementById('body-'+id),c=document.getElementById('chev-'+id);b.classList.toggle('open',!b.classList.contains('open'));c.classList.toggle('open',!c.classList.contains('open'));}
@@ -356,6 +380,159 @@ function updateSummary(){
   document.getElementById('prog-fill').style.width=Math.round(done/4*100)+'%';
   document.getElementById('prog-label').textContent=done+' of 4 sections completed';
 }
+
+// ── BUILD EMISSION ENTRIES FROM STATE (all Scope 3, Cat 1, spend-based) ──
+function buildEntriesFromState() {
+  const entries = [];
+
+  if (!document.getElementById('pkg-na').checked && S.pkg.co2 > 0) {
+    const ef = parseFloat(val('pkg-type')) || 0.50;
+    const e = createEmissionEntry();
+    e.activityName = `Packaging materials — ${PKG_LABEL[ef] || 'Mixed packaging'}`;
+    e.activityKey = 'packaging_materials_spend';
+    e.quantity = +S.pkg.sgd.toFixed(2);
+    e.unit = 'SGD/yr';
+    e.efValue = ef;
+    e.efUnit = 'kgCO2e/SGD';
+    e.efSource = EF_SOURCE.pkg;
+    e.emissionsKgCo2e = +(S.pkg.co2 * 1000).toFixed(3);
+    e.scope = 3; e.scope3Category = 1;
+    e.costSgd = +S.pkg.sgd.toFixed(2);
+    e.costBasis = 'user_entered'; e.dataQuality = 'estimated';
+    e.notes = `ef=${ef}`;
+    entries.push(e);
+  }
+
+  if (!document.getElementById('clean-na').checked && S.clean.co2 > 0) {
+    const e = createEmissionEntry();
+    e.activityName = 'Cleaning & facility services';
+    e.activityKey = 'cleaning_facility_spend';
+    e.quantity = +S.clean.sgd.toFixed(2);
+    e.unit = 'SGD/yr';
+    e.efValue = 0.15;
+    e.efUnit = 'kgCO2e/SGD';
+    e.efSource = EF_SOURCE.clean;
+    e.emissionsKgCo2e = +(S.clean.co2 * 1000).toFixed(3);
+    e.scope = 3; e.scope3Category = 1;
+    e.costSgd = +S.clean.sgd.toFixed(2);
+    e.costBasis = 'user_entered'; e.dataQuality = 'estimated';
+    entries.push(e);
+  }
+
+  if (!document.getElementById('prof-na').checked && S.prof.co2 > 0) {
+    const e = createEmissionEntry();
+    e.activityName = 'Professional & business services';
+    e.activityKey = 'professional_services_spend';
+    e.quantity = +S.prof.sgd.toFixed(2);
+    e.unit = 'SGD/yr';
+    e.efValue = 0.08;
+    e.efUnit = 'kgCO2e/SGD';
+    e.efSource = EF_SOURCE.prof;
+    e.emissionsKgCo2e = +(S.prof.co2 * 1000).toFixed(3);
+    e.scope = 3; e.scope3Category = 1;
+    e.costSgd = +S.prof.sgd.toFixed(2);
+    e.costBasis = 'user_entered'; e.dataQuality = 'estimated';
+    entries.push(e);
+  }
+
+  if (!document.getElementById('other-na').checked && S.other.co2 > 0) {
+    const ef = parseFloat(val('other-type')) || 0.45;
+    const e = createEmissionEntry();
+    e.activityName = `Other purchased goods — ${OTHER_LABEL[ef] || 'General goods (mixed)'}`;
+    e.activityKey = 'other_purchased_goods_spend';
+    e.quantity = +S.other.sgd.toFixed(2);
+    e.unit = 'SGD/yr';
+    e.efValue = ef;
+    e.efUnit = 'kgCO2e/SGD';
+    e.efSource = EF_SOURCE.other;
+    e.emissionsKgCo2e = +(S.other.co2 * 1000).toFixed(3);
+    e.scope = 3; e.scope3Category = 1;
+    e.costSgd = +S.other.sgd.toFixed(2);
+    e.costBasis = 'user_entered'; e.dataQuality = 'estimated';
+    e.notes = `ef=${ef}`;
+    entries.push(e);
+  }
+
+  return entries;
+}
+
+// ── RESTORE STATE FROM SAVED ENTRIES ──
+function restoreFromSaved() {
+  const saved = loadClusterData(CLUSTER_ID);
+  if (!saved || !saved.entries || !saved.entries.length) return;
+
+  saved.entries.forEach(entry => {
+    const p = parseNotes(entry.notes);
+    switch (entry.activityKey) {
+      case 'packaging_materials_spend':
+        document.getElementById('pkg-na').checked = false;
+        toggleNA('pkg-inputs', document.getElementById('pkg-na'), 'pkg');
+        document.getElementById('pkg-sgd').value = entry.quantity;
+        if (p.ef) document.getElementById('pkg-type').value = p.ef;
+        calcPkg();
+        break;
+
+      case 'cleaning_facility_spend':
+        document.getElementById('clean-na').checked = false;
+        toggleNA('clean-inputs', document.getElementById('clean-na'), 'clean');
+        document.getElementById('clean-sgd').value = entry.quantity;
+        calcClean();
+        break;
+
+      case 'professional_services_spend':
+        document.getElementById('prof-na').checked = false;
+        toggleNA('prof-inputs', document.getElementById('prof-na'), 'prof');
+        document.getElementById('prof-sgd').value = entry.quantity;
+        calcProf();
+        break;
+
+      case 'other_purchased_goods_spend':
+        document.getElementById('other-na').checked = false;
+        toggleNA('other-inputs', document.getElementById('other-na'), 'other');
+        document.getElementById('other-sgd').value = entry.quantity;
+        if (p.ef) document.getElementById('other-type').value = p.ef;
+        calcOther();
+        break;
+    }
+  });
+
+  updateSummary();
+}
+
+// ── SAVE / EXIT ──
+function persist() {
+  const data = createClusterData(CLUSTER_ID);
+  data.saved = true;
+  data.entries = buildEntriesFromState();
+  saveClusterData(CLUSTER_ID, data);
+}
+
+function saveAndNext() {
+  persist();
+  goTo('S-18');
+}
+
+function saveAndExit() {
+  persist();
+  goTo('S-09');
+}
+
+// expose for inline onclick handlers
+window.toggleSec = toggleSec;
+window.toggleTip = toggleTip;
+window.toggleNA = toggleNA;
+window.calcPkg = calcPkg;
+window.calcClean = calcClean;
+window.calcProf = calcProf;
+window.calcOther = calcOther;
+window.saveAndNext = saveAndNext;
+window.saveAndExit = saveAndExit;
+
+// ── INIT ──
+window.addEventListener('load', () => {
+  restoreFromSaved();
+  updateSummary();
+});
 </script>
 </body>
 </html>

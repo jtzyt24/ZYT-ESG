@@ -634,14 +634,37 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
       Save & go to Cooling & refrigeration
       <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg>
     </button>
-    <button class="btn-save-draft">Save & exit</button>
+    <button class="btn-save-draft" onclick="saveAndExit()">Save & exit</button>
   </div>
 </div>
 </div>
 
 </div><!-- /layout -->
 
-<script>
+<script type="module">
+import { createClusterData, createEmissionEntry, saveClusterData, loadClusterData } from '/js/zyt-core/schema.js';
+import { goTo } from '/js/zyt-core/config.js';
+
+const CLUSTER_ID = 'transport';
+
+const EF_SOURCE = {
+  petrol: 'NEA/SEFR Jan 2026 — Petrol combustion (SEFR_PETROL_L)',
+  diesel: 'NEA/SEFR Jan 2026 — Diesel combustion (SEFR_DIESEL_L)',
+  lpg: 'NEA/SEFR Jan 2026 — LPG combustion (SEFR_LPG_L)',
+  cng: 'IPCC default — CNG combustion',
+  ev: 'N/A — electric vehicle (no direct combustion)',
+};
+
+function parseNotes(notes) {
+  const out = {};
+  if (!notes) return out;
+  notes.split(';').forEach(pair => {
+    const [k, v] = pair.split('=');
+    out[k] = v;
+  });
+  return out;
+}
+
 // ── CONSTANTS ──
 const EF = {
   petrol: 2.295,    // kgCO₂/litre (3080.755 × 0.745 / 1000)
@@ -1097,18 +1120,340 @@ function clearPersonalVeh() {
   r[1].className='rpill empty'; r[1].innerHTML='<span class="rpill-val">—</span><span>annual mileage reimbursement</span>';
 }
 
-function saveAndNext() {
-  localStorage.setItem('zyt_transport_data', JSON.stringify({saved:true}));
-  window.location.href = '/S-12-cooling-refrigeration.html';
+// ── BUILD EMISSION ENTRIES FROM STATE ──
+function buildEntriesFromState() {
+  const entries = [];
+
+  // Company vehicles (Scope 1)
+  S.vehicles.forEach(v => {
+    const fuel = document.getElementById(v.id + '-fuel')?.value || 'diesel';
+    const fd = FUEL_TYPES.find(f => f.val === fuel);
+    const name = document.getElementById(v.id + '-name')?.value || fd.label;
+    if (v.litres_yr > 0) {
+      const e = createEmissionEntry();
+      e.activityName = name;
+      e.activityKey = `company_vehicle_${fuel}`;
+      e.quantity = +v.litres_yr.toFixed(1);
+      e.unit = fd.unit === 'litres' ? 'L' : fd.unit;
+      e.efValue = fd.ef;
+      e.efUnit = fd.unit === 'kg' ? 'kgCO2e/kg' : fd.unit === 'kWh' ? 'kgCO2e/kWh' : 'kgCO2e/L';
+      e.efSource = EF_SOURCE[fuel] || 'NEA/SEFR Jan 2026';
+      e.emissionsKgCo2e = +(v.co2 * 1000).toFixed(3);
+      e.scope = 1;
+      e.costSgd = +v.cost.toFixed(2);
+      e.costBasis = 'reference_price';
+      e.dataQuality = 'estimated';
+      entries.push(e);
+    }
+  });
+
+  // Inbound freight (Scope 3 Cat 4)
+  if (S.inbound > 0) {
+    const mode = document.querySelector('#inbound-mode-tabs .mtab.active')?.dataset.m;
+    const e = createEmissionEntry();
+    e.activityName = 'Inbound freight (3PL)';
+    e.efSource = 'GHG Protocol default — road freight (spend-based proxy)';
+    e.emissionsKgCo2e = +(S.inbound * 1000).toFixed(3);
+    e.scope = 3; e.scope3Category = 4;
+    e.costSgd = S.inbound_sgd > 0 ? +S.inbound_sgd.toFixed(2) : null;
+    e.costBasis = 'estimated'; e.dataQuality = 'estimated';
+    if (mode === 'inbound-weight') {
+      const t = parseFloat(document.getElementById('inb-tonnes').value) || 0;
+      const km = parseFloat(document.getElementById('inb-km').value) || 0;
+      const trips = parseFloat(document.getElementById('inb-trips').value) || 0;
+      e.activityKey = 'inbound_freight_tkm';
+      e.quantity = +(t * km * trips).toFixed(1);
+      e.unit = 'tonne-km';
+      e.efValue = EF.freight_road;
+      e.efUnit = 'kgCO2e/tonne-km';
+      e.notes = `tonnes=${t};km=${km};trips=${trips}`;
+    } else {
+      e.activityKey = 'inbound_freight_spend';
+      e.quantity = +(parseFloat(document.getElementById('inb-sgd').value) || 0).toFixed(2);
+      e.unit = 'SGD/yr';
+    }
+    entries.push(e);
+  }
+
+  // Outbound delivery (Scope 3 Cat 9)
+  if (S.outbound > 0) {
+    const mode = document.querySelector('#outbound-mode-tabs .mtab.active')?.dataset.m || 'outbound-parcels';
+    const e = createEmissionEntry();
+    e.activityName = 'Outbound delivery (3PL/courier)';
+    e.efSource = 'GHG Protocol-based last-mile delivery estimate';
+    e.emissionsKgCo2e = +(S.outbound * 1000).toFixed(3);
+    e.scope = 3; e.scope3Category = 9;
+    e.costSgd = S.outbound_sgd > 0 ? +S.outbound_sgd.toFixed(2) : null;
+    e.costBasis = 'estimated'; e.dataQuality = 'estimated';
+    if (mode === 'outbound-spend') {
+      e.activityKey = 'outbound_delivery_spend';
+      e.quantity = +(parseFloat(document.getElementById('out-sgd').value) || 0).toFixed(2);
+      e.unit = 'SGD/mo';
+    } else {
+      const parcels = parseFloat(document.getElementById('out-parcels').value) || 0;
+      const km = parseFloat(document.getElementById('out-km').value) || 0;
+      e.activityKey = 'outbound_delivery_parcels';
+      e.quantity = +(parcels * km).toFixed(1);
+      e.unit = 'parcel-km/mo';
+      e.notes = `parcels=${parcels};km=${km}`;
+    }
+    entries.push(e);
+  }
+
+  // Business flights (Scope 3 Cat 6)
+  S.flights.forEach(f => {
+    if (f.co2 > 0) {
+      const routeKey = document.getElementById(f.id + '-route')?.value || '';
+      const trips = document.getElementById(f.id + '-trips')?.value || '';
+      const pax = document.getElementById(f.id + '-pax')?.value || '1';
+      const cabin = document.getElementById(f.id + '-cabin')?.value || '1.0';
+      const customKm = document.getElementById(f.id + '-custom-km')?.value || '';
+      const e = createEmissionEntry();
+      e.activityName = `Business flight — ${routeKey}`;
+      e.activityKey = 'business_flight';
+      e.unit = 'trips';
+      e.efSource = 'ICAO Carbon Emissions Calculator (RFI ×2 for high-altitude emissions)';
+      e.emissionsKgCo2e = +(f.co2 * 1000).toFixed(3);
+      e.scope = 3; e.scope3Category = 6;
+      e.costSgd = +f.cost.toFixed(2);
+      e.costBasis = 'estimated'; e.dataQuality = 'estimated';
+      e.notes = `route=${routeKey};trips=${trips};pax=${pax};cabin=${cabin};customKm=${customKm}`;
+      entries.push(e);
+    }
+  });
+
+  // Grab/taxi business use (Scope 3 Cat 6)
+  if (S.grab > 0) {
+    const e = createEmissionEntry();
+    e.activityName = 'Grab/taxi — business use';
+    e.activityKey = 'grab_taxi_business';
+    e.quantity = +(S.grab_sgd / PRICE.grab_per_km).toFixed(1);
+    e.unit = 'km';
+    e.efValue = EF.grab_ice;
+    e.efUnit = 'kgCO2e/person-km';
+    e.efSource = 'MOT Singapore via SEFR (MOT_TAXI_GRAB_PKM)';
+    e.emissionsKgCo2e = +(S.grab * 1000).toFixed(3);
+    e.scope = 3; e.scope3Category = 6;
+    e.costSgd = +S.grab_sgd.toFixed(2);
+    e.costBasis = 'estimated'; e.dataQuality = 'estimated';
+    entries.push(e);
+  }
+
+  // Personal vehicle for business (Scope 3 Cat 6)
+  if (S.personal_veh > 0) {
+    const isReimburse = document.getElementById('pv-reimburse')?.classList.contains('active');
+    const e = createEmissionEntry();
+    e.activityName = 'Personal vehicle — business use';
+    e.unit = 'km';
+    e.efUnit = 'kgCO2e/person-km';
+    e.efSource = 'MOT Singapore via SEFR (MOT_CAR_*_PKM)';
+    e.emissionsKgCo2e = +(S.personal_veh * 1000).toFixed(3);
+    e.scope = 3; e.scope3Category = 6;
+    e.costSgd = +S.personal_veh_sgd.toFixed(2);
+    e.costBasis = 'estimated'; e.dataQuality = 'estimated';
+    if (isReimburse) {
+      const sgd = parseFloat(document.getElementById('pv-sgd').value) || 0;
+      const rate = parseFloat(document.getElementById('pv-rate').value) || 0.60;
+      e.activityKey = 'personal_vehicle_reimburse';
+      e.quantity = +(sgd / rate).toFixed(1);
+      e.efValue = 0.1732;
+      e.notes = `sgd=${sgd};rate=${rate}`;
+    } else {
+      const staff = parseFloat(document.getElementById('pv-staff').value) || 0;
+      const kmPw = parseFloat(document.getElementById('pv-km-pw').value) || 0;
+      const weeks = parseFloat(document.getElementById('pv-weeks').value) || 48;
+      const ef = parseFloat(document.getElementById('pv-fuel-type').value) || 0.1732;
+      e.activityKey = 'personal_vehicle_km';
+      e.quantity = +(staff * kmPw * weeks).toFixed(1);
+      e.efValue = ef;
+      e.notes = `staff=${staff};kmPw=${kmPw};weeks=${weeks};ef=${ef}`;
+    }
+    entries.push(e);
+  }
+
+  // Hotel stays (Scope 3 Cat 6)
+  if (S.hotels > 0) {
+    const e = createEmissionEntry();
+    e.activityName = 'Hotel stays — business travel';
+    e.activityKey = 'hotel_stays';
+    e.quantity = parseFloat(document.getElementById('hotel-nights').value) || 0;
+    e.unit = 'nights';
+    e.efValue = parseFloat(document.getElementById('hotel-type').value) || 30;
+    e.efUnit = 'kgCO2e/night';
+    e.efSource = 'GHG Protocol average — hotel stay';
+    e.emissionsKgCo2e = +(S.hotels * 1000).toFixed(3);
+    e.scope = 3; e.scope3Category = 6;
+    e.costSgd = +S.hotel_sgd.toFixed(2);
+    e.costBasis = 'estimated'; e.dataQuality = 'estimated';
+    entries.push(e);
+  }
+
+  return entries;
 }
 
-// ── INIT: add one demo vehicle ──
+// ── RESTORE STATE FROM SAVED ENTRIES ──
+function restoreFromSaved() {
+  const saved = loadClusterData(CLUSTER_ID);
+  if (!saved || !saved.entries || !saved.entries.length) return;
+
+  saved.entries.forEach(entry => {
+    switch (entry.activityKey) {
+      case 'company_vehicle_petrol':
+      case 'company_vehicle_diesel':
+      case 'company_vehicle_lpg':
+      case 'company_vehicle_cng':
+      case 'company_vehicle_ev': {
+        const fuel = entry.activityKey.replace('company_vehicle_', '');
+        addVehicle();
+        const id = 'v' + vehicleCount;
+        document.getElementById(id + '-name').value = entry.activityName;
+        document.getElementById(id + '-fuel').value = fuel;
+        document.getElementById(id + '-litres').value = +(entry.quantity / 12).toFixed(2);
+        calcVehicleEntry(id);
+        break;
+      }
+      case 'inbound_freight_tkm': {
+        document.getElementById('inbound-na').checked = false;
+        toggleNA('inbound-inputs', document.getElementById('inbound-na'), 'inbound');
+        const p = parseNotes(entry.notes);
+        const btns = document.querySelectorAll('#inbound-mode-tabs .mtab');
+        switchMode('inbound', ['inbound-spend', 'inbound-weight'], 'inbound-weight', btns[1]);
+        document.getElementById('inb-tonnes').value = p.tonnes;
+        document.getElementById('inb-km').value = p.km;
+        document.getElementById('inb-trips').value = p.trips;
+        calcInbound();
+        break;
+      }
+      case 'inbound_freight_spend':
+        document.getElementById('inbound-na').checked = false;
+        toggleNA('inbound-inputs', document.getElementById('inbound-na'), 'inbound');
+        document.getElementById('inb-sgd').value = entry.quantity;
+        calcInbound();
+        break;
+
+      case 'outbound_delivery_parcels': {
+        document.getElementById('outbound-na').checked = false;
+        toggleNA('outbound-inputs', document.getElementById('outbound-na'), 'outbound');
+        const p = parseNotes(entry.notes);
+        document.getElementById('out-parcels').value = p.parcels;
+        document.getElementById('out-km').value = p.km;
+        calcOutbound();
+        break;
+      }
+      case 'outbound_delivery_spend': {
+        document.getElementById('outbound-na').checked = false;
+        toggleNA('outbound-inputs', document.getElementById('outbound-na'), 'outbound');
+        const btns = document.querySelectorAll('#outbound-mode-tabs .mtab');
+        switchMode('outbound', ['outbound-parcels', 'outbound-spend'], 'outbound-spend', btns[1]);
+        document.getElementById('out-sgd').value = entry.quantity;
+        calcOutbound();
+        break;
+      }
+      case 'business_flight': {
+        document.getElementById('flights-na').checked = false;
+        toggleNA('flights-inputs', document.getElementById('flights-na'), 'flights');
+        const p = parseNotes(entry.notes);
+        addFlight();
+        const id = 'f' + flightCount;
+        if (p.route && ROUTES.hasOwnProperty(p.route)) {
+          document.getElementById(id + '-route').value = p.route;
+          if (p.route === 'Custom route') {
+            document.getElementById(id + '-custom-km-wrap').style.display = 'block';
+            document.getElementById(id + '-custom-km').value = p.customKm;
+          }
+        }
+        document.getElementById(id + '-trips').value = p.trips;
+        document.getElementById(id + '-pax').value = p.pax;
+        document.getElementById(id + '-cabin').value = p.cabin;
+        calcFlightEntry(id);
+        break;
+      }
+      case 'grab_taxi_business':
+        document.getElementById('grab-na').checked = false;
+        toggleNA('grab-inputs', document.getElementById('grab-na'), 'grab');
+        document.getElementById('grab-km').value = +(entry.quantity / 12).toFixed(1);
+        calcGrab();
+        break;
+
+      case 'personal_vehicle_reimburse': {
+        document.getElementById('pv-na').checked = false;
+        toggleNA('pv-inputs', document.getElementById('pv-na'), 'pv');
+        const p = parseNotes(entry.notes);
+        document.getElementById('pv-sgd').value = p.sgd;
+        document.getElementById('pv-rate').value = p.rate;
+        calcPersonalVeh();
+        break;
+      }
+      case 'personal_vehicle_km': {
+        document.getElementById('pv-na').checked = false;
+        toggleNA('pv-inputs', document.getElementById('pv-na'), 'pv');
+        const p = parseNotes(entry.notes);
+        const btns = document.querySelectorAll('#pv-mode-tabs .mtab');
+        switchMode('pv', ['pv-reimburse', 'pv-km'], 'pv-km', btns[1]);
+        document.getElementById('pv-staff').value = p.staff;
+        document.getElementById('pv-km-pw').value = p.kmPw;
+        document.getElementById('pv-weeks').value = p.weeks;
+        document.getElementById('pv-fuel-type').value = p.ef;
+        calcPersonalVehKm();
+        break;
+      }
+      case 'hotel_stays':
+        document.getElementById('hotels-na').checked = false;
+        toggleNA('hotels-inputs', document.getElementById('hotels-na'), 'hotels');
+        document.getElementById('hotel-nights').value = entry.quantity;
+        document.getElementById('hotel-type').value = entry.efValue;
+        calcHotels();
+        break;
+    }
+  });
+
+  updateSummary();
+}
+
+// ── SAVE / EXIT ──
+function persist() {
+  const data = createClusterData(CLUSTER_ID);
+  data.saved = true;
+  data.entries = buildEntriesFromState();
+  saveClusterData(CLUSTER_ID, data);
+}
+
+function saveAndNext() {
+  persist();
+  goTo('S-12');
+}
+
+function saveAndExit() {
+  persist();
+  goTo('S-09');
+}
+
+// expose for inline onclick handlers (including dynamically created list rows)
+window.addVehicle = addVehicle;
+window.removeVehicle = removeVehicle;
+window.calcVehicleEntry = calcVehicleEntry;
+window.calcVehicleFromKm = calcVehicleFromKm;
+window.addFlight = addFlight;
+window.removeFlight = removeFlight;
+window.calcFlightEntry = calcFlightEntry;
+window.calcInbound = calcInbound;
+window.calcOutbound = calcOutbound;
+window.calcGrab = calcGrab;
+window.calcGrabBill = calcGrabBill;
+window.calcPersonalVeh = calcPersonalVeh;
+window.calcPersonalVehKm = calcPersonalVehKm;
+window.calcHotels = calcHotels;
+window.toggleSec = toggleSec;
+window.toggleTip = toggleTip;
+window.toggleNA = toggleNA;
+window.switchMode = switchMode;
+window.attachFile = attachFile;
+window.saveAndNext = saveAndNext;
+window.saveAndExit = saveAndExit;
+
+// ── INIT ──
 window.addEventListener('load', () => {
-  addVehicle();
-  document.getElementById('v1-name').value='Delivery van';
-  document.getElementById('v1-fuel').value='diesel';
-  document.getElementById('v1-litres').value='80';
-  calcVehicleEntry('v1');
+  restoreFromSaved();
   updateProgress();
 });
 </script>

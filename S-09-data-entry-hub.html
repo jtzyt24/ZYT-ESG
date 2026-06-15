@@ -654,9 +654,9 @@ nav {
 
   <div class="page-hd">
     <div class="page-company">
-      Reporting year <span>2024</span>
-      <span>Sunshine Bakery Pte Ltd</span>
-      <span>F&B</span>
+      Reporting year <span id="ph-year">—</span>
+      <span id="ph-company">Your company</span>
+      <span id="ph-industry">—</span>
     </div>
     <h1 class="page-title">Enter your ESG data</h1>
     <p class="page-sub">Work through each section below. Your data is saved automatically as you go. You can return and update any section at any time.</p>
@@ -685,7 +685,7 @@ nav {
   <div class="pillar-panel active" id="panel-E">
     <div class="preset-notice">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5l2 1.5"/></svg>
-      Highlighted clusters are most relevant for <strong>F&B</strong> businesses. All clusters are shown — <a onclick="window.location.href='/S-06-company-profile.html'">change industry</a>.
+      Highlighted clusters are most relevant for <strong id="ph-industry-notice">your industry</strong> businesses. All clusters are shown — <a onclick="window.location.href='/S-06-company-profile.html'">change industry</a>.
     </div>
 
     <div class="cluster-grid" id="cluster-grid">
@@ -756,7 +756,35 @@ nav {
 </div>
 
 <script>
+// ── INDUSTRY → RELEVANT CLUSTERS MAP ──
+const INDUSTRY_RELEVANCE = {
+  fnb:           ['power','cooling','cooking','waste'],
+  retail:        ['power','waste','people','digital'],
+  logistics:     ['transport','power','cooling','people'],
+  manufacturing: ['power','cooling','cooking','waste','procurement'],
+  construction:  ['transport','power','waste','procurement'],
+  ict:           ['power','digital','people','procurement'],
+  cleaning:      ['transport','people','procurement','power'],
+  healthcare:    ['power','cooling','waste','procurement'],
+  hospitality:   ['power','cooling','cooking','waste','people'],
+  other:         ['power','transport','waste','people'],
+};
+
+const INDUSTRY_LABELS = {
+  fnb:           'Food & Beverage',
+  retail:        'Retail',
+  logistics:     'Logistics & Transport',
+  manufacturing: 'Manufacturing',
+  construction:  'Construction',
+  ict:           'ICT & Professional Services',
+  cleaning:      'Cleaning & Facility Services',
+  healthcare:    'Healthcare & Social Services',
+  hospitality:   'Hospitality & Events',
+  other:         'General Business',
+};
+
 // ── CLUSTER DATA ──
+// relevant/status/co2/sgd/progress are placeholders — set dynamically in initFromProfile()
 const CLUSTERS = [
   {
     id: 'power',
@@ -765,10 +793,7 @@ const CLUSTERS = [
     role: 'Owner / facilities manager',
     activities: ['Grid electricity', 'Diesel generator', 'Solar', 'District cooling'],
     scopes: ['S2','S1'],
-    relevant: true,   // F&B preset
-    status: 'done',
-    co2: 14.2, sgd: 29000,
-    progress: 100,
+    relevant: false, status: 'none', co2: 0, sgd: 0, progress: 0,
     screen: 'S-10'
   },
   {
@@ -778,10 +803,7 @@ const CLUSTERS = [
     role: 'Logistics / operations manager',
     activities: ['Company vehicles', '3PL freight', 'Business flights'],
     scopes: ['S1','S3'],
-    relevant: false,
-    status: 'prog',
-    co2: 8.4, sgd: 11200,
-    progress: 60,
+    relevant: false, status: 'none', co2: 0, sgd: 0, progress: 0,
     screen: 'S-11'
   },
   {
@@ -791,10 +813,7 @@ const CLUSTERS = [
     role: 'Facilities manager',
     activities: ['AC refrigerant', 'Cold room / freezer', 'Reefer units'],
     scopes: ['S1'],
-    relevant: true,
-    status: 'done',
-    co2: 4.1, sgd: 4200,
-    progress: 100,
+    relevant: false, status: 'none', co2: 0, sgd: 0, progress: 0,
     screen: 'S-12'
   },
   {
@@ -804,10 +823,7 @@ const CLUSTERS = [
     role: 'Kitchen supervisor',
     activities: ['Piped gas', 'LPG cylinders', 'Industrial boiler'],
     scopes: ['S1'],
-    relevant: true,
-    status: 'done',
-    co2: 6.8, sgd: 8400,
-    progress: 100,
+    relevant: false, status: 'none', co2: 0, sgd: 0, progress: 0,
     screen: 'S-13'
   },
   {
@@ -817,10 +833,7 @@ const CLUSTERS = [
     role: 'Operations / kitchen',
     activities: ['General waste', 'Food waste', 'Plastics', 'PUB water'],
     scopes: ['S3'],
-    relevant: true,
-    status: 'none',
-    co2: 0, sgd: 0,
-    progress: 0,
+    relevant: false, status: 'none', co2: 0, sgd: 0, progress: 0,
     screen: 'S-14'
   },
   {
@@ -830,10 +843,7 @@ const CLUSTERS = [
     role: 'HR manager',
     activities: ['MRT / bus commute', 'Private car commute', 'WFH days'],
     scopes: ['S3'],
-    relevant: false,
-    status: 'none',
-    co2: 0, sgd: 0,
-    progress: 0,
+    relevant: false, status: 'none', co2: 0, sgd: 0, progress: 0,
     screen: 'S-15'
   },
   {
@@ -843,10 +853,7 @@ const CLUSTERS = [
     role: 'IT manager / office manager',
     activities: ['Cloud storage', 'Virtual machines', 'IT equipment'],
     scopes: ['S3'],
-    relevant: false,
-    status: 'none',
-    co2: 0, sgd: 0,
-    progress: 0,
+    relevant: false, status: 'none', co2: 0, sgd: 0, progress: 0,
     screen: 'S-16'
   },
   {
@@ -856,13 +863,66 @@ const CLUSTERS = [
     role: 'Purchasing / admin',
     activities: ['Packaging', 'Cleaning services', 'Security services', 'Professional services'],
     scopes: ['S3'],
-    relevant: false,
-    status: 'none',
-    co2: 0, sgd: 0,
-    progress: 0,
+    relevant: false, status: 'none', co2: 0, sgd: 0, progress: 0,
     screen: 'S-17'
   },
 ];
+
+// ── INIT FROM PROFILE (S-06 data) ──
+function initFromProfile() {
+  let profile = {};
+  try { profile = JSON.parse(localStorage.getItem('zyt_company_profile') || '{}'); } catch(e) {}
+
+  const company  = profile.companyName || 'Your company';
+  const year     = profile.reportingYear || '—';
+  const industry = profile.industry || 'other';
+  const industryLabel = INDUSTRY_LABELS[industry] || 'General Business';
+
+  document.getElementById('ph-company').textContent = company;
+  document.getElementById('ph-year').textContent = year;
+  document.getElementById('ph-industry').textContent = industryLabel;
+  document.getElementById('ph-industry-notice').textContent = industryLabel;
+
+  // Set relevance based on industry
+  const relevantIds = INDUSTRY_RELEVANCE[industry] || INDUSTRY_RELEVANCE.other;
+  CLUSTERS.forEach(cl => {
+    cl.relevant = relevantIds.includes(cl.id);
+  });
+
+  // Check which clusters have saved data (currently just a {saved:true} flag —
+  // emissions calculations are wired in a later phase)
+  const storageMap = {
+    power: 'zyt_power_data',
+    transport: 'zyt_transport_data',
+    cooling: 'zyt_cooling_data',
+    cooking: 'zyt_cooking_data',
+    waste: 'zyt_waste_data',
+    people: 'zyt_commuting_data',
+    digital: 'zyt_digital_data',
+    procurement: 'zyt_procurement_data',
+  };
+  CLUSTERS.forEach(cl => {
+    if (localStorage.getItem(storageMap[cl.id])) {
+      cl.status = 'done';
+      cl.progress = 100;
+    }
+  });
+
+  // Social & Governance status (S-31/32, S-33)
+  const sgStatus = {
+    social_workforce: !!localStorage.getItem('zyt_social_data'),
+    social_training:  !!localStorage.getItem('zyt_social_data'),
+    governance:       !!localStorage.getItem('zyt_governance_data'),
+  };
+  const sCards = document.querySelectorAll('#panel-S .sg-card .sg-status');
+  const gCards = document.querySelectorAll('#panel-G .sg-card .sg-status');
+  let sDone = 0, gDone = 0;
+  if (sgStatus.social_workforce) { sCards[0].textContent = 'Complete'; sCards[0].className = 'sg-status done'; sDone++; }
+  if (sgStatus.social_training)  { sCards[1].textContent = 'Complete'; sCards[1].className = 'sg-status done'; sDone++; }
+  if (sgStatus.governance)       { gCards[0].textContent = 'Complete'; gCards[0].className = 'sg-status done'; gDone++; }
+  document.getElementById('pc-S').textContent = `${sDone} / 2`;
+  document.getElementById('pc-G').textContent = `${gDone} / 1`;
+}
 
 function scopeTag(s) {
   const cols = { S1:'#f4a88a', S2:'#8ab4f4', S3:'#a8d4a8' };
@@ -1000,6 +1060,7 @@ function goToReview() {
 }
 
 // ── INIT ──
+initFromProfile();
 renderClusters();
 computeTotals();
 computeStatus();

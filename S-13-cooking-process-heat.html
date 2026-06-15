@@ -592,14 +592,29 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
       Save & go to Waste & water
       <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg>
     </button>
-    <button class="btn-save-draft">Save & exit</button>
+    <button class="btn-save-draft" onclick="saveAndExit()">Save & exit</button>
   </div>
 </div>
 </div>
 
 </div><!-- /layout -->
 
-<script>
+<script type="module">
+import { createClusterData, createEmissionEntry, saveClusterData, loadClusterData } from '/js/zyt-core/schema.js';
+import { goTo } from '/js/zyt-core/config.js';
+
+const CLUSTER_ID = 'cooking';
+
+function parseNotes(notes) {
+  const out = {};
+  if (!notes) return out;
+  notes.split(';').forEach(pair => {
+    const [k, v] = pair.split('=');
+    out[k] = v;
+  });
+  return out;
+}
+
 // ── EMISSION FACTORS ──
 const EF = {
   gas_kwh: 0.2023,    // kgCO₂/kWh (natural gas, derived from SEFR 2,695.416 kgCO₂e/t using calorific value ~39.4 MJ/m³)
@@ -943,17 +958,208 @@ function attachFile(section) {
   alert(`Attaching documentation for ${section}.\n\nIn production → Supabase Storage → report appendix.`);
 }
 
-function saveAndNext() {
-localStorage.setItem('zyt_s13_cooking_process_heat_data', JSON.stringify({saved:true}));
-  window.location.href = '/S-14-waste-water.html';
+// ── BUILD EMISSION ENTRIES FROM STATE ──
+function buildEntriesFromState() {
+  const entries = [];
+
+  // Piped gas (Scope 1)
+  if (S.gas.kwh_yr > 0) {
+    const e = createEmissionEntry();
+    e.activityName = 'Piped gas (metered)';
+    e.activityKey = 'piped_gas_kwh';
+    e.quantity = +S.gas.kwh_yr.toFixed(2);
+    e.unit = 'kWh';
+    e.efValue = EF.gas_kwh;
+    e.efUnit = 'kgCO2e/kWh';
+    e.efSource = 'NEA/SEFR Jan 2026 — Piped/natural gas combustion (SEFR_PIPED_GAS_KWH)';
+    e.emissionsKgCo2e = +(S.gas.kwh_yr * EF.gas_kwh).toFixed(3);
+    e.scope = 1;
+    e.costSgd = +S.gas.sgd_yr.toFixed(2);
+    e.costBasis = 'user_entered';
+    e.dataQuality = S.gas.acc === 'h' ? 'measured' : S.gas.acc === 'm' ? 'calculated' : 'estimated';
+    entries.push(e);
+  }
+
+  // LPG (Scope 1)
+  if (S.lpg.co2 > 0) {
+    const e = createEmissionEntry();
+    e.scope = 1;
+    e.emissionsKgCo2e = +(S.lpg.co2 * 1000).toFixed(3);
+    e.costSgd = +S.lpg.sgd.toFixed(2);
+    e.costBasis = 'reference_price';
+    e.dataQuality = 'estimated';
+    if (S.lpg.mode === 'bulk') {
+      const qty = parseFloat(document.getElementById('lpg-bulk-qty').value) || 0;
+      e.activityName = `LPG bulk delivery (${lpgBulkUnit})`;
+      e.activityKey = 'lpg_bulk';
+      e.quantity = +(qty * 12).toFixed(1);
+      e.unit = lpgBulkUnit;
+      e.efValue = lpgBulkUnit === 'kg' ? EF.lpg_kg : EF.lpg_litre;
+      e.efUnit = lpgBulkUnit === 'kg' ? 'kgCO2e/kg' : 'kgCO2e/L';
+      e.efSource = lpgBulkUnit === 'kg' ? 'NEA/SEFR Jan 2026 — LPG combustion per kg (SEFR_LPG_KG)' : 'NEA/SEFR Jan 2026 — LPG combustion per litre (SEFR_LPG_L)';
+      e.notes = `unit=${lpgBulkUnit}`;
+    } else {
+      const cylMode = document.getElementById('lpg-monthly-cyl').classList.contains('active') ? 'monthly' : 'annual';
+      const annualCyls = cylMode === 'annual'
+        ? (parseFloat(document.getElementById('la-cyls').value) || 0)
+        : (S.lpg.cylCo2 > 0 ? S.lpg.co2 * 1000 / S.lpg.cylCo2 : 0);
+      e.activityName = `LPG cylinders (${S.lpg.cylKg}kg)`;
+      e.activityKey = 'lpg_cylinders';
+      e.quantity = +annualCyls.toFixed(1);
+      e.unit = 'cylinders/yr';
+      e.efValue = S.lpg.cylCo2;
+      e.efUnit = 'kgCO2e/cylinder';
+      e.efSource = S.lpg.cylKg === 12 ? 'NEA/SEFR Jan 2026 — LPG 12kg cylinder (SEFR_LPG_12KG_CYL)' : 'NEA/SEFR Jan 2026 — LPG 48kg cylinder (SEFR_LPG_48KG_CYL)';
+      e.notes = `cylKg=${S.lpg.cylKg};mode=${cylMode}`;
+    }
+    entries.push(e);
+  }
+
+  // Boiler / process heat (Scope 1, optional)
+  if (!document.getElementById('boiler-na').checked && S.boiler.co2 > 0) {
+    const ef = parseFloat(document.getElementById('boiler-fuel').value) || 2.660;
+    const isGas = ef === 0.202;
+    const e = createEmissionEntry();
+    e.activityName = `Boiler / process heat (${document.getElementById('boiler-fuel').selectedOptions[0].text})`;
+    e.activityKey = 'boiler_fuel';
+    e.quantity = +(S.boiler.co2 * 1000 / ef).toFixed(1);
+    e.unit = isGas ? 'kWh' : 'L';
+    e.efValue = ef;
+    e.efUnit = isGas ? 'kgCO2e/kWh' : 'kgCO2e/L';
+    e.efSource = ef === 2.660 ? 'NEA/SEFR Jan 2026 — Diesel combustion (SEFR_DIESEL_L)'
+      : isGas ? 'NEA/SEFR Jan 2026 — Piped gas (SEFR_PIPED_GAS_KWH)'
+      : 'NEA/SEFR Jan 2026 — Residual fuel oil combustion';
+    e.emissionsKgCo2e = +(S.boiler.co2 * 1000).toFixed(3);
+    e.scope = 1;
+    e.costSgd = +S.boiler.sgd.toFixed(2);
+    e.costBasis = 'reference_price';
+    e.dataQuality = 'estimated';
+    e.notes = `fuelEf=${ef}`;
+    entries.push(e);
+  }
+
+  // Charcoal / solid fuel (Scope 1, optional)
+  if (!document.getElementById('charcoal-na').checked && S.charcoal.co2 > 0) {
+    const ef = parseFloat(document.getElementById('charcoal-type').value) || EF.charcoal;
+    const e = createEmissionEntry();
+    e.activityName = ef === EF.charcoal ? 'Charcoal' : 'Wood / wood waste';
+    e.activityKey = 'charcoal_solid_fuel';
+    e.quantity = +(S.charcoal.co2 * 1000 / ef).toFixed(1);
+    e.unit = 'kg';
+    e.efValue = ef;
+    e.efUnit = 'kgCO2e/kg';
+    e.efSource = ef === EF.charcoal ? 'NEA/SEFR Jan 2026 — Charcoal combustion (SEFR_CHARCOAL_KG)' : 'NEA/SEFR Jan 2026 — Wood/wood waste combustion';
+    e.emissionsKgCo2e = +(S.charcoal.co2 * 1000).toFixed(3);
+    e.scope = 1;
+    e.costSgd = +S.charcoal.sgd.toFixed(2);
+    e.costBasis = 'reference_price';
+    e.dataQuality = 'estimated';
+    e.notes = `fuelEf=${ef}`;
+    entries.push(e);
+  }
+
+  return entries;
 }
+
+// ── RESTORE STATE FROM SAVED ENTRIES ──
+function restoreFromSaved() {
+  const saved = loadClusterData(CLUSTER_ID);
+  if (!saved || !saved.entries || !saved.entries.length) return;
+
+  saved.entries.forEach(entry => {
+    const p = parseNotes(entry.notes);
+    switch (entry.activityKey) {
+      case 'piped_gas_kwh': {
+        const btns = document.querySelectorAll('#gas-mode-tabs .mtab');
+        switchMode('gas', ['gas-monthly', 'gas-annual', 'gas-single'], 'gas-annual', btns[1]);
+        document.getElementById('ga-kwh').value = entry.quantity;
+        calcGasAnnual();
+        if (entry.dataQuality === 'measured') S.gas.acc = 'h';
+        break;
+      }
+      case 'lpg_cylinders': {
+        const cylBtn = document.getElementById(p.cylKg === '48' ? 'cyl-48' : 'cyl-12');
+        selectCylinder(cylBtn, 'lpg');
+        const btns = document.querySelectorAll('#lpg-mode-tabs .mtab');
+        switchMode('lpg', ['lpg-monthly-cyl', 'lpg-annual-cyl'], 'lpg-annual-cyl', btns[1]);
+        document.getElementById('la-cyls').value = entry.quantity;
+        calcLPGAnnual();
+        break;
+      }
+      case 'lpg_bulk': {
+        selectCylinder(document.getElementById('cyl-bulk'), 'lpg');
+        const unitBtn = document.getElementById(p.unit === 'L' ? 'lpg-bulk-L-btn' : 'lpg-bulk-kg-btn');
+        switchBulkUnit(p.unit, unitBtn);
+        document.getElementById('lpg-bulk-qty').value = +(entry.quantity / 12).toFixed(2);
+        calcLPGBulk();
+        break;
+      }
+      case 'boiler_fuel':
+        document.getElementById('boiler-na').checked = false;
+        toggleNA('boiler-inputs', document.getElementById('boiler-na'), 'boiler');
+        document.getElementById('boiler-fuel').value = p.fuelEf;
+        document.getElementById('boiler-fuel').dispatchEvent(new Event('change'));
+        document.getElementById('boiler-annual').value = entry.quantity;
+        calcBoilerAnnual();
+        break;
+
+      case 'charcoal_solid_fuel':
+        document.getElementById('charcoal-na').checked = false;
+        toggleNA('charcoal-inputs', document.getElementById('charcoal-na'), 'charcoal');
+        document.getElementById('charcoal-type').value = p.fuelEf;
+        document.getElementById('charcoal-kg').value = +(entry.quantity / 12).toFixed(2);
+        calcCharcoal();
+        break;
+    }
+  });
+
+  updateSummary();
+}
+
+// ── SAVE / EXIT ──
+function persist() {
+  const data = createClusterData(CLUSTER_ID);
+  data.saved = true;
+  data.entries = buildEntriesFromState();
+  saveClusterData(CLUSTER_ID, data);
+}
+
+function saveAndNext() {
+  persist();
+  goTo('S-14');
+}
+
+function saveAndExit() {
+  persist();
+  goTo('S-09');
+}
+
+// expose for inline onclick handlers
+window.toggleSec = toggleSec;
+window.toggleTip = toggleTip;
+window.switchMode = switchMode;
+window.toggleNA = toggleNA;
+window.calcGasMonthly = calcGasMonthly;
+window.calcGasAnnual = calcGasAnnual;
+window.calcGasAnnualBill = calcGasAnnualBill;
+window.calcGasSingle = calcGasSingle;
+window.calcGasSingleBill = calcGasSingleBill;
+window.selectCylinder = selectCylinder;
+window.calcLPGMonthly = calcLPGMonthly;
+window.calcLPGAnnual = calcLPGAnnual;
+window.switchBulkUnit = switchBulkUnit;
+window.calcLPGBulk = calcLPGBulk;
+window.calcBoiler = calcBoiler;
+window.calcBoilerAnnual = calcBoilerAnnual;
+window.updateCharcoalEF = updateCharcoalEF;
+window.calcCharcoal = calcCharcoal;
+window.attachFile = attachFile;
+window.saveAndNext = saveAndNext;
+window.saveAndExit = saveAndExit;
 
 // ── INIT ──
 window.addEventListener('load', () => {
-  // Pre-demo: enter 1,200 kWh on one City Gas bill (bimonthly)
-  document.getElementById('gs-kwh').value = 1200;
-  document.getElementById('gs-period').value = '2';
-  calcGasSingle();
+  restoreFromSaved();
   updateProgress();
 });
 </script>

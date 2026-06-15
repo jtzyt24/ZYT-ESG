@@ -425,16 +425,47 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
       Save & go to Digital & IT
       <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg>
     </button>
-    <button class="btn-save-draft">Save & exit</button>
+    <button class="btn-save-draft" onclick="saveAndExit()">Save & exit</button>
   </div>
 </div>
 </div>
 
 </div><!-- /layout -->
 
-<script>
+<script type="module">
+import { createClusterData, createEmissionEntry, saveClusterData, loadClusterData } from '/js/zyt-core/schema.js';
+import { goTo } from '/js/zyt-core/config.js';
+
+const CLUSTER_ID = 'people';
+
 const EF={mrt:0.0416,bus:0.0737,mix:0.0577,car:0.1732,hybrid:0.1343,ev:0.0618,moto:0.0834,wfh_grid:0.412};
-const S={pt:{co2:0,detail:{mrt:0,bus:0,mix:0}},car:{co2:0,detail:{car:0,hybrid:0,ev:0,moto:0}},wfh:{co2:0,sgd:0},workingDays:264};
+const EF_SOURCE = {
+  mrt: 'MOT Singapore via SEFR — MRT/LRT commuting (MOT_MRT_PKM)',
+  bus: 'MOT Singapore via SEFR — Public bus commuting (MOT_BUS_PKM)',
+  mix: 'MOT Singapore via SEFR — Mixed MRT/bus (avg of MOT_MRT_PKM, MOT_BUS_PKM)',
+  car: 'MOT Singapore via SEFR — Private car petrol/diesel (MOT_CAR_ICE_PKM)',
+  hybrid: 'MOT Singapore via SEFR — Private car hybrid (MOT_CAR_HEV_PKM)',
+  ev: 'MOT Singapore via SEFR — Private car electric (MOT_CAR_EV_PKM)',
+  moto: 'MOT Singapore via SEFR — Motorcycle (MOT_MOTORCYCLE_PKM)',
+  wfh: 'EMA Grid EF 2023 (EMA_GRID_2023)',
+};
+function simpleEfSource(ef) {
+  if (Math.abs(ef - EF.mrt) < 0.0005) return EF_SOURCE.mrt;
+  if (Math.abs(ef - EF.bus) < 0.0005) return EF_SOURCE.bus;
+  return EF_SOURCE.mix;
+}
+function parseNotes(notes) {
+  const out = {};
+  if (!notes) return out;
+  notes.split(';').forEach(pair => {
+    const [k, v] = pair.split('=');
+    out[k] = v;
+  });
+  return out;
+}
+const val = id => document.getElementById(id)?.value || '';
+
+const S={pt:{co2:0,detail:{mrt:0,bus:0,mix:0}},car:{co2:0,detail:{car:0,hybrid:0,ev:0,moto:0}},wfh:{co2:0,sgd:0,kwh_yr:0},workingDays:264};
 
 function toggleSec(id){const b=document.getElementById('body-'+id),c=document.getElementById('chev-'+id);b.classList.toggle('open',!b.classList.contains('open'));c.classList.toggle('open',!c.classList.contains('open'));}
 function toggleTip(id){document.getElementById(id).classList.toggle('open');}
@@ -489,7 +520,7 @@ function calcWFH(){
   const hrs=parseFloat(document.getElementById('wfh-hrs').value)||8;
   const mo_kwh=watts*hrs*days/1000;
   const annual=mo_kwh*staff*12;
-  S.wfh.co2=annual*EF.wfh_grid/1000;S.wfh.sgd=annual*0.2972;
+  S.wfh.co2=annual*EF.wfh_grid/1000;S.wfh.sgd=annual*0.2972;S.wfh.kwh_yr=annual;
   document.getElementById('wfh-result-text').textContent=staff>0&&days>0?`${staff} staff × ${mo_kwh.toFixed(1)} kWh/mo each = ${(mo_kwh*staff).toFixed(0)} kWh/mo · ${annual.toFixed(0)} kWh/yr`:'Enter staff count and WFH days to calculate';
   const r=document.getElementById('result-wfh').querySelectorAll('.rpill');
   if(S.wfh.co2>0){r[0].className='rpill co2';r[0].innerHTML=`<span class="rpill-val">~ ${S.wfh.co2.toFixed(3)}</span><span>tCO₂e / yr</span>`;r[1].className='rpill cost';r[1].innerHTML=`<span class="rpill-val">≈ SGD ${Math.round(S.wfh.sgd).toLocaleString()}</span><span>est. WFH electricity</span>`;document.getElementById('st-wfh').textContent=`~ ${S.wfh.co2.toFixed(3)} tCO₂e`;document.getElementById('st-wfh').className='sec-total live';}
@@ -527,12 +558,207 @@ function updateProgress(){
   document.getElementById('prog-label').textContent=done+' of 3 sections completed';
 }
 
-localStorage.setItem('zyt_s15_people_commuting_data', JSON.stringify({saved:true}));
-  window.location.href = '/S-16-digital-it.html';}
+// ── BUILD EMISSION ENTRIES FROM STATE ──
+const CAR_ACTIVITY_KEY = { car:'commute_car_petrol', hybrid:'commute_car_hybrid', ev:'commute_car_ev', moto:'commute_motorcycle' };
+const CAR_LABEL = { car:'petrol/diesel car', hybrid:'hybrid car', ev:'electric car (EV)', moto:'motorcycle' };
 
+function buildEntriesFromState() {
+  const entries = [];
+  const wd = getWD();
+
+  // Public transport (Cat 7)
+  const ptDetailActive = document.getElementById('pt-detail').classList.contains('active');
+  if (ptDetailActive) {
+    const modes = [
+      { key:'mrt', name:'Staff commuting — MRT/LRT', ef:EF.mrt, source:EF_SOURCE.mrt, staffId:'mrt-staff', kmId:'mrt-km' },
+      { key:'bus', name:'Staff commuting — public bus', ef:EF.bus, source:EF_SOURCE.bus, staffId:'bus-staff', kmId:'bus-km' },
+      { key:'mix', name:'Staff commuting — mixed MRT + bus', ef:EF.mix, source:EF_SOURCE.mix, staffId:'mix-staff', kmId:'mix-km' },
+    ];
+    modes.forEach(m => {
+      const co2 = S.pt.detail[m.key] || 0;
+      if (co2 > 0) {
+        const staff = val(m.staffId), km = val(m.kmId);
+        const e = createEmissionEntry();
+        e.activityName = m.name;
+        e.activityKey = 'commute_' + m.key;
+        e.quantity = +annualKm(staff, km).toFixed(1);
+        e.unit = 'person-km';
+        e.efValue = m.ef;
+        e.efUnit = 'kgCO2e/person-km';
+        e.efSource = m.source;
+        e.emissionsKgCo2e = +(co2 * 1000).toFixed(3);
+        e.scope = 3; e.scope3Category = 7;
+        e.costBasis = 'estimated'; e.dataQuality = 'estimated';
+        e.notes = `mode=detail;staff=${staff};km=${km};workingDays=${wd}`;
+        entries.push(e);
+      }
+    });
+  } else if (S.pt.co2 > 0) {
+    const staff = val('pt-simple-staff'), km = val('pt-simple-km');
+    const ef = parseFloat(val('pt-simple-mode')) || EF.mix;
+    const e = createEmissionEntry();
+    e.activityName = 'Staff commuting — public transport (simple estimate)';
+    e.activityKey = 'commute_pt_simple';
+    e.quantity = +annualKm(staff, km).toFixed(1);
+    e.unit = 'person-km';
+    e.efValue = ef;
+    e.efUnit = 'kgCO2e/person-km';
+    e.efSource = simpleEfSource(ef);
+    e.emissionsKgCo2e = +(S.pt.co2 * 1000).toFixed(3);
+    e.scope = 3; e.scope3Category = 7;
+    e.costBasis = 'estimated'; e.dataQuality = 'estimated';
+    e.notes = `mode=simple;staff=${staff};km=${km};ef=${ef};workingDays=${wd}`;
+    entries.push(e);
+  }
+
+  // Private vehicle commuting (Cat 7)
+  if (!document.getElementById('car-na').checked) {
+    ['car','hybrid','ev','moto'].forEach(key => {
+      const co2 = (S.car.detail && S.car.detail[key]) || 0;
+      if (co2 > 0) {
+        const staffId = key + '-staff', kmId = key + '-km';
+        const staff = val(staffId), km = val(kmId);
+        const e = createEmissionEntry();
+        e.activityName = `Staff commuting — ${CAR_LABEL[key]}`;
+        e.activityKey = CAR_ACTIVITY_KEY[key];
+        e.quantity = +annualKm(staff, km).toFixed(1);
+        e.unit = 'person-km';
+        e.efValue = EF[key];
+        e.efUnit = 'kgCO2e/person-km';
+        e.efSource = EF_SOURCE[key];
+        e.emissionsKgCo2e = +(co2 * 1000).toFixed(3);
+        e.scope = 3; e.scope3Category = 7;
+        e.costBasis = 'estimated'; e.dataQuality = 'estimated';
+        e.notes = `staff=${staff};km=${km};workingDays=${wd}`;
+        entries.push(e);
+      }
+    });
+  }
+
+  // WFH electricity (Cat 7)
+  if (!document.getElementById('wfh-na').checked && S.wfh.co2 > 0) {
+    const e = createEmissionEntry();
+    e.activityName = 'Staff WFH electricity (business-use share)';
+    e.activityKey = 'commute_wfh_electricity';
+    e.quantity = +(S.wfh.kwh_yr || 0).toFixed(1);
+    e.unit = 'kWh';
+    e.efValue = EF.wfh_grid;
+    e.efUnit = 'kgCO2e/kWh';
+    e.efSource = EF_SOURCE.wfh;
+    e.emissionsKgCo2e = +(S.wfh.co2 * 1000).toFixed(3);
+    e.scope = 3; e.scope3Category = 7;
+    e.costSgd = +S.wfh.sgd.toFixed(2);
+    e.costBasis = 'estimated'; e.dataQuality = 'estimated';
+    e.notes = `staff=${val('wfh-staff')};days=${val('wfh-days')};hrs=${val('wfh-hrs')};device=${val('wfh-device')};customW=${val('wfh-custom-w')}`;
+    entries.push(e);
+  }
+
+  return entries;
+}
+
+// ── RESTORE STATE FROM SAVED ENTRIES ──
+function restoreFromSaved() {
+  const saved = loadClusterData(CLUSTER_ID);
+  if (!saved || !saved.entries || !saved.entries.length) return;
+
+  saved.entries.forEach(entry => {
+    const p = parseNotes(entry.notes);
+    if (p.workingDays) document.getElementById('working-days').value = p.workingDays;
+
+    switch (entry.activityKey) {
+      case 'commute_mrt':
+        document.getElementById('mrt-staff').value = p.staff;
+        document.getElementById('mrt-km').value = p.km;
+        calcPT();
+        break;
+
+      case 'commute_bus':
+        document.getElementById('bus-staff').value = p.staff;
+        document.getElementById('bus-km').value = p.km;
+        calcPT();
+        break;
+
+      case 'commute_mixed':
+        document.getElementById('mix-staff').value = p.staff;
+        document.getElementById('mix-km').value = p.km;
+        calcPT();
+        break;
+
+      case 'commute_pt_simple': {
+        const btns = document.querySelectorAll('#pt-tabs .mtab');
+        switchMode('pt', ['pt-detail','pt-simple'], 'pt-simple', btns[1]);
+        document.getElementById('pt-simple-staff').value = p.staff;
+        document.getElementById('pt-simple-km').value = p.km;
+        document.getElementById('pt-simple-mode').value = p.ef;
+        calcPTSimple();
+        break;
+      }
+
+      case 'commute_car_petrol':
+      case 'commute_car_hybrid':
+      case 'commute_car_ev':
+      case 'commute_motorcycle': {
+        document.getElementById('car-na').checked = false;
+        toggleNA('car-inputs', document.getElementById('car-na'), 'car');
+        const key = Object.keys(CAR_ACTIVITY_KEY).find(k => CAR_ACTIVITY_KEY[k] === entry.activityKey);
+        document.getElementById(key + '-staff').value = p.staff;
+        document.getElementById(key + '-km').value = p.km;
+        calcCar();
+        break;
+      }
+
+      case 'commute_wfh_electricity':
+        document.getElementById('wfh-na').checked = false;
+        toggleNA('wfh-inputs', document.getElementById('wfh-na'), 'wfh');
+        document.getElementById('wfh-staff').value = p.staff;
+        document.getElementById('wfh-days').value = p.days;
+        document.getElementById('wfh-hrs').value = p.hrs;
+        document.getElementById('wfh-device').value = p.device;
+        if (p.device === '0') {
+          document.getElementById('wfh-custom-row').style.display = 'block';
+          document.getElementById('wfh-custom-w').value = p.customW;
+        }
+        calcWFH();
+        break;
+    }
+  });
+
+  updateSummary();
+}
+
+// ── SAVE / EXIT ──
+function persist() {
+  const data = createClusterData(CLUSTER_ID);
+  data.saved = true;
+  data.entries = buildEntriesFromState();
+  saveClusterData(CLUSTER_ID, data);
+}
+
+function saveAndNext() {
+  persist();
+  goTo('S-16');
+}
+
+function saveAndExit() {
+  persist();
+  goTo('S-09');
+}
+
+// expose for inline onclick handlers
+window.toggleSec = toggleSec;
+window.toggleTip = toggleTip;
+window.switchMode = switchMode;
+window.toggleNA = toggleNA;
+window.calcPT = calcPT;
+window.calcPTSimple = calcPTSimple;
+window.calcCar = calcCar;
+window.calcWFH = calcWFH;
+window.saveAndNext = saveAndNext;
+window.saveAndExit = saveAndExit;
+
+// ── INIT ──
 window.addEventListener('load',()=>{
-  document.getElementById('mrt-staff').value=6;document.getElementById('mrt-km').value=14;calcPT();
-  document.getElementById('car-staff').value=2;document.getElementById('car-km').value=12;calcCar();
+  restoreFromSaved();
   updateProgress();
 });
 </script>

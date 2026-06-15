@@ -660,14 +660,39 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
       Save & go to People & commuting
       <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg>
     </button>
-    <button class="btn-save-draft">Save & exit</button>
+    <button class="btn-save-draft" onclick="saveAndExit()">Save & exit</button>
   </div>
 </div>
 </div>
 
 </div><!-- /layout -->
 
-<script>
+<script type="module">
+import { createClusterData, createEmissionEntry, saveClusterData, loadClusterData } from '/js/zyt-core/schema.js';
+import { goTo } from '/js/zyt-core/config.js';
+
+const CLUSTER_ID = 'waste';
+
+const EF_SOURCE = {
+  general: 'NEA/SEFR Jan 2026 — General waste incineration (NEA_WASTE_GENERAL_KG)',
+  food: 'NEA/SEFR Jan 2026 — Food waste incineration (NEA_WASTE_FOOD_KG)',
+  plastics: 'NEA/SEFR Jan 2026 — Plastics incineration (NEA_WASTE_PLASTIC_KG)',
+  water: 'PUB/SEFR Jan 2026 — Potable mains water (PUB_WATER_M3)',
+};
+function recyclingEfSource(label) {
+  return `GHG Protocol — verified recycling (${label})`;
+}
+function parseNotes(notes) {
+  const out = {};
+  if (!notes) return out;
+  notes.split(';').forEach(pair => {
+    const [k, v] = pair.split('=');
+    out[k] = v;
+  });
+  return out;
+}
+const val = id => document.getElementById(id)?.value || '';
+
 // ── EMISSION FACTORS ──
 const EF = {
   general: 1.0017,   // kgCO₂/kg — SEFR incineration mixed waste
@@ -1004,23 +1029,263 @@ function updateProgress() {
 function attachFile(section) {
   alert(`Attaching documentation for ${section}.\n\nIn production → Supabase Storage → report appendix.`);
 }
-function saveAndNext() {
-localStorage.setItem('zyt_s14_waste_water_data', JSON.stringify({saved:true}));
-  window.location.href = '/S-15-people-commuting.html';
+// ── BUILD EMISSION ENTRIES FROM STATE ──
+function buildEntriesFromState() {
+  const entries = [];
+
+  // General / mixed waste (Scope 3, Cat 5)
+  if (S.general.co2 > 0) {
+    const genMode = ['gw-bags','gw-bins','gw-kg','gw-spend'].find(id => document.getElementById(id).classList.contains('active'));
+    const e = createEmissionEntry();
+    e.activityName = 'General/mixed waste to incineration';
+    e.activityKey = 'general_waste_kg';
+    e.quantity = +S.general.kg_yr.toFixed(1);
+    e.unit = 'kg';
+    e.efValue = EF.general;
+    e.efUnit = 'kgCO2e/kg';
+    e.efSource = EF_SOURCE.general;
+    e.emissionsKgCo2e = +(S.general.co2 * 1000).toFixed(3);
+    e.scope = 3;
+    e.scope3Category = 5;
+    e.costSgd = +S.general.sgd.toFixed(2);
+    if (genMode === 'gw-kg') {
+      e.dataQuality = 'measured'; e.costBasis = 'estimated';
+      e.notes = `mode=kg;kgMonth=${val('gw-kg-month')};kgYear=${val('gw-kg-year')}`;
+    } else if (genMode === 'gw-spend') {
+      e.dataQuality = 'estimated'; e.costBasis = 'user_entered';
+      e.notes = `mode=spend;spendMonth=${val('gw-spend-month')}`;
+    } else if (genMode === 'gw-bins') {
+      e.dataQuality = 'calculated'; e.costBasis = 'estimated';
+      e.notes = `mode=bins;binKg=${S.gw_bin_kg};collectionsPw=${val('gw-collections-pw')};binCount=${val('gw-bin-count')}`;
+    } else {
+      e.dataQuality = 'calculated'; e.costBasis = 'estimated';
+      e.notes = `mode=bags;bagKg=${S.gw_bag_kg};bagsDay=${val('gw-bags-day')};days=${val('gw-days')}`;
+    }
+    entries.push(e);
+  }
+
+  // Food waste (Scope 3, Cat 5)
+  if (S.food.co2 > 0) {
+    const foodMode = document.getElementById('food-kg').classList.contains('active') ? 'kg' : 'bags';
+    const e = createEmissionEntry();
+    e.activityName = 'Food waste to incineration';
+    e.activityKey = 'food_waste_kg';
+    e.quantity = +S.food.kg_yr.toFixed(1);
+    e.unit = 'kg';
+    e.efValue = EF.food;
+    e.efUnit = 'kgCO2e/kg';
+    e.efSource = EF_SOURCE.food;
+    e.emissionsKgCo2e = +(S.food.co2 * 1000).toFixed(3);
+    e.scope = 3;
+    e.scope3Category = 5;
+    e.costSgd = +S.food.sgd.toFixed(2);
+    e.costBasis = 'estimated';
+    e.dataQuality = foodMode === 'kg' ? 'calculated' : 'estimated';
+    if (foodMode === 'kg') {
+      e.notes = `mode=kg;kgMonth=${val('fw-kg-month')};costMeaning=food_value_wasted`;
+    } else {
+      e.notes = `mode=bags;bagsDay=${val('fw-bags-day')};days=${val('fw-days')};costMeaning=food_value_wasted`;
+    }
+    entries.push(e);
+  }
+
+  // Plastics & packaging waste (Scope 3, Cat 5)
+  if (S.plastics.co2 > 0) {
+    const kgMonth = parseFloat(val('pw-kg-month')) || 0;
+    const e = createEmissionEntry();
+    e.activityName = 'Plastic packaging & single-use plastics waste';
+    e.activityKey = 'plastics_waste_kg';
+    e.quantity = +(kgMonth * 12).toFixed(1);
+    e.unit = 'kg';
+    e.efValue = EF.plastics;
+    e.efUnit = 'kgCO2e/kg';
+    e.efSource = EF_SOURCE.plastics;
+    e.emissionsKgCo2e = +(S.plastics.co2 * 1000).toFixed(3);
+    e.scope = 3;
+    e.scope3Category = 5;
+    e.costSgd = +(kgMonth * 12 * PRICE.plastics_per_kg).toFixed(2);
+    e.costBasis = 'estimated';
+    e.dataQuality = 'estimated';
+    entries.push(e);
+  }
+
+  // Verified recyclables (Scope 3, Cat 5 — low-EF alternative to incineration)
+  if (S.recycling.co2 > 0) {
+    const kgMonth = parseFloat(val('rec-kg-month')) || 0;
+    const sel = document.getElementById('rec-type');
+    const ef = parseFloat(sel.value) || 0.05;
+    const label = sel.selectedOptions[0]?.textContent || 'Mixed recyclables';
+    const e = createEmissionEntry();
+    e.activityName = `Recyclables — ${label}`;
+    e.activityKey = 'recyclables_verified_kg';
+    e.quantity = +(kgMonth * 12).toFixed(1);
+    e.unit = 'kg';
+    e.efValue = ef;
+    e.efUnit = 'kgCO2e/kg';
+    e.efSource = recyclingEfSource(label);
+    e.emissionsKgCo2e = +(S.recycling.co2 * 1000).toFixed(3);
+    e.scope = 3;
+    e.scope3Category = 5;
+    e.costBasis = 'estimated';
+    e.dataQuality = 'estimated';
+    e.notes = `ef=${ef}`;
+    entries.push(e);
+  }
+
+  // PUB water (Scope 3, Cat 1 — purchased goods & services)
+  if (S.water.co2 > 0) {
+    const e = createEmissionEntry();
+    e.activityName = 'PUB mains water consumption';
+    e.activityKey = 'pub_water_m3';
+    e.quantity = +S.water.m3_yr.toFixed(2);
+    e.unit = 'm3';
+    e.efValue = EF.water;
+    e.efUnit = 'kgCO2e/m3';
+    e.efSource = EF_SOURCE.water;
+    e.emissionsKgCo2e = +(S.water.co2 * 1000).toFixed(3);
+    e.scope = 3;
+    e.scope3Category = 1;
+    e.costSgd = +S.water.sgd.toFixed(2);
+    e.costBasis = 'estimated';
+    e.dataQuality = S.water.acc === 'h' ? 'measured' : S.water.acc === 'm' ? 'calculated' : 'estimated';
+    entries.push(e);
+  }
+
+  return entries;
 }
+
+// ── RESTORE STATE FROM SAVED ENTRIES ──
+function selectByDataKg(containerSelector, dataKg, selectFn) {
+  const btn = document.querySelector(`${containerSelector} [data-kg="${dataKg}"]`);
+  if (btn) selectFn(btn, 'genwaste');
+}
+
+function restoreFromSaved() {
+  const saved = loadClusterData(CLUSTER_ID);
+  if (!saved || !saved.entries || !saved.entries.length) return;
+
+  saved.entries.forEach(entry => {
+    const p = parseNotes(entry.notes);
+    switch (entry.activityKey) {
+      case 'general_waste_kg': {
+        const genTabs = document.querySelectorAll('#gen-waste-tabs .mtab');
+        if (p.mode === 'kg') {
+          switchMode('genwaste', ['gw-bags','gw-bins','gw-kg','gw-spend'], 'gw-kg', genTabs[2]);
+          if (p.kgMonth) { document.getElementById('gw-kg-month').value = p.kgMonth; calcGenWasteKg(); }
+          else { document.getElementById('gw-kg-year').value = p.kgYear; calcGenWasteKgYear(); }
+        } else if (p.mode === 'spend') {
+          switchMode('genwaste', ['gw-bags','gw-bins','gw-kg','gw-spend'], 'gw-spend', genTabs[3]);
+          document.getElementById('gw-spend-month').value = p.spendMonth;
+          calcGenWasteSpend();
+        } else if (p.mode === 'bins') {
+          switchMode('genwaste', ['gw-bags','gw-bins','gw-kg','gw-spend'], 'gw-bins', genTabs[1]);
+          selectByDataKg('.bin-grid', p.binKg, selectBin);
+          document.getElementById('gw-collections-pw').value = p.collectionsPw;
+          document.getElementById('gw-bin-count').value = p.binCount;
+          calcGenWasteBin();
+        } else {
+          switchMode('genwaste', ['gw-bags','gw-bins','gw-kg','gw-spend'], 'gw-bags', genTabs[0]);
+          selectByDataKg('.bag-grid', p.bagKg, selectBag);
+          document.getElementById('gw-bags-day').value = p.bagsDay;
+          document.getElementById('gw-days').value = p.days;
+          calcGenWaste();
+        }
+        break;
+      }
+
+      case 'food_waste_kg': {
+        document.getElementById('food-na').checked = false;
+        toggleNA('food-inputs', document.getElementById('food-na'), 'food');
+        const foodTabs = document.querySelectorAll('#food-tabs .mtab');
+        if (p.mode === 'kg') {
+          switchMode('food', ['food-bags','food-kg'], 'food-kg', foodTabs[1]);
+          document.getElementById('fw-kg-month').value = p.kgMonth;
+          calcFoodWasteKg();
+        } else {
+          switchMode('food', ['food-bags','food-kg'], 'food-bags', foodTabs[0]);
+          document.getElementById('fw-bags-day').value = p.bagsDay;
+          document.getElementById('fw-days').value = p.days;
+          calcFoodWaste();
+        }
+        break;
+      }
+
+      case 'plastics_waste_kg':
+        document.getElementById('plastics-na').checked = false;
+        toggleNA('plastics-inputs', document.getElementById('plastics-na'), 'plastics');
+        document.getElementById('pw-kg-month').value = +(entry.quantity / 12).toFixed(2);
+        calcPlastics();
+        break;
+
+      case 'recyclables_verified_kg':
+        document.getElementById('recycling-na').checked = false;
+        toggleNA('recycling-inputs', document.getElementById('recycling-na'), 'recycling');
+        document.getElementById('rec-type').value = p.ef || entry.efValue;
+        document.getElementById('rec-kg-month').value = +(entry.quantity / 12).toFixed(2);
+        calcRecycling();
+        break;
+
+      case 'pub_water_m3': {
+        // Restore via Annual mode — most lossless representation
+        const waterTabs = document.querySelectorAll('#water-tabs .mtab');
+        switchMode('water', ['water-monthly','water-annual','water-single'], 'water-annual', waterTabs[1]);
+        document.getElementById('wa-m3').value = entry.quantity;
+        calcWaterAnnual();
+        if (entry.dataQuality === 'measured') S.water.acc = 'h';
+        break;
+      }
+    }
+  });
+
+  updateSummary();
+}
+
+// ── SAVE / EXIT ──
+function persist() {
+  const data = createClusterData(CLUSTER_ID);
+  data.saved = true;
+  data.entries = buildEntriesFromState();
+  saveClusterData(CLUSTER_ID, data);
+}
+
+function saveAndNext() {
+  persist();
+  goTo('S-15');
+}
+
+function saveAndExit() {
+  persist();
+  goTo('S-09');
+}
+
+// expose for inline onclick handlers
+window.toggleSec = toggleSec;
+window.toggleTip = toggleTip;
+window.switchMode = switchMode;
+window.toggleNA = toggleNA;
+window.selectBag = selectBag;
+window.selectBin = selectBin;
+window.calcGenWaste = calcGenWaste;
+window.calcGenWasteBin = calcGenWasteBin;
+window.calcGenWasteKg = calcGenWasteKg;
+window.calcGenWasteKgYear = calcGenWasteKgYear;
+window.calcGenWasteSpend = calcGenWasteSpend;
+window.calcFoodWaste = calcFoodWaste;
+window.calcFoodWasteKg = calcFoodWasteKg;
+window.calcPlastics = calcPlastics;
+window.calcRecycling = calcRecycling;
+window.calcWaterMonthly = calcWaterMonthly;
+window.calcWaterAnnual = calcWaterAnnual;
+window.calcWaterAnnualBill = calcWaterAnnualBill;
+window.calcWaterSingle = calcWaterSingle;
+window.calcWaterSingleBill = calcWaterSingleBill;
+window.attachFile = attachFile;
+window.saveAndNext = saveAndNext;
+window.saveAndExit = saveAndExit;
 
 // ── INIT ──
 window.addEventListener('load', () => {
-  // Pre-fill with demo: 3 large bags/day general waste, 11.8 m³/month water
-  document.getElementById('gw-bags-day').value = 3;
-  calcGenWaste();
-  document.getElementById('ws-m3').value = 11.8;
-  // Switch to single bill mode for water demo
-  const waterSingleBtn = document.querySelector('#water-tabs .mtab:nth-child(3)');
-  if (waterSingleBtn) {
-    waterSingleBtn.click();
-    calcWaterSingle();
-  }
+  restoreFromSaved();
   updateProgress();
 });
 </script>
