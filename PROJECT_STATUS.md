@@ -11,12 +11,35 @@ need the full conversation history to get oriented.
 
 ## Live deployment
 
-- **URL:** https://zyt-esg.netlify.app/
-- **Hosting:** Netlify, deployed via GitHub Desktop (push to repo → auto-deploy)
+- **Status (2026-06-14):** the Netlify free-tier account is currently over its
+  usage limits and can't be re-deployed to. **All internal paths have been
+  converted from absolute (`/S-10-...html`, `/js/zyt-core/...`) to relative**
+  so the app can be deployed to *any* host/subpath without code changes —
+  including a GitHub Pages project site at `https://<user>.github.io/<repo>/`,
+  which serves from a subpath rather than domain root. Previously the app
+  only worked correctly at domain root (Netlify/Vercel/Cloudflare default).
+  ES module `import` specifiers use `./js/...` (browsers require `./`, `../`,
+  or `/` prefixes — a bare `js/...` import throws `TypeError: Relative
+  references must start with "/", "./", or "../"`); `href`/`location.href`/
+  `NAV_MAP` values use bare `S-XX-...html` (valid for normal URL resolution,
+  not subject to the module-specifier restriction). `js/supabase.js`'s
+  password-reset `redirectTo` now builds via `new URL('S-05-login.html',
+  window.location.href).href` so it resolves correctly under any subpath too.
+- **Previous URL:** https://zyt-esg.netlify.app/ (may still work, but can't
+  be redeployed until the Netlify account's usage resets or is upgraded)
+- **Recommended next host:** GitHub Pages (free, no new signup — same GitHub
+  account/repo already used via GitHub Desktop). Enable via repo Settings →
+  Pages → Deploy from branch → root. Repo should be public (the only key in
+  `js/supabase.js` is the Supabase **anon/public** key, which is designed to
+  be exposed — RLS policies are the real security boundary).
 - **Backend:** Supabase project `hgwsadwrhhedyaljnpbg` (free tier, `ap-southeast-1` likely)
   — credentials are already filled in at `js/supabase.js` lines 11–12
 - **Auth:** Email + password only (Google OAuth removed). Custom SMTP via Resend
   is configured in Supabase dashboard (Authentication → SMTP Settings).
+- **⚠️ After deploying to a new URL:** update Supabase dashboard → Authentication
+  → URL Configuration → Site URL and Redirect URLs to the new domain (currently
+  set to `zyt-esg.netlify.app`). Otherwise signup-confirmation and
+  password-reset emails will link to the old (now-broken) Netlify URL.
 - **Free tier note:** Supabase free projects auto-pause after 7 days of
   inactivity. Not yet automated — visit the dashboard periodically, or set up
   a free UptimeRobot/cron-job.org ping to `https://hgwsadwrhhedyaljnpbg.supabase.co/rest/v1/`.

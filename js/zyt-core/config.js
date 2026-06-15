@@ -65,35 +65,35 @@ export const CLUSTERS = [
 
 export const NAV_MAP = {
   // Auth / onboarding
-  'S-02': '/S-02-intent-selector.html',
-  'S-03': '/S-03-signup.html',
-  'S-04': '/S-04-check-email.html',
-  'S-05': '/S-05-login.html',
-  'S-06': '/S-06-company-profile.html',
+  'S-02': 'S-02-intent-selector.html',
+  'S-03': 'S-03-signup.html',
+  'S-04': 'S-04-check-email.html',
+  'S-05': 'S-05-login.html',
+  'S-06': 'S-06-company-profile.html',
 
   // Data entry hub + clusters
-  'S-09': '/S-09-data-entry-hub.html',
-  'S-10': '/S-10-power-energy-v3.html',
-  'S-11': '/S-11-transport-fleet.html',
-  'S-12': '/S-12-cooling-refrigeration.html',
-  'S-13': '/S-13-cooking-process-heat.html',
-  'S-14': '/S-14-waste-water.html',
-  'S-15': '/S-15-people-commuting.html',
-  'S-16': '/S-16-digital-it.html',
-  'S-17': '/S-17-procurement.html',
-  'S-18': '/S-18-review-confirm.html',
+  'S-09': 'S-09-data-entry-hub.html',
+  'S-10': 'S-10-power-energy-v3.html',
+  'S-11': 'S-11-transport-fleet.html',
+  'S-12': 'S-12-cooling-refrigeration.html',
+  'S-13': 'S-13-cooking-process-heat.html',
+  'S-14': 'S-14-waste-water.html',
+  'S-15': 'S-15-people-commuting.html',
+  'S-16': 'S-16-digital-it.html',
+  'S-17': 'S-17-procurement.html',
+  'S-18': 'S-18-review-confirm.html',
 
   // Social & Governance
-  'S-31': '/S-31-32-social.html',
-  'S-32': '/S-31-32-social.html',
-  'S-33': '/S-33-governance.html',
+  'S-31': 'S-31-32-social.html',
+  'S-32': 'S-31-32-social.html',
+  'S-33': 'S-33-governance.html',
 
   // Results, targets, context, report
-  'S-19': '/S-19-carbon-overview.html',
-  'S-21': '/S-21-target-setting.html',
-  'S-23': '/S-23-sustainability-context.html',
-  'S-24': '/S-24-report-preview.html',
-  'S-25': '/S-25-generate.html',
+  'S-19': 'S-19-carbon-overview.html',
+  'S-21': 'S-21-target-setting.html',
+  'S-23': 'S-23-sustainability-context.html',
+  'S-24': 'S-24-report-preview.html',
+  'S-25': 'S-25-generate.html',
 };
 
 /** Navigate to a screen by its canonical S-NN code. No-op + console.warn if unknown. */

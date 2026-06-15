@@ -927,7 +927,7 @@ nav {
       <button class="btn-primary" id="generate-btn" onclick="generatePassport()" disabled style="opacity:0.4;cursor:not-allowed">
         Generate Carbon Passport with targets →
       </button>
-      <button class="btn-secondary" onclick="window.location.href='/S-23-sustainability-context.html'">
+      <button class="btn-secondary" onclick="window.location.href='S-23-sustainability-context.html'">
         Skip for now — generate report without targets
       </button>
     </div>
@@ -1046,7 +1046,7 @@ function generatePassport() {
     });
   });
   localStorage.setItem('zyt_targets_data', JSON.stringify({ targets, savedAt: Date.now() }));
-  window.location.href = '/S-23-sustainability-context.html';
+  window.location.href = 'S-23-sustainability-context.html';
 }
 </script>
 </body>

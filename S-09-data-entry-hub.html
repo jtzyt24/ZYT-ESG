@@ -685,7 +685,7 @@ nav {
   <div class="pillar-panel active" id="panel-E">
     <div class="preset-notice">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5l2 1.5"/></svg>
-      Highlighted clusters are most relevant for <strong id="ph-industry-notice">your industry</strong> businesses. All clusters are shown — <a onclick="window.location.href='/S-06-company-profile.html'">change industry</a>.
+      Highlighted clusters are most relevant for <strong id="ph-industry-notice">your industry</strong> businesses. All clusters are shown — <a onclick="window.location.href='S-06-company-profile.html'">change industry</a>.
     </div>
 
     <div class="cluster-grid" id="cluster-grid">
@@ -1032,14 +1032,14 @@ function switchPillar(p) {
 
 function openCluster(screen, name) {
   const screenMap = {
-    'S-10': '/S-10-power-energy-v3.html',
-    'S-11': '/S-11-transport-fleet.html',
-    'S-12': '/S-12-cooling-refrigeration.html',
-    'S-13': '/S-13-cooking-process-heat.html',
-    'S-14': '/S-14-waste-water.html',
-    'S-15': '/S-15-people-commuting.html',
-    'S-16': '/S-16-digital-it.html',
-    'S-17': '/S-17-procurement.html',
+    'S-10': 'S-10-power-energy-v3.html',
+    'S-11': 'S-11-transport-fleet.html',
+    'S-12': 'S-12-cooling-refrigeration.html',
+    'S-13': 'S-13-cooking-process-heat.html',
+    'S-14': 'S-14-waste-water.html',
+    'S-15': 'S-15-people-commuting.html',
+    'S-16': 'S-16-digital-it.html',
+    'S-17': 'S-17-procurement.html',
   };
   const url = screenMap[screen];
   if (url) window.location.href = url;
@@ -1047,16 +1047,16 @@ function openCluster(screen, name) {
 
 function openScreen(screen) {
   const screenMap = {
-    'S-31': '/S-31-32-social.html',
-    'S-32': '/S-31-32-social.html',
-    'S-33': '/S-33-governance.html',
+    'S-31': 'S-31-32-social.html',
+    'S-32': 'S-31-32-social.html',
+    'S-33': 'S-33-governance.html',
   };
   const url = screenMap[screen];
   if (url) window.location.href = url;
 }
 
 function goToReview() {
-  window.location.href = '/S-18-review-confirm.html';
+  window.location.href = 'S-18-review-confirm.html';
 }
 
 // ── INIT ──

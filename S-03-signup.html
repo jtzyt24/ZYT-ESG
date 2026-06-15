@@ -54,7 +54,7 @@
 <body>
 
 <nav class="topnav">
-  <a href="/index.html" class="logo">ZYT<span>.ESG</span></a>
+  <a href="index.html" class="logo">ZYT<span>.ESG</span></a>
 </nav>
 
 <div class="auth-wrap">
@@ -86,13 +86,13 @@
   </div>
 
   <div class="auth-footer">
-    Already have an account? <a href="/S-05-login.html">Log in →</a>
+    Already have an account? <a href="S-05-login.html">Log in →</a>
   </div>
   <div class="skip-link" onclick="skipAuth()">Continue without an account (data saved to this browser only)</div>
 </div>
 
 <script type="module">
-  import { signUp, saveLocal } from '/js/supabase.js';
+  import { signUp, saveLocal } from './js/supabase.js';
 
   function showError(msg) {
     const el = document.getElementById('error-box');
@@ -135,12 +135,12 @@
     }
 
     saveLocal('zyt_signup_email', email);
-    window.location.href = '/S-04-check-email.html';
+    window.location.href = 'S-04-check-email.html';
   };
 
   window.skipAuth = () => {
     saveLocal('zyt_auth_skipped', true);
-    window.location.href = '/S-06-company-profile.html';
+    window.location.href = 'S-06-company-profile.html';
   };
 </script>
 </body>

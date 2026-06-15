@@ -23,7 +23,7 @@
 </style>
 </head>
 <body>
-<nav class="topnav"><a href="/index.html" class="logo">ZYT<span>.ESG</span></a></nav>
+<nav class="topnav"><a href="index.html" class="logo">ZYT<span>.ESG</span></a></nav>
 <div class="wrap">
   <div class="icon">📧</div>
   <div class="title">Check your email</div>
@@ -31,13 +31,13 @@
     We sent a confirmation link to <strong id="email-display">your email address</strong>.<br>
     Click the link to activate your account, then return here to continue.
   </div>
-  <button class="btn" onclick="window.location.href='/S-06-company-profile.html'">
+  <button class="btn" onclick="window.location.href='S-06-company-profile.html'">
     I've confirmed — continue to my report →
   </button>
   <div class="resend">Didn't receive it? <a onclick="resendEmail()">Resend confirmation email</a></div>
 </div>
 <script type="module">
-  import { supabase, loadLocal } from '/js/supabase.js';
+  import { supabase, loadLocal } from './js/supabase.js';
   const email = loadLocal('zyt_signup_email');
   if (email) document.getElementById('email-display').textContent = email;
   window.resendEmail = async () => {

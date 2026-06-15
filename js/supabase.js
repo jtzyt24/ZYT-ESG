@@ -24,7 +24,7 @@ export async function getSession() {
 export async function requireAuth() {
   const session = await getSession();
   if (!session) {
-    window.location.href = '/S-05-login.html';
+    window.location.href = 'S-05-login.html';
     return null;
   }
   return session;
@@ -40,12 +40,12 @@ export async function signIn(email, password) {
 
 export async function signOut() {
   await supabase.auth.signOut();
-  window.location.href = '/index.html';
+  window.location.href = 'index.html';
 }
 
 export async function resetPassword(email) {
   return supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + '/S-05-login.html'
+    redirectTo: new URL('S-05-login.html', window.location.href).href
   });
 }
 

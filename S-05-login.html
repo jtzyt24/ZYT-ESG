@@ -52,7 +52,7 @@
 <body>
 
 <nav class="topnav">
-  <a href="/index.html" class="logo">ZYT<span>.ESG</span></a>
+  <a href="index.html" class="logo">ZYT<span>.ESG</span></a>
 </nav>
 
 <div class="auth-wrap">
@@ -79,15 +79,15 @@
   </div>
 
   <div class="auth-footer">
-    Don't have an account? <a href="/S-03-signup.html">Create one free →</a>
+    Don't have an account? <a href="S-03-signup.html">Create one free →</a>
   </div>
-  <div class="skip-link" onclick="window.location.href='/S-06-company-profile.html'">
+  <div class="skip-link" onclick="window.location.href='S-06-company-profile.html'">
     Continue without logging in
   </div>
 </div>
 
 <script type="module">
-  import { signIn, resetPassword } from '/js/supabase.js';
+  import { signIn, resetPassword } from './js/supabase.js';
 
   function showError(msg) {
     const el = document.getElementById('error-box');
@@ -116,7 +116,7 @@
       return;
     }
 
-    window.location.href = '/S-06-company-profile.html';
+    window.location.href = 'S-06-company-profile.html';
   };
 
   window.doForgotPassword = async () => {
