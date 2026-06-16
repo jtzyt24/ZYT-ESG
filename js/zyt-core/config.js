@@ -49,14 +49,14 @@ export const INDUSTRY_RELEVANCE = {
 // `screen` maps to NAV_MAP below.
 
 export const CLUSTERS = [
-  { id: 'power',       icon: '⚡', name: 'Power & energy',           role: 'Owner / facilities manager',       scopes: ['S2', 'S1'], screen: 'S-10' },
-  { id: 'transport',   icon: '🚚', name: 'Transport & fleet',         role: 'Logistics / operations manager',   scopes: ['S1', 'S3'], screen: 'S-11' },
-  { id: 'cooling',     icon: '❄',  name: 'Cooling & refrigeration',   role: 'Facilities manager',               scopes: ['S1'],       screen: 'S-12' },
-  { id: 'cooking',     icon: '🔥', name: 'Cooking & process heat',    role: 'Kitchen supervisor',                scopes: ['S1'],       screen: 'S-13' },
-  { id: 'waste',       icon: '♻',  name: 'Waste & water',             role: 'Operations / kitchen',              scopes: ['S3'],       screen: 'S-14' },
-  { id: 'people',      icon: '🚶', name: 'People & commuting',        role: 'HR manager',                        scopes: ['S3'],       screen: 'S-15' },
-  { id: 'digital',     icon: '☁',  name: 'Digital & IT',              role: 'IT manager / office manager',       scopes: ['S3'],       screen: 'S-16' },
-  { id: 'procurement', icon: '📦', name: 'Procurement & supply chain',role: 'Purchasing / admin',                scopes: ['S3'],       screen: 'S-17' },
+  { id: 'power',       icon: '⚡', name: 'Power & energy',           role: 'Owner / facilities manager',       scopes: ['S2', 'S1'], screen: 'S-10', sub: 'Electricity, generator, solar, district cooling' },
+  { id: 'transport',   icon: '🚚', name: 'Transport & fleet',         role: 'Logistics / operations manager',   scopes: ['S1', 'S3'], screen: 'S-11', sub: 'Vehicles, freight, business travel' },
+  { id: 'cooling',     icon: '❄',  name: 'Cooling & refrigeration',   role: 'Facilities manager',               scopes: ['S1'],       screen: 'S-12', sub: 'Refrigerant leakage, TRU diesel' },
+  { id: 'cooking',     icon: '🔥', name: 'Cooking & process heat',    role: 'Kitchen supervisor',                scopes: ['S1'],       screen: 'S-13', sub: 'Town gas, LPG, boilers' },
+  { id: 'waste',       icon: '♻',  name: 'Waste & water',             role: 'Operations / kitchen',              scopes: ['S3'],       screen: 'S-14', sub: 'General waste, food waste, PUB water' },
+  { id: 'people',      icon: '🚶', name: 'People & commuting',        role: 'HR manager',                        scopes: ['S3'],       screen: 'S-15', sub: 'MRT, bus, car, WFH electricity' },
+  { id: 'digital',     icon: '☁',  name: 'Digital & IT',              role: 'IT manager / office manager',       scopes: ['S3'],       screen: 'S-16', sub: 'Cloud services, hardware' },
+  { id: 'procurement', icon: '📦', name: 'Procurement & supply chain',role: 'Purchasing / admin',                scopes: ['S3'],       screen: 'S-17', sub: 'Packaging, services, goods' },
 ];
 
 // ── NAVIGATION MAP ───────────────────────────────────────────

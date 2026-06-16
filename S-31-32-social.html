@@ -847,22 +847,25 @@
   </div>
 </div>
 
-<script>
+<script type="module">
+  import { createSocialData, saveSocialData, loadSocialData } from './js/zyt-core/schema.js';
+  import { getSession, upsertSocialData } from './js/supabase.js';
+
   // ── Toggle section collapse ──
-  function toggleSection(id) {
+  window.toggleSection = function(id) {
     const sec = document.getElementById(id);
     sec.classList.toggle('collapsed');
-  }
+  };
 
   // ── Toggle optional sub-sections ──
-  function toggleOpt(id, cb) {
+  window.toggleOpt = function(id, cb) {
     const sec = document.getElementById(id);
     if (cb.checked) sec.classList.add('visible');
     else sec.classList.remove('visible');
-  }
+  };
 
   // ── Gender bar update ──
-  function updateGenderBar() {
+  window.updateGenderBar = function() {
     const m = parseInt(document.getElementById('g-male').value) || 0;
     const f = parseInt(document.getElementById('g-female').value) || 0;
     const nb = parseInt(document.getElementById('g-nb').value) || 0;
@@ -902,7 +905,7 @@
     }
 
     updateCalcs();
-  }
+  };
 
   // ── Auto-calc training avg ──
   function updateCalcs() {
@@ -928,18 +931,19 @@
 
     updateCompletionStatus();
   }
+  window.updateCalcs = updateCalcs;
 
   // ── Toggle training type tags ──
-  function toggleTag(el) {
+  window.toggleTag = function(el) {
     el.classList.toggle('selected');
-  }
+  };
 
   // ── bizSAFE selection ──
-  function selectBizsafe(el, val) {
+  window.selectBizsafe = function(el, val) {
     document.querySelectorAll('.bizsafe-card').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
     document.getElementById('bizsafe-value').value = val;
-  }
+  };
 
   // ── Completion status ──
   function updateCompletionStatus() {
@@ -961,7 +965,7 @@
 
   // ── UNGC tag (check localStorage / URL param) ──
   function checkUNGC() {
-    const isUNGC = localStorage.getItem('zyt_intent_ungc') === 'true' || 
+    const isUNGC = localStorage.getItem('zyt_intent_ungc') === 'true' ||
                    new URLSearchParams(window.location.search).get('ungc') === '1';
     if (isUNGC) {
       document.getElementById('ungc-tag').style.display = '';
@@ -970,54 +974,127 @@
   }
   checkUNGC();
 
-  // ── Save & continue ──
-  function saveAndContinue() {
-    const data = {
-      totalEmployees: document.getElementById('total-emp').value,
-      genderM: document.getElementById('g-male').value,
-      genderF: document.getElementById('g-female').value,
-      genderNB: document.getElementById('g-nb').value,
-      genderND: document.getElementById('g-nd').value,
-      newHires: document.getElementById('new-hires').value,
-      leavers: document.getElementById('leavers').value,
-      trainingHrsTotal: document.getElementById('training-total').value,
-      trainingAvgPerEmp: document.getElementById('training-avg').value,
-      injFatal: document.getElementById('inj-fatal').value,
-      injHCI: document.getElementById('inj-hci').value,
-      injRec: document.getElementById('inj-rec').value,
-      bizsafe: document.getElementById('bizsafe-value').value,
-      trainingTypes: [...document.querySelectorAll('.tt-tag.selected')].map(t => t.textContent)
-    };
-    localStorage.setItem('zyt_social_data', JSON.stringify(data));
-    // Navigate to S-33 Governance
-    window.location.href = 'S-33-governance.html';
+  // ── Build a canonical SocialData object (matches schema.js shape) from form fields ──
+  function buildSocialData() {
+    const d = createSocialData();
+    const totalEmp = parseInt(document.getElementById('total-emp').value) || null;
+    const m = parseInt(document.getElementById('g-male').value) || null;
+    const f = parseInt(document.getElementById('g-female').value) || null;
+    const nb = parseInt(document.getElementById('g-nb').value) || null;
+    const nd = parseInt(document.getElementById('g-nd').value) || null;
+    const leavers = parseInt(document.getElementById('leavers').value) || null;
+    const trainHrs = parseFloat(document.getElementById('training-total').value) || null;
+
+    d.totalEmployees = totalEmp;
+    d.employeesMale = m;
+    d.employeesFemale = f;
+    d.employeesNonbinary = nb;
+    d.employeesNotDisclosed = nd;
+    d.employees30to50 = parseInt(document.getElementById('age-30to50')?.value) || null;
+    d.newHires = parseInt(document.getElementById('new-hires').value) || null;
+    d.leavers = leavers;
+    d.turnoverRatePct = (leavers && totalEmp) ? +(leavers/totalEmp*100).toFixed(1) : null;
+    d.totalTrainingHours = trainHrs;
+    d.avgTrainingHoursPerEmp = (trainHrs && totalEmp) ? +(trainHrs/totalEmp).toFixed(1) : null;
+    d.trainingTypes = [...document.querySelectorAll('.tt-tag.selected')].map(t => t.textContent);
+    d.fatalities = parseInt(document.getElementById('inj-fatal').value) || 0;
+    d.highConsequenceInjuries = parseInt(document.getElementById('inj-hci').value) || 0;
+    d.recordableInjuries = parseInt(document.getElementById('inj-rec').value) || 0;
+    d.bizsafeLevel = document.getElementById('bizsafe-value').value || 'none';
+    return d;
   }
+
+  // ── Save & continue ──
+  window.saveAndContinue = async function() {
+    const data = buildSocialData();
+    saveSocialData(data);
+
+    // Sync to Supabase if logged in — fire-and-forget, never blocks navigation
+    (async () => {
+      try {
+        const session = await getSession();
+        if (!session) return;
+        const periodId = localStorage.getItem('zyt_period_id');
+        if (!periodId) return;
+        await upsertSocialData(periodId, data);
+      } catch (e) {
+        console.warn('[S-31/32] Supabase sync failed (data saved locally):', e);
+      }
+    })();
+
+    window.location.href = 'S-33-governance.html';
+  };
 
   // ── Wire leavers input to calc ──
   document.getElementById('leavers').addEventListener('input', updateCalcs);
   document.getElementById('training-total').addEventListener('input', updateCalcs);
 
-  // ── Load saved data on init ──
-  const saved = localStorage.getItem('zyt_social_data');
-  if (saved) {
-    try {
-      const d = JSON.parse(saved);
-      if (d.totalEmployees) document.getElementById('total-emp').value = d.totalEmployees;
-      if (d.genderM) document.getElementById('g-male').value = d.genderM;
-      if (d.genderF) document.getElementById('g-female').value = d.genderF;
-      if (d.genderNB) document.getElementById('g-nb').value = d.genderNB;
-      if (d.genderND) document.getElementById('g-nd').value = d.genderND;
-      if (d.trainingHrsTotal) document.getElementById('training-total').value = d.trainingHrsTotal;
-      if (d.bizsafe) {
-        document.querySelectorAll('.bizsafe-card').forEach(c => {
-          if (c.getAttribute('onclick').includes(`'${d.bizsafe}'`)) c.classList.add('selected');
-        });
-        document.getElementById('bizsafe-value').value = d.bizsafe;
-      }
-      updateGenderBar();
-      updateCalcs();
-    } catch(e) {}
+  // ── Load saved data on init — try Supabase first, fall back to localStorage ──
+  async function populateForm(d) {
+    if (d.totalEmployees) document.getElementById('total-emp').value = d.totalEmployees;
+    if (d.employeesMale) document.getElementById('g-male').value = d.employeesMale;
+    if (d.employeesFemale) document.getElementById('g-female').value = d.employeesFemale;
+    if (d.employeesNonbinary) document.getElementById('g-nb').value = d.employeesNonbinary;
+    if (d.employeesNotDisclosed) document.getElementById('g-nd').value = d.employeesNotDisclosed;
+    if (d.employees30to50 && document.getElementById('age-30to50')) document.getElementById('age-30to50').value = d.employees30to50;
+    if (d.newHires) document.getElementById('new-hires').value = d.newHires;
+    if (d.leavers) document.getElementById('leavers').value = d.leavers;
+    if (d.totalTrainingHours) document.getElementById('training-total').value = d.totalTrainingHours;
+    if (d.fatalities) document.getElementById('inj-fatal').value = d.fatalities;
+    if (d.highConsequenceInjuries) document.getElementById('inj-hci').value = d.highConsequenceInjuries;
+    if (d.recordableInjuries) document.getElementById('inj-rec').value = d.recordableInjuries;
+    if (d.trainingTypes) {
+      document.querySelectorAll('.tt-tag').forEach(tag => {
+        if (d.trainingTypes.includes(tag.textContent)) tag.classList.add('selected');
+      });
+    }
+    if (d.bizsafeLevel && d.bizsafeLevel !== 'none') {
+      document.querySelectorAll('.bizsafe-card').forEach(c => {
+        if (c.getAttribute('onclick').includes(`'${d.bizsafeLevel}'`)) c.classList.add('selected');
+      });
+      document.getElementById('bizsafe-value').value = d.bizsafeLevel;
+    }
+    updateGenderBar();
+    updateCalcs();
   }
+
+  window.addEventListener('load', async () => {
+    const session = await getSession();
+    if (session) {
+      try {
+        const periodId = localStorage.getItem('zyt_period_id');
+        if (periodId) {
+          const { supabase } = await import('./js/supabase.js');
+          const { data: row } = await supabase.from('social_data').select('*').eq('period_id', periodId).single();
+          if (row) {
+            // DB row uses snake_case columns — map back to camelCase before populating
+            await populateForm({
+              totalEmployees: row.total_employees,
+              employeesMale: row.employees_male,
+              employeesFemale: row.employees_female,
+              employeesNonbinary: row.employees_nonbinary,
+              employeesNotDisclosed: row.employees_not_disclosed,
+              employees30to50: row.employees_30to50,
+              newHires: row.new_hires,
+              leavers: row.leavers,
+              totalTrainingHours: row.total_training_hours,
+              fatalities: row.fatalities,
+              highConsequenceInjuries: row.high_consequence_injuries,
+              recordableInjuries: row.recordable_injuries,
+              trainingTypes: row.training_types,
+              bizsafeLevel: row.bizsafe_level,
+            });
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('[S-31/32] Supabase load failed, falling back to localStorage:', e);
+      }
+    }
+
+    const saved = loadSocialData();
+    if (saved) await populateForm(saved);
+  });
 </script>
 
 </body>

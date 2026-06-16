@@ -87,12 +87,88 @@
 </div>
 
 <script type="module">
-  import { signIn, resetPassword } from './js/supabase.js';
+  import { signIn, resetPassword, getSession, supabase } from './js/supabase.js';
+  import { hydrateClustersFromSupabase, hydrateSocialGovernanceFromSupabase } from './js/zyt-core/schema.js';
+
+  // ── Handle password-reset hash (Supabase redirects here with #access_token=...) ──
+  // On a reset link click the hash contains access_token — let Supabase process it
+  // silently, then show the login form as normal (user can log in with new password).
+  // No special action needed; @supabase/supabase-js auto-processes the hash.
 
   function showError(msg) {
     const el = document.getElementById('error-box');
     el.textContent = msg;
     el.style.display = 'block';
+  }
+
+  // ── After successful sign-in: fetch profile and route accordingly ──
+  async function onLoginSuccess(userId) {
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (profile) {
+        // Reverse-lookup the revenue bucket string from the stored midpoint
+        // (profiles table only stores annual_revenue_sgd as a number; the
+        // bucket itself, e.g. '1-5m', isn't persisted — S-06's <select>
+        // needs the bucket string to show the right option as selected)
+        const REVENUE_MIDPOINTS = { 'under1m':500000, '1-5m':3000000, '5-25m':15000000, '25-100m':62500000, 'over100m':150000000 };
+        const revenueBucket = Object.entries(REVENUE_MIDPOINTS)
+          .find(([, v]) => v === profile.annual_revenue_sgd)?.[0] || '';
+
+        // Returning user — hydrate localStorage so S-06/S-09 work offline too
+        const local = {
+          companyName:          profile.company_name || '',
+          uen:                  profile.uen || '',
+          companySize:          profile.employee_count || '',
+          industry:             profile.industry || '',
+          reportingYear:        String(profile.reporting_year || new Date().getFullYear()),
+          responsiblePerson:    profile.responsible_person_name || '',
+          responsiblePersonRole:profile.responsible_person_role || '',
+          annualRevenue:        revenueBucket,
+          annualRevenueSgd:     profile.annual_revenue_sgd || null,
+          address:              profile.address || '',
+        };
+        localStorage.setItem('zyt_company_profile', JSON.stringify(local));
+
+        // Also fetch and cache the reporting period id
+        const year = profile.reporting_year || new Date().getFullYear();
+        const { data: period } = await supabase
+          .from('reporting_periods')
+          .select('id')
+          .eq('profile_id', userId)
+          .eq('year', year)
+          .single();
+
+        if (period?.id) {
+          localStorage.setItem('zyt_period_id', period.id);
+
+          // Pull cluster emissions + social/governance data back from Supabase
+          // so a returning user on a new device/browser sees their full data,
+          // not just an empty S-09 hub. Failures here are non-fatal — the
+          // user still proceeds to S-09 with whatever localStorage already has.
+          try {
+            await hydrateClustersFromSupabase(supabase, period.id);
+            await hydrateSocialGovernanceFromSupabase(supabase, period.id);
+          } catch (e) {
+            console.warn('[S-05] Cluster/social/governance hydration failed (continuing):', e);
+          }
+        }
+
+        // Returning user — skip profile screen, go straight to hub
+        window.location.href = 'S-09-data-entry-hub.html';
+      } else {
+        // First-time user — needs to fill in profile
+        window.location.href = 'S-06-company-profile.html';
+      }
+    } catch (e) {
+      // Profile fetch failed (network issue etc.) — still proceed to profile screen
+      console.warn('[S-05] Profile fetch failed, proceeding to S-06:', e);
+      window.location.href = 'S-06-company-profile.html';
+    }
   }
 
   window.doLogin = async () => {
@@ -106,7 +182,7 @@
     btn.textContent = 'Logging in…';
     btn.disabled = true;
 
-    const { error } = await signIn(email, password);
+    const { data, error } = await signIn(email, password);
     if (error) {
       showError(error.message === 'Invalid login credentials'
         ? 'Incorrect email or password. Please try again.'
@@ -116,7 +192,8 @@
       return;
     }
 
-    window.location.href = 'S-06-company-profile.html';
+    btn.textContent = 'Loading your data…';
+    await onLoginSuccess(data.user.id);
   };
 
   window.doForgotPassword = async () => {
@@ -126,6 +203,14 @@
     if (error) showError(error.message);
     else alert(`Password reset email sent to ${email}.\nCheck your inbox and follow the link.`);
   };
+
+  // ── If already logged in (e.g. session still valid), skip login screen ──
+  window.addEventListener('load', async () => {
+    // Don't auto-skip if this is a password-reset redirect (hash present)
+    if (window.location.hash.includes('access_token')) return;
+    const session = await getSession();
+    if (session) await onLoginSuccess(session.user.id);
+  });
 </script>
 </body>
 </html>

@@ -676,8 +676,9 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
 </div><!-- /layout -->
 
 <script type="module">
-import { createClusterData, createEmissionEntry, saveClusterData, loadClusterData } from './js/zyt-core/schema.js';
+import { createClusterData, createEmissionEntry, saveClusterData, loadClusterData, emissionEntryToDbRow } from './js/zyt-core/schema.js';
 import { goTo } from './js/zyt-core/config.js';
+import { getSession, upsertEmissions } from './js/supabase.js';
 
 const CLUSTER_ID = 'cooling';
 
@@ -1042,11 +1043,25 @@ function restoreFromSaved() {
 }
 
 // ── SAVE / EXIT ──
+async function syncToSupabase(entries) {
+  try {
+    const session = await getSession();
+    if (!session) return;
+    const periodId = localStorage.getItem('zyt_period_id');
+    if (!periodId) return;
+    const rows = entries.map(e => emissionEntryToDbRow(e, periodId, CLUSTER_ID));
+    await upsertEmissions(periodId, CLUSTER_ID, rows);
+  } catch (e) {
+    console.warn('[S-12] Supabase sync failed (data saved locally):', e);
+  }
+}
+
 function persist() {
   const data = createClusterData(CLUSTER_ID);
   data.saved = true;
   data.entries = buildEntriesFromState();
   saveClusterData(CLUSTER_ID, data);
+  syncToSupabase(data.entries);
 }
 
 function saveAndNext() {

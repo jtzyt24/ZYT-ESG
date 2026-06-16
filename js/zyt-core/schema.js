@@ -66,6 +66,13 @@ export function profileToDbRow(profile, userId) {
   };
 }
 
+/** Reads the saved CompanyProfile from localStorage, or null if none saved yet. */
+export function loadCompanyProfile() {
+  const raw = localStorage.getItem('zyt_company_profile');
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch (e) { return null; }
+}
+
 // ============================================================
 // 2. INTENT — zyt_intent, zyt_intent_ungc, zyt_intent_pcr
 // Mirrors: profiles.intent
@@ -205,6 +212,61 @@ export function emissionEntryToDbRow(entry, periodId, clusterId) {
     data_quality: entry.dataQuality,
     notes: entry.notes,
   };
+}
+
+/** Reverse of emissionEntryToDbRow() — maps an emissions_data row back to an EmissionEntry. */
+export function dbRowToEmissionEntry(row) {
+  return {
+    activityName: row.activity_name || '',
+    activityKey: row.activity_key || '',
+    quantity: row.quantity,
+    unit: row.unit || '',
+    efValue: row.ef_value,
+    efUnit: row.ef_unit || '',
+    efSource: row.ef_source || '',
+    emissionsKgCo2e: row.emissions_kgco2e,
+    scope: row.scope,
+    scope3Category: row.scope3_category,
+    costSgd: row.cost_sgd,
+    costBasis: row.cost_basis || 'estimated',
+    dataQuality: row.data_quality || 'estimated',
+    notes: row.notes || '',
+  };
+}
+
+/**
+ * Fetches all emissions_data rows for a period from Supabase, groups them by
+ * cluster, and writes a ClusterData object to localStorage for each of the
+ * 8 clusters (via saveClusterData()) — the reverse of what S-10–S-17's
+ * syncToSupabase() does on save. Used by S-05 on login to hydrate a
+ * returning user's cluster data from Supabase onto a new device/browser.
+ * Clusters with no rows in Supabase are left untouched (not overwritten
+ * with an empty ClusterData) so any local-only draft isn't clobbered.
+ * Returns the number of clusters hydrated.
+ */
+export async function hydrateClustersFromSupabase(supabaseClient, periodId) {
+  const { data: rows, error } = await supabaseClient
+    .from('emissions_data')
+    .select('*')
+    .eq('period_id', periodId);
+  if (error || !rows) return 0;
+
+  const byCluster = {};
+  for (const row of rows) {
+    if (!byCluster[row.cluster]) byCluster[row.cluster] = [];
+    byCluster[row.cluster].push(dbRowToEmissionEntry(row));
+  }
+
+  let count = 0;
+  for (const [clusterId, entries] of Object.entries(byCluster)) {
+    if (!CLUSTER_STORAGE_KEYS[clusterId]) continue; // unknown cluster id, skip
+    const data = createClusterData(clusterId);
+    data.saved = true;
+    data.entries = entries;
+    saveClusterData(clusterId, data);
+    count++;
+  }
+  return count;
 }
 
 // ============================================================
@@ -360,6 +422,50 @@ export function loadGovernanceData() {
   try { return JSON.parse(raw); } catch (e) { return null; }
 }
 
+/** Reverse of socialDataToDbRow() — maps a social_data row back to a SocialData object. */
+export function dbRowToSocialData(row) {
+  const data = createSocialData();
+  for (const [jsKey, dbKey] of Object.entries(SOCIAL_FIELD_MAP)) {
+    if (row[dbKey] !== undefined) data[jsKey] = row[dbKey];
+  }
+  return data;
+}
+
+/** Reverse of governanceDataToDbRow() — maps a governance_data row back to a GovernanceData object. */
+export function dbRowToGovernanceData(row) {
+  const data = createGovernanceData();
+  for (const [jsKey, dbKey] of Object.entries(GOVERNANCE_FIELD_MAP)) {
+    if (row[dbKey] !== undefined) data[jsKey] = row[dbKey];
+  }
+  return data;
+}
+
+/**
+ * Fetches social_data and governance_data rows for a period from Supabase
+ * and writes them to localStorage (via saveSocialData()/saveGovernanceData())
+ * if present. Used by S-05 on login alongside hydrateClustersFromSupabase().
+ * Returns { social: boolean, governance: boolean } indicating what was hydrated.
+ */
+export async function hydrateSocialGovernanceFromSupabase(supabaseClient, periodId) {
+  const result = { social: false, governance: false };
+
+  const { data: socialRow } = await supabaseClient
+    .from('social_data').select('*').eq('period_id', periodId).maybeSingle();
+  if (socialRow) {
+    saveSocialData(dbRowToSocialData(socialRow));
+    result.social = true;
+  }
+
+  const { data: govRow } = await supabaseClient
+    .from('governance_data').select('*').eq('period_id', periodId).maybeSingle();
+  if (govRow) {
+    saveGovernanceData(dbRowToGovernanceData(govRow));
+    result.governance = true;
+  }
+
+  return result;
+}
+
 // ============================================================
 // 6. TARGETS — zyt_targets_data
 // Mirrors: targets table (array of target rows)
@@ -448,6 +554,173 @@ export function loadContextData() {
   const raw = localStorage.getItem('zyt_context_data');
   if (!raw) return null;
   try { return JSON.parse(raw); } catch (e) { return null; }
+}
+
+// ============================================================
+// 8. AGGREGATION — used by S-18 (review/confirm) and S-19 (carbon overview)
+// ============================================================
+// Single source of truth for combining EmissionEntry[] across all 8
+// emissions clusters into scope/category totals, per-cluster summaries,
+// and grouped source breakdowns. Both S-18 and S-19 should call
+// aggregateClusters() rather than reading localStorage directly.
+// ============================================================
+
+/**
+ * Categorizes a Scope 1 entry as 'fuel' (combustion) or 'fugitive'
+ * (refrigerant leakage), for the Scope 1 cat-breakdown on S-18.
+ */
+function scope1Category(entry) {
+  return (entry.activityKey || '').startsWith('refrigerant_') ? 'fugitive' : 'fuel';
+}
+
+/**
+ * Categorizes a Scope 2 entry as 'grid' (grid electricity, including the
+ * on-site solar offset) or 'dc' (district cooling), for the Scope 2
+ * cat-breakdown on S-18.
+ */
+function scope2Category(entry) {
+  return entry.activityKey === 'district_cooling_kwh_equiv' ? 'dc' : 'grid';
+}
+
+/**
+ * Derives a 3-tier accuracy rating from the dataQuality mix of a cluster's
+ * entries — same three-tier system S-18 displays in "Data quality summary":
+ *  - all entries 'measured'  -> 'high'
+ *  - all entries 'estimated' -> 'low'
+ *  - mixed, or any 'calculated' -> 'medium'
+ *  - no entries -> 'none'
+ */
+function deriveAccuracy(entries) {
+  if (!entries || entries.length === 0) return 'none';
+  const qualities = new Set(entries.map(e => e.dataQuality));
+  if (qualities.size === 1) {
+    if (qualities.has('measured')) return 'high';
+    if (qualities.has('estimated')) return 'low';
+  }
+  return 'medium';
+}
+
+/**
+ * Aggregates EmissionEntry[] from all 8 clusters into scope/category totals,
+ * per-cluster summaries, and grouped source lists.
+ *
+ * @returns {{
+ *   clusters: Object.<string, {
+ *     s1: number, s2: number, s3: number, sgd: number,
+ *     status: 'complete'|'na'|'not_started',
+ *     acc: 'high'|'medium'|'low'|'none',
+ *     entryCount: number,
+ *     scopesPresent: string[]
+ *   }>,
+ *   scope1_kgco2e: number, scope2_kgco2e: number, scope3_kgco2e: number,
+ *   scope1_sgd: number, scope2_sgd: number, scope3_sgd: number,
+ *   total_kgco2e: number, total_sgd: number,
+ *   scope1_fuel_kgco2e: number, scope1_fugitive_kgco2e: number,
+ *   scope2_grid_kgco2e: number, scope2_dc_kgco2e: number,
+ *   scope3_by_category: Object.<number, number>,
+ *   s1_sources: {name: string, kgco2e: number}[],
+ *   s2_sources: {name: string, kgco2e: number}[],
+ *   s3_sources: {name: string, kgco2e: number}[]
+ * }}
+ *
+ * - s1/s2/s3 (per-cluster and overall) are in kgCO2e. A cluster's `s3`
+ *   includes entries of ALL scope3Category values for that cluster
+ *   (e.g. Power's Cat-3 upstream electricity is folded into its s3).
+ * - status: 'complete' if the cluster has any entries, 'na' if the
+ *   cluster was visited and saved with zero entries (explicitly marked
+ *   not applicable), 'not_started' if the cluster has never been saved.
+ * - scopesPresent lists which of s1/s2/s3 have non-zero entries for
+ *   that cluster, e.g. ['s2','s3'].
+ * - s1_sources/s2_sources/s3_sources group entries by activityName
+ *   across all clusters, summing emissionsKgCo2e, sorted descending.
+ */
+export function aggregateClusters() {
+  const clusters = {};
+  let scope1_kgco2e = 0, scope2_kgco2e = 0, scope3_kgco2e = 0;
+  let scope1_sgd = 0, scope2_sgd = 0, scope3_sgd = 0;
+  let scope1_fuel_kgco2e = 0, scope1_fugitive_kgco2e = 0;
+  let scope2_grid_kgco2e = 0, scope2_dc_kgco2e = 0;
+  const scope3_by_category = {};
+  const sourceMaps = { 1: new Map(), 2: new Map(), 3: new Map() };
+
+  for (const clusterId of Object.keys(CLUSTER_STORAGE_KEYS)) {
+    const data = loadClusterData(clusterId);
+    let s1 = 0, s2 = 0, s3 = 0, sgd = 0;
+    let status, acc, entryCount = 0;
+
+    if (data === null) {
+      status = 'not_started';
+      acc = 'none';
+    } else {
+      const entries = data.entries || [];
+      entryCount = entries.length;
+
+      if (entryCount === 0) {
+        status = data.saved ? 'na' : 'not_started';
+        acc = 'none';
+      } else {
+        status = 'complete';
+        acc = deriveAccuracy(entries);
+      }
+
+      for (const e of entries) {
+        const kg = e.emissionsKgCo2e || 0;
+        const cost = e.costSgd || 0;
+        const name = e.activityName || e.activityKey || 'Unnamed activity';
+        sgd += cost;
+
+        if (e.scope === 1) {
+          s1 += kg;
+          scope1_kgco2e += kg;
+          scope1_sgd += cost;
+          if (scope1Category(e) === 'fugitive') scope1_fugitive_kgco2e += kg;
+          else scope1_fuel_kgco2e += kg;
+          sourceMaps[1].set(name, (sourceMaps[1].get(name) || 0) + kg);
+        } else if (e.scope === 2) {
+          s2 += kg;
+          scope2_kgco2e += kg;
+          scope2_sgd += cost;
+          if (scope2Category(e) === 'dc') scope2_dc_kgco2e += kg;
+          else scope2_grid_kgco2e += kg;
+          sourceMaps[2].set(name, (sourceMaps[2].get(name) || 0) + kg);
+        } else {
+          s3 += kg;
+          scope3_kgco2e += kg;
+          scope3_sgd += cost;
+          if (e.scope3Category) {
+            scope3_by_category[e.scope3Category] = (scope3_by_category[e.scope3Category] || 0) + kg;
+          }
+          sourceMaps[3].set(name, (sourceMaps[3].get(name) || 0) + kg);
+        }
+      }
+    }
+
+    const scopesPresent = [];
+    if (s1 > 0) scopesPresent.push('s1');
+    if (s2 > 0) scopesPresent.push('s2');
+    if (s3 > 0) scopesPresent.push('s3');
+
+    clusters[clusterId] = { s1, s2, s3, sgd, status, acc, entryCount, scopesPresent };
+  }
+
+  const toSourceList = (map) =>
+    [...map.entries()]
+      .map(([name, kgco2e]) => ({ name, kgco2e }))
+      .sort((a, b) => b.kgco2e - a.kgco2e);
+
+  return {
+    clusters,
+    scope1_kgco2e, scope2_kgco2e, scope3_kgco2e,
+    scope1_sgd, scope2_sgd, scope3_sgd,
+    total_kgco2e: scope1_kgco2e + scope2_kgco2e + scope3_kgco2e,
+    total_sgd: scope1_sgd + scope2_sgd + scope3_sgd,
+    scope1_fuel_kgco2e, scope1_fugitive_kgco2e,
+    scope2_grid_kgco2e, scope2_dc_kgco2e,
+    scope3_by_category,
+    s1_sources: toSourceList(sourceMaps[1]),
+    s2_sources: toSourceList(sourceMaps[2]),
+    s3_sources: toSourceList(sourceMaps[3]),
+  };
 }
 
 // ============================================================

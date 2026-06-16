@@ -621,22 +621,25 @@
   </div>
 </div>
 
-<script>
-  function toggleSection(id) {
+<script type="module">
+  import { createGovernanceData, saveGovernanceData, loadGovernanceData } from './js/zyt-core/schema.js';
+  import { getSession, upsertGovernanceData, supabase } from './js/supabase.js';
+
+  window.toggleSection = function(id) {
     document.getElementById(id).classList.toggle('collapsed');
-  }
-  function toggleOpt(id, cb) {
+  };
+  window.toggleOpt = function(id, cb) {
     const s = document.getElementById(id);
     cb.checked ? s.classList.add('visible') : s.classList.remove('visible');
-  }
+  };
 
-  function selectFreq(el, val) {
+  window.selectFreq = function(el, val) {
     document.querySelectorAll('.freq-card').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
     document.getElementById('esg-freq').value = val;
-  }
+  };
 
-  function selectYN(fieldId, val, btn) {
+  window.selectYN = function(fieldId, val, btn) {
     const parent = btn.closest('.yn-toggle');
     parent.querySelectorAll('.yn-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
@@ -646,9 +649,9 @@
       document.getElementById('ac-desc-field').style.display = val ? 'block' : 'none';
     }
     updateCompletionStatus();
-  }
+  };
 
-  function updateMgmtBar() {
+  window.updateMgmtBar = function() {
     const total = parseInt(document.getElementById('mgmt-total').value) || 0;
     const m = parseInt(document.getElementById('mgmt-male').value) || 0;
     const f = parseInt(document.getElementById('mgmt-female').value) || 0;
@@ -659,20 +662,23 @@
     document.getElementById('mbar-f').style.width = fPct+'%';
     document.getElementById('mgmt-result').textContent = `${fPct}% female · ${mPct}% male leadership`;
     updateCompletionStatus();
-  }
+  };
 
-  function toggleCert(el) {
+  window.toggleCert = function(el) {
     el.classList.toggle('selected');
-  }
+  };
 
-  // AC training % auto-calc
+  // AC training % auto-calc — reads total employees from S-31/32's saved social data
   document.addEventListener('input', function(e) {
     if (e.target.id === 'ac-staff-trained') {
-      const socialData = JSON.parse(localStorage.getItem('zyt_social_data') || '{}');
-      const total = parseInt(socialData.totalEmployees) || 0;
+      let totalEmp = 0;
+      try {
+        const socialData = JSON.parse(localStorage.getItem('zyt_social_data') || '{}');
+        totalEmp = parseInt(socialData.totalEmployees) || 0;
+      } catch (err) {}
       const trained = parseInt(e.target.value) || 0;
-      if (total > 0 && trained > 0) {
-        document.getElementById('ac-staff-pct').value = (trained/total*100).toFixed(0);
+      if (totalEmp > 0 && trained > 0) {
+        document.getElementById('ac-staff-pct').value = (trained/totalEmp*100).toFixed(0);
       }
     }
   });
@@ -702,51 +708,108 @@
   checkUNGC();
 
   // Load profile data (ESG person from S-06)
-  const profileData = JSON.parse(localStorage.getItem('zyt_company_profile') || '{}');
-  if (profileData.responsiblePerson) {
-    document.getElementById('esg-person-display').value = profileData.responsiblePerson;
-    document.getElementById('esg-person-role').value = profileData.responsiblePersonRole || '';
-  }
-
-  function saveAndContinue() {
-    const certs = [...document.querySelectorAll('.cert-chip.selected')].map(c => c.textContent);
-    if (document.getElementById('cert-other').value) {
-      certs.push(document.getElementById('cert-other').value);
+  try {
+    const profileData = JSON.parse(localStorage.getItem('zyt_company_profile') || '{}');
+    if (profileData.responsiblePerson) {
+      document.getElementById('esg-person-display').value = profileData.responsiblePerson;
+      document.getElementById('esg-person-role').value = profileData.responsiblePersonRole || '';
     }
-    const data = {
-      esgFrequency: document.getElementById('esg-freq').value,
-      mgmtTotal: document.getElementById('mgmt-total').value,
-      mgmtMale: document.getElementById('mgmt-male').value,
-      mgmtFemale: document.getElementById('mgmt-female').value,
-      acPolicy: document.getElementById('ac-policy').value,
-      acDesc: document.getElementById('ac-desc').value,
-      whistlePolicy: document.getElementById('whistle-policy').value,
-      certifications: certs,
-      assuranceType: document.getElementById('assurance-type').value,
-    };
-    localStorage.setItem('zyt_governance_data', JSON.stringify(data));
-    window.location.href = 'S-19-carbon-overview.html';
+  } catch (e) {}
+
+  // ── Build a canonical GovernanceData object (matches schema.js shape) from form fields ──
+  function buildGovernanceData() {
+    const d = createGovernanceData();
+    const certs = [...document.querySelectorAll('.cert-chip.selected')].map(c => c.textContent);
+    if (document.getElementById('cert-other').value) certs.push(document.getElementById('cert-other').value);
+
+    const mgmtTotal = parseInt(document.getElementById('mgmt-total').value) || null;
+    const mgmtFemale = parseInt(document.getElementById('mgmt-female').value) || null;
+
+    d.esgReviewFrequency = document.getElementById('esg-freq').value || '';
+    d.mgmtTeamTotal = mgmtTotal;
+    d.mgmtTeamMale = parseInt(document.getElementById('mgmt-male').value) || null;
+    d.mgmtTeamFemale = mgmtFemale;
+    d.mgmtTeamFemalePct = (mgmtTotal && mgmtFemale) ? +(mgmtFemale/mgmtTotal*100).toFixed(1) : null;
+    d.anticorruptionPolicy = document.getElementById('ac-policy').value === 'yes';
+    d.anticorruptionPolicyDesc = document.getElementById('ac-desc').value || '';
+    d.staffWithAcTraining = parseInt(document.getElementById('ac-staff-trained')?.value) || null;
+    d.staffAcTrainingPct = parseFloat(document.getElementById('ac-staff-pct')?.value) || null;
+    d.whistleblowingChannel = document.getElementById('whistle-policy').value === 'yes';
+    d.certifications = certs;
+    return d;
   }
 
-  // Load saved governance data
-  const savedG = localStorage.getItem('zyt_governance_data');
-  if (savedG) {
-    try {
-      const d = JSON.parse(savedG);
-      if (d.mgmtTotal) document.getElementById('mgmt-total').value = d.mgmtTotal;
-      if (d.mgmtMale) document.getElementById('mgmt-male').value = d.mgmtMale;
-      if (d.mgmtFemale) document.getElementById('mgmt-female').value = d.mgmtFemale;
-      if (d.assuranceType) document.getElementById('assurance-type').value = d.assuranceType;
-      if (d.certifications) {
-        d.certifications.forEach(cert => {
-          document.querySelectorAll('.cert-chip').forEach(c => {
-            if (c.textContent === cert) c.classList.add('selected');
-          });
-        });
+  window.saveAndContinue = async function() {
+    const data = buildGovernanceData();
+    saveGovernanceData(data);
+
+    // Sync to Supabase if logged in — fire-and-forget, never blocks navigation
+    (async () => {
+      try {
+        const session = await getSession();
+        if (!session) return;
+        const periodId = localStorage.getItem('zyt_period_id');
+        if (!periodId) return;
+        await upsertGovernanceData(periodId, data);
+      } catch (e) {
+        console.warn('[S-33] Supabase sync failed (data saved locally):', e);
       }
-      updateMgmtBar();
-    } catch(e) {}
+    })();
+
+    window.location.href = 'S-19-carbon-overview.html';
+  };
+
+  // ── Populate form from a canonical GovernanceData object ──
+  function populateForm(d) {
+    if (d.mgmtTeamTotal) document.getElementById('mgmt-total').value = d.mgmtTeamTotal;
+    if (d.mgmtTeamMale) document.getElementById('mgmt-male').value = d.mgmtTeamMale;
+    if (d.mgmtTeamFemale) document.getElementById('mgmt-female').value = d.mgmtTeamFemale;
+    if (d.esgReviewFrequency) {
+      document.getElementById('esg-freq').value = d.esgReviewFrequency;
+      document.querySelectorAll('.freq-card').forEach(c => {
+        if (c.getAttribute('onclick')?.includes(`'${d.esgReviewFrequency}'`)) c.classList.add('selected');
+      });
+    }
+    if (d.anticorruptionPolicyDesc) document.getElementById('ac-desc').value = d.anticorruptionPolicyDesc;
+    if (d.staffWithAcTraining) document.getElementById('ac-staff-trained').value = d.staffWithAcTraining;
+    if (d.certifications) {
+      d.certifications.forEach(cert => {
+        document.querySelectorAll('.cert-chip').forEach(c => {
+          if (c.textContent === cert) c.classList.add('selected');
+        });
+      });
+    }
+    window.updateMgmtBar();
   }
+
+  window.addEventListener('load', async () => {
+    const session = await getSession();
+    if (session) {
+      try {
+        const periodId = localStorage.getItem('zyt_period_id');
+        if (periodId) {
+          const { data: row } = await supabase.from('governance_data').select('*').eq('period_id', periodId).single();
+          if (row) {
+            populateForm({
+              mgmtTeamTotal: row.mgmt_team_total,
+              mgmtTeamMale: row.mgmt_team_male,
+              mgmtTeamFemale: row.mgmt_team_female,
+              esgReviewFrequency: row.esg_review_frequency,
+              anticorruptionPolicyDesc: row.anti_corruption_policy_desc,
+              staffWithAcTraining: row.staff_with_ac_training,
+              certifications: row.certifications,
+            });
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('[S-33] Supabase load failed, falling back to localStorage:', e);
+      }
+    }
+
+    const saved = loadGovernanceData();
+    if (saved) populateForm(saved);
+  });
 </script>
 </body>
 </html>

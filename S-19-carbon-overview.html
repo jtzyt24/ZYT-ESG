@@ -573,57 +573,50 @@
   </div>
 </div>
 
-<script>
-// ── SAMPLE / DEMO DATA ──
-// In production this would come from Supabase (aggregated from emissions_data table)
-// For demo purposes, using representative data for a 42-person ICT/services SME
+<script type="module">
+import { aggregateClusters, loadCompanyProfile, loadSocialData } from './js/zyt-core/schema.js';
+import { INDUSTRY_LABELS } from './js/zyt-core/config.js';
 
-const DEMO = {
-  company: 'ZYT Solutions Pte Ltd',
-  year: 2024,
-  industry: 'ICT & professional services',
-  employees: 42,
-  revenue_sgd: 3200000,  // SGD 3.2M (optional — from S-06)
+// ── REAL DATA (aggregated from all 8 emissions clusters) ──
+const agg = aggregateClusters();
+const profile = loadCompanyProfile();
+const social = loadSocialData();
 
-  // kgCO₂e values
-  scope1_kgco2e: 4820,   // diesel generator, company vehicles
-  scope2_kgco2e: 31200,  // grid electricity
-  scope3_kgco2e: 18940,  // commuting, cloud, business travel, waste
+const DATA = {
+  company: profile?.companyName || 'Your company',
+  year: profile?.reportingYear || String(new Date().getFullYear()),
+  industry: profile?.industry ? (INDUSTRY_LABELS[profile.industry] || profile.industry) : 'your industry',
+  employees: social?.totalEmployees || 0,
+  revenue_sgd: profile?.annualRevenueSgd || 0, // from S-06's revenue bucket midpoint, via zyt_company_profile
 
-  // SGD cost
-  scope1_sgd: 14200,
-  scope2_sgd: 38500,
-  scope3_sgd: 0,
+  // kgCO2e totals
+  scope1_kgco2e: agg.scope1_kgco2e,
+  scope2_kgco2e: agg.scope2_kgco2e,
+  scope3_kgco2e: agg.scope3_kgco2e,
 
-  // Scope 1 breakdown
-  s1_sources: [
-    { name: 'Company vehicles (petrol)', kgco2e: 3100 },
-    { name: 'Diesel generator (backup)', kgco2e: 1720 },
-  ],
-  // Scope 2 breakdown
-  s2_sources: [
-    { name: 'Office electricity (S-10)', kgco2e: 28400 },
-    { name: 'WFH electricity (S-15)', kgco2e: 2800 },
-  ],
-  // Scope 3 breakdown
-  s3_sources: [
-    { name: 'Employee commuting (Cat 7)', kgco2e: 8200 },
-    { name: 'Business travel (Cat 6)', kgco2e: 4100 },
-    { name: 'Cloud & IT (Cat 1+2)', kgco2e: 3840 },
-    { name: 'Waste & water (Cat 5)', kgco2e: 1600 },
-    { name: 'Upstream energy (Cat 3)', kgco2e: 1200 },
-  ],
+  // SGD cost totals (cost of entries by scope)
+  scope1_sgd: agg.scope1_sgd,
+  scope2_sgd: agg.scope2_sgd,
+  scope3_sgd: agg.scope3_sgd,
 
-  // Benchmark (indicative — ZYT estimates for similar ICT SME)
+  // Source breakdowns, grouped by activityName within each scope
+  s1_sources: agg.s1_sources,
+  s2_sources: agg.s2_sources,
+  s3_sources: agg.s3_sources,
+
+  // Scope 3 breakdown by category (1-9), in kgCO2e — used for the Cat 3
+  // (upstream energy) intensity metric below
+  scope3_by_category: agg.scope3_by_category,
+
+  // Benchmark — ZYT estimates for similar-size Singapore SMEs.
+  // Static reference values (no per-company benchmark source yet).
   benchmark_median_kgco2e: 62000,
   benchmark_best_kgco2e: 38000,
 };
 
-// ── Load from localStorage if available, else use demo ──
+// ── Load aggregated data ──
 function loadData() {
-  // In production: aggregate from emissions_data rows
-  // For now: check if emissions data exists, otherwise use demo
-  return DEMO;
+  return DATA;
 }
 
 function fmt(kgco2e, decimals=1) {
@@ -778,6 +771,7 @@ function render() {
   const s3 = d.scope3_kgco2e;
   const total = s1 + s2 + s3;
   const totalT = total / 1000;
+  const pct = (v) => total > 0 ? (v/total*100) : 0;
 
   // Hero
   document.getElementById('hero-company').textContent = d.company;
@@ -791,14 +785,14 @@ function render() {
   document.getElementById('s1-val').textContent = fmt(s1);
   document.getElementById('s2-val').textContent = fmt(s2);
   document.getElementById('s3-val').textContent = fmt(s3);
-  document.getElementById('s1-pct').textContent = (s1/total*100).toFixed(0)+'%';
-  document.getElementById('s2-pct').textContent = (s2/total*100).toFixed(0)+'%';
-  document.getElementById('s3-pct').textContent = (s3/total*100).toFixed(0)+'%';
+  document.getElementById('s1-pct').textContent = pct(s1).toFixed(0)+'%';
+  document.getElementById('s2-pct').textContent = pct(s2).toFixed(0)+'%';
+  document.getElementById('s3-pct').textContent = pct(s3).toFixed(0)+'%';
   if (d.scope1_sgd) document.getElementById('s1-sgd').textContent = 'SGD ' + d.scope1_sgd.toLocaleString('en-SG');
   if (d.scope2_sgd) document.getElementById('s2-sgd').textContent = 'SGD ' + d.scope2_sgd.toLocaleString('en-SG');
-  document.getElementById('s1-bar').style.width = (s1/total*100)+'%';
-  document.getElementById('s2-bar').style.width = (s2/total*100)+'%';
-  document.getElementById('s3-bar').style.width = (s3/total*100)+'%';
+  document.getElementById('s1-bar').style.width = pct(s1)+'%';
+  document.getElementById('s2-bar').style.width = pct(s2)+'%';
+  document.getElementById('s3-bar').style.width = pct(s3)+'%';
 
   buildSourceList('s1-sources', d.s1_sources, '--s1');
   buildSourceList('s2-sources', d.s2_sources, '--s2');
@@ -810,17 +804,16 @@ function render() {
   document.getElementById('dl-s1').textContent = fmt(s1) + ' t';
   document.getElementById('dl-s2').textContent = fmt(s2) + ' t';
   document.getElementById('dl-s3').textContent = fmt(s3) + ' t';
-  document.getElementById('dl-s1-pct').textContent = (s1/total*100).toFixed(0)+'%';
-  document.getElementById('dl-s2-pct').textContent = (s2/total*100).toFixed(0)+'%';
-  document.getElementById('dl-s3-pct').textContent = (s3/total*100).toFixed(0)+'%';
+  document.getElementById('dl-s1-pct').textContent = pct(s1).toFixed(0)+'%';
+  document.getElementById('dl-s2-pct').textContent = pct(s2).toFixed(0)+'%';
+  document.getElementById('dl-s3-pct').textContent = pct(s3).toFixed(0)+'%';
 
   // Intensity
   document.getElementById('int-s12').textContent = fmt(s1+s2);
   if (d.employees > 0) document.getElementById('int-per-emp').textContent = (totalT/d.employees).toFixed(2);
   if (d.revenue_sgd > 0) document.getElementById('int-per-rev').textContent = (total / (d.revenue_sgd/1000)).toFixed(1);
-  // Cat 3 auto-calc: upstream electricity (EMA SEFR Cat 3 = 0.00212 kgCO₂e/kWh)
-  // Approximated from scope 2 total
-  const cat3 = s2 * (0.00212 / 0.412);
+  // Cat 3 — upstream energy (T&D losses), auto-calculated by S-10 from grid electricity
+  const cat3 = d.scope3_by_category?.[3] || 0;
   document.getElementById('int-cat3').textContent = fmt(cat3, 2);
 
   // Analogies
@@ -829,8 +822,8 @@ function render() {
   // Benchmark
   buildBenchmark(d);
 
-  // Advisory nudge
-  document.getElementById('advisory-nudge').style.display = 'flex';
+  // Advisory nudge — only meaningful once there's real data to act on
+  if (total > 0) document.getElementById('advisory-nudge').style.display = 'flex';
 }
 
 // ── INIT ──

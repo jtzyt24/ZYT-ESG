@@ -257,7 +257,7 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
       <div class="act-sub">Petrol and diesel burned in vehicles your business owns or operates. Add each vehicle type separately for the most accurate calculation.</div>
       <div class="tip-panel" id="tip-veh">
         Fuel burned in your company vehicles is a direct (Scope 1) emission — you control the source. If a vehicle is leased and you pay for the fuel, it is still Scope 1. If you reimburse employees for using their personal vehicles for business, that is Scope 3 Cat 6 (business travel).
-        <div class="tip-analogy">🚗 1 litre of petrol ≈ 13 km in a typical Singapore sedan · 1 litre diesel ≈ 12 km in a van</div>
+        <div class="tip-analogy">🚗 Enter either monthly litres (from fuel card / receipts) or monthly km driven. For km: petrol car ≈ 0.18 kgCO₂/km · diesel van ≈ 0.22 kgCO₂/km (SEFR-derived)</div>
         <div class="tip-ef">SEFR: Fuel → Combustion → Motor Gasoline: 2.295 kgCO₂/L · Gas/Diesel Oil: 2.660 kgCO₂/L · Source: NEA Singapore</div>
       </div>
 
@@ -623,8 +623,8 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
   </div>
   <div class="sum-ef">
     <div class="sum-ef-lbl">Emission factors used</div>
-    <div class="ef-row"><span>Petrol (NEA/SEFR)</span><span>2.295 kgCO₂/litre</span></div>
-    <div class="ef-row"><span>Diesel (NEA/SEFR)</span><span>2.660 kgCO₂/litre</span></div>
+    <div class="ef-row"><span>Petrol (NEA/SEFR)</span><span>2.295 kgCO₂/L · 0.177 kgCO₂/km</span></div>
+    <div class="ef-row"><span>Diesel (NEA/SEFR)</span><span>2.660 kgCO₂/L · 0.222 kgCO₂/km</span></div>
     <div class="ef-row"><span>Road freight (GHG Protocol)</span><span>~0.1 kgCO₂/tonne-km</span></div>
     <div class="ef-row"><span>Grab/taxi ICE (SEFR MOT)</span><span>0.173 kgCO₂/person-km</span></div>
     <div class="ef-row"><span>Hotel stay (GHG Protocol)</span><span>20–70 kgCO₂/night</span></div>
@@ -642,8 +642,9 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
 </div><!-- /layout -->
 
 <script type="module">
-import { createClusterData, createEmissionEntry, saveClusterData, loadClusterData } from './js/zyt-core/schema.js';
+import { createClusterData, createEmissionEntry, saveClusterData, loadClusterData, emissionEntryToDbRow } from './js/zyt-core/schema.js';
 import { goTo } from './js/zyt-core/config.js';
+import { getSession, upsertEmissions } from './js/supabase.js';
 
 const CLUSTER_ID = 'transport';
 
@@ -667,9 +668,9 @@ function parseNotes(notes) {
 
 // ── CONSTANTS ──
 const EF = {
-  petrol: 2.295,    // kgCO₂/litre (3080.755 × 0.745 / 1000)
-  diesel: 2.660,    // kgCO₂/litre (3196.749 × 0.832 / 1000)
-  lpg: 1.644,       // kgCO₂/litre (2987.208 × 0.55 / 1000)
+  petrol: 2.295,    // kgCO₂/litre (SEFR Jan 2026 — Motor Gasoline)
+  diesel: 2.660,    // kgCO₂/litre (SEFR Jan 2026 — Gas/Diesel Oil)
+  lpg: 1.644,       // kgCO₂/litre (SEFR Jan 2026 — LPG)
   cng_kg: 2.163,    // kgCO₂/kg (IPCC default)
   freight_road: 0.1, // kgCO₂/tonne-km (GHG Protocol default)
   grab_ice: 0.1732, // kgCO₂/person-km (SEFR MOT)
@@ -678,6 +679,13 @@ const EF = {
   flight_short: 0.255, // <3000 km
   flight_medium: 0.195, // 3000-6000 km
   flight_long: 0.150,   // >6000 km
+  // Per-km EFs for company vehicles (derived from SEFR fuel EFs × typical Singapore fleet consumption)
+  // Used when user enters km/month instead of litres/month
+  petrol_km: 0.177,  // kgCO₂/km — petrol car/van @ ~13 km/L × 2.295 kgCO₂/L
+  diesel_km: 0.222,  // kgCO₂/km — diesel van/truck @ ~12 km/L × 2.660 kgCO₂/L
+  lpg_km:    0.149,  // kgCO₂/km — LPG vehicle @ ~11 km/L × 1.644 kgCO₂/L
+  cng_km:    0.180,  // kgCO₂/km — CNG vehicle (estimate, IPCC default basis)
+  ev_km:     0,      // kgCO₂/km — EV: zero Scope 1 (upstream in Scope 2 via S-10)
 };
 
 const PRICE = {
@@ -758,9 +766,9 @@ function addVehicle() {
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div class="ve-result empty" id="${id}-result">Enter monthly fuel to calculate</div>
       <div style="display:flex;gap:4px;align-items:center;margin-left:auto">
-        <span style="font-size:10px;color:var(--ink3)">Or enter by km/month:</span>
-        <input class="inp" type="number" id="${id}-km" placeholder="km" oninput="calcVehicleFromKm('${id}')" style="height:28px;width:70px;font-size:11px">
-        <input class="inp" type="number" id="${id}-eff" placeholder="km/L" oninput="calcVehicleFromKm('${id}')" style="height:28px;width:55px;font-size:11px">
+        <span style="font-size:10px;color:var(--ink3)">Or enter km/month:</span>
+        <input class="inp" type="number" id="${id}-km" placeholder="km" oninput="calcVehicleFromKm('${id}')" style="height:28px;width:80px;font-size:11px">
+        <span style="font-size:10px;color:var(--ink3)">km/mo</span>
       </div>
     </div>`;
   document.getElementById('vehicle-list').appendChild(div);
@@ -795,18 +803,32 @@ function calcVehicleEntry(id) {
     entry.classList.remove('has-data');
   }
   const v = S.vehicles.find(v=>v.id===id);
-  if (v) { v.co2=co2; v.cost=cost; v.litres_yr=litres_yr; }
+  if (v) { v.co2=co2; v.cost=cost; v.litres_yr=litres_yr; v.km_yr=0; v.km_mode=false; }
+  if (litres > 0) document.getElementById(id+'-km').value = ''; // clear km field to avoid conflict
   updateVehicleTotals();
 }
 
 function calcVehicleFromKm(id) {
   const km = parseFloat(document.getElementById(id+'-km').value)||0;
-  const eff = parseFloat(document.getElementById(id+'-eff').value)||0;
-  if (km>0 && eff>0) {
-    const litres = km/eff;
-    document.getElementById(id+'-litres').value = litres.toFixed(1);
-    calcVehicleEntry(id);
-  }
+  if (km <= 0) return;
+  const fuel = document.getElementById(id+'-fuel').value;
+  // Per-km EF lookup (derived from SEFR fuel EFs × typical Singapore fleet consumption)
+  const kmEfMap = { petrol: EF.petrol_km, diesel: EF.diesel_km, lpg: EF.lpg_km, cng: EF.cng_km, ev: EF.ev_km };
+  const efKm = kmEfMap[fuel] ?? EF.petrol_km;
+  const km_yr = km * 12;
+  const co2 = km_yr * efKm / 1000; // tCO₂e/yr
+  const fuelData = FUEL_TYPES.find(f=>f.val===fuel);
+  const cost = fuelData && fuelData.price > 0 ? 0 : 0; // cost not calculable from km alone without efficiency
+  const resEl = document.getElementById(id+'-result');
+  const entry = document.getElementById('entry-'+id);
+  resEl.className = 've-result';
+  resEl.textContent = `~ ${co2.toFixed(2)} tCO₂e/yr (km-based estimate)`;
+  entry.classList.add('has-data');
+  // Clear the litres field so the two paths don't conflict
+  document.getElementById(id+'-litres').value = '';
+  const v = S.vehicles.find(v=>v.id===id);
+  if (v) { v.co2=co2; v.cost=0; v.litres_yr=0; v.km_yr=km_yr; v.km_mode=true; }
+  updateVehicleTotals();
 }
 
 function updateVehicleTotals() {
@@ -1129,7 +1151,25 @@ function buildEntriesFromState() {
     const fuel = document.getElementById(v.id + '-fuel')?.value || 'diesel';
     const fd = FUEL_TYPES.find(f => f.val === fuel);
     const name = document.getElementById(v.id + '-name')?.value || fd.label;
-    if (v.litres_yr > 0) {
+    if (v.km_mode && v.km_yr > 0) {
+      // km/month path — quantity stored in annual km, EF is kgCO₂/km
+      const kmEfMap = { petrol: EF.petrol_km, diesel: EF.diesel_km, lpg: EF.lpg_km, cng: EF.cng_km, ev: EF.ev_km };
+      const efKm = kmEfMap[fuel] ?? EF.petrol_km;
+      const e = createEmissionEntry();
+      e.activityName = name;
+      e.activityKey = `company_vehicle_${fuel}`;
+      e.quantity = +v.km_yr.toFixed(0);
+      e.unit = 'km';
+      e.efValue = efKm;
+      e.efUnit = 'kgCO2e/km';
+      e.efSource = `NEA/SEFR Jan 2026 — derived from fuel EF × typical ${fuel} fleet consumption`;
+      e.emissionsKgCo2e = +(v.co2 * 1000).toFixed(3);
+      e.scope = 1;
+      e.costSgd = null; // cost not calculable from km alone
+      e.costBasis = 'estimated';
+      e.dataQuality = 'estimated';
+      entries.push(e);
+    } else if (v.litres_yr > 0) {
       const e = createEmissionEntry();
       e.activityName = name;
       e.activityKey = `company_vehicle_${fuel}`;
@@ -1308,8 +1348,15 @@ function restoreFromSaved() {
         const id = 'v' + vehicleCount;
         document.getElementById(id + '-name').value = entry.activityName;
         document.getElementById(id + '-fuel').value = fuel;
-        document.getElementById(id + '-litres').value = +(entry.quantity / 12).toFixed(2);
-        calcVehicleEntry(id);
+        if (entry.unit === 'km') {
+          // Saved via km/month path — restore the km field
+          document.getElementById(id + '-km').value = +(entry.quantity / 12).toFixed(0);
+          calcVehicleFromKm(id);
+        } else {
+          // Saved via litres/month path — restore the litres field
+          document.getElementById(id + '-litres').value = +(entry.quantity / 12).toFixed(2);
+          calcVehicleEntry(id);
+        }
         break;
       }
       case 'inbound_freight_tkm': {
@@ -1411,11 +1458,25 @@ function restoreFromSaved() {
 }
 
 // ── SAVE / EXIT ──
+async function syncToSupabase(entries) {
+  try {
+    const session = await getSession();
+    if (!session) return;
+    const periodId = localStorage.getItem('zyt_period_id');
+    if (!periodId) return;
+    const rows = entries.map(e => emissionEntryToDbRow(e, periodId, CLUSTER_ID));
+    await upsertEmissions(periodId, CLUSTER_ID, rows);
+  } catch (e) {
+    console.warn('[S-11] Supabase sync failed (data saved locally):', e);
+  }
+}
+
 function persist() {
   const data = createClusterData(CLUSTER_ID);
   data.saved = true;
   data.entries = buildEntriesFromState();
   saveClusterData(CLUSTER_ID, data);
+  syncToSupabase(data.entries);
 }
 
 function saveAndNext() {

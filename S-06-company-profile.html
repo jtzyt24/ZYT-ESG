@@ -378,7 +378,9 @@ textarea.inp{height:80px;padding:10px 12px;resize:vertical;line-height:1.5}
 
 </div><!-- /page -->
 
-<script>
+<script type="module">
+import { getSession, supabase, upsertProfile, getOrCreatePeriod } from './js/supabase.js';
+
 const SUBSECTORS = {
   fnb: ['Restaurant / dine-in','Café / bakery','Catering & events','Food manufacturing','Food retail / supermarket','Hawker / coffeeshop','Bar & nightlife'],
   retail: ['Fashion & apparel','Electronics & appliances','Supermarket / grocery','Convenience store','E-commerce / online retail','Home & furniture'],
@@ -392,15 +394,23 @@ const SUBSECTORS = {
   other: [],
 };
 
+// Revenue bucket → representative midpoint SGD value for intensity calcs
+const REVENUE_MIDPOINTS = {
+  'under1m':  500000,
+  '1-5m':     3000000,
+  '5-25m':    15000000,
+  '25-100m':  62500000,
+  'over100m': 150000000,
+};
+
 let selectedIndustry = null;
 let selectedIntents = new Set();
 
-function selectIndustry(ind, btn) {
+window.selectIndustry = function(ind, btn) {
   document.querySelectorAll('.ind-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   selectedIndustry = ind;
   document.getElementById('err-industry').style.display = 'none';
-  // Subsectors
   const subs = SUBSECTORS[ind] || [];
   const wrap = document.getElementById('subsector-wrap');
   const sel = document.getElementById('subsector');
@@ -410,24 +420,23 @@ function selectIndustry(ind, btn) {
   } else {
     wrap.className = 'subsector-wrap';
   }
-}
+};
 
-function toggleIntent(btn) {
+window.toggleIntent = function(btn) {
   btn.classList.toggle('active');
   const intent = btn.dataset.intent;
   if (btn.classList.contains('active')) selectedIntents.add(intent);
   else selectedIntents.delete(intent);
-  // Show CoP note
   document.getElementById('cop-note').style.display = selectedIntents.has('cop') ? 'block' : 'none';
-}
+};
 
-function updatePreview() {
+window.updatePreview = function() {
   const name = document.getElementById('company-name').value || '[Company Name]';
   const year = document.getElementById('report-year').value || '2024';
   document.getElementById('preview-filename').textContent = `Sustainability Report — ${name} — ${year}.pdf`;
-}
+};
 
-function validateUEN() {
+window.validateUEN = function() {
   const val = document.getElementById('uen').value.trim();
   const valid = /^[0-9A-Z]{9,10}$/.test(val.toUpperCase());
   const err = document.getElementById('err-uen');
@@ -436,11 +445,10 @@ function validateUEN() {
     err.style.display = valid ? 'none' : 'block';
     inp.className = valid || val.length < 9 ? 'inp' : 'inp error';
   }
-}
+};
 
-function saveProfile() {
+window.saveProfile = async function() {
   let valid = true;
-  // Validate required fields
   const name = document.getElementById('company-name').value.trim();
   if (!name) {
     document.getElementById('err-name').style.display = 'block';
@@ -475,54 +483,129 @@ function saveProfile() {
     return;
   }
 
-  // In production: save to Supabase profiles table
-  // Save to localStorage
-  const profileData = {
-    companyName: name,
-    uen: document.getElementById('uen')?.value || '',
-    companySize: document.getElementById('company-size')?.value || '',
-    industry: selectedIndustry,
-    reportingYear: document.getElementById('report-year').value,
-    responsiblePerson: esgName,
-    responsiblePersonRole: esgRole,
+  const btn = document.querySelector('.btn-primary');
+  btn.textContent = 'Saving…';
+  btn.disabled = true;
+
+  const revenueBucket = document.getElementById('revenue')?.value || '';
+  const revenueMidpoint = REVENUE_MIDPOINTS[revenueBucket] || null;
+  const reportingYear = parseInt(document.getElementById('report-year').value) || new Date().getFullYear();
+
+  // ── 1. Save to localStorage (always, even if Supabase fails) ──
+  const localProfile = {
+    companyName:          name,
+    uen:                  uen,
+    companySize:          document.getElementById('company-size')?.value || '',
+    industry:             selectedIndustry,
+    reportingYear:        String(reportingYear),
+    responsiblePerson:    esgName,
+    responsiblePersonRole:esgRole,
+    annualRevenue:        revenueBucket,
+    annualRevenueSgd:     revenueMidpoint,
+    address:              document.getElementById('address')?.value.trim() || '',
   };
-  localStorage.setItem('zyt_company_profile', JSON.stringify(profileData));
+  localStorage.setItem('zyt_company_profile', JSON.stringify(localProfile));
+
+  // ── 2. Sync to Supabase if logged in ──
+  const session = await getSession();
+  if (session) {
+    try {
+      const dbProfile = {
+        company_name:           name,
+        uen:                    uen,
+        employee_count:         localProfile.companySize,
+        industry:               selectedIndustry,
+        reporting_year:         reportingYear,
+        responsible_person_name:esgName,
+        responsible_person_role:esgRole,
+        annual_revenue_sgd:     revenueMidpoint,
+        intent:                 [...selectedIntents].join(',') || null,
+      };
+      await upsertProfile(session.user.id, dbProfile);
+
+      // ── 3. Get or create the reporting period, cache its id ──
+      const { data: period, error: periodErr } = await getOrCreatePeriod(session.user.id, reportingYear);
+      if (period?.id) {
+        localStorage.setItem('zyt_period_id', period.id);
+      } else if (periodErr) {
+        console.warn('[S-06] getOrCreatePeriod error:', periodErr);
+      }
+    } catch (e) {
+      console.warn('[S-06] Supabase sync failed (continuing):', e);
+    }
+  }
+
   window.location.href = 'S-09-data-entry-hub.html';
+};
+
+// ── Populate form from a profile object (localStorage or Supabase shape) ──
+function populateForm(p) {
+  document.getElementById('company-name').value = p.companyName || p.company_name || '';
+  document.getElementById('uen').value = p.uen || '';
+  document.getElementById('company-size').value = p.companySize || p.employee_count || '';
+  document.getElementById('esg-name').value = p.responsiblePerson || p.responsible_person_name || '';
+  document.getElementById('esg-role').value = p.responsiblePersonRole || p.responsible_person_role || '';
+  if (p.reportingYear || p.reporting_year)
+    document.getElementById('report-year').value = p.reportingYear || String(p.reporting_year);
+
+  // Revenue: localStorage already has the bucket string (annualRevenue).
+  // A raw Supabase row only has the numeric annual_revenue_sgd — reverse-
+  // lookup the bucket from the midpoint since the bucket itself isn't stored.
+  const revenueBucket = p.annualRevenue || Object.entries(REVENUE_MIDPOINTS)
+    .find(([, v]) => v === p.annual_revenue_sgd)?.[0] || '';
+  if (revenueBucket) document.getElementById('revenue').value = revenueBucket;
+
+  if (p.address)
+    document.getElementById('address').value = p.address;
+
+  const ind = p.industry || p.selectedIndustry;
+  if (ind) {
+    const btn = document.querySelector(`[data-ind="${ind}"]`);
+    if (btn) window.selectIndustry(ind, btn);
+  }
+  window.updatePreview();
 }
 
-// Load saved profile, or pre-fill demo data for first-time visitors
-window.addEventListener('load', () => {
+// ── On load: try Supabase first, fall back to localStorage, then demo prefill ──
+window.addEventListener('load', async () => {
+  const session = await getSession();
+
+  if (session) {
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+
+      if (profile) {
+        populateForm(profile);
+        return;
+      }
+    } catch (e) {
+      console.warn('[S-06] Supabase load failed, falling back to localStorage:', e);
+    }
+  }
+
+  // No session or Supabase fetch failed — try localStorage
   let saved = null;
   try { saved = JSON.parse(localStorage.getItem('zyt_company_profile') || 'null'); } catch(e) {}
 
   if (saved) {
-    // Returning user — load their saved profile
-    document.getElementById('company-name').value = saved.companyName || '';
-    document.getElementById('uen').value = saved.uen || '';
-    document.getElementById('company-size').value = saved.companySize || '11-50';
-    document.getElementById('esg-name').value = saved.responsiblePerson || '';
-    document.getElementById('esg-role').value = saved.responsiblePersonRole || '';
-    if (saved.reportingYear) document.getElementById('report-year').value = saved.reportingYear;
-
-    if (saved.industry) {
-      const indBtn = document.querySelector(`[data-ind="${saved.industry}"]`);
-      if (indBtn) selectIndustry(saved.industry, indBtn);
-    }
+    populateForm(saved);
   } else {
-    // First-time visitor — demo pre-fill to show what a completed profile looks like
+    // First-time visitor with no session — demo prefill
     document.getElementById('company-name').value = 'ZYT Sustainability Consultancy Pte Ltd';
     document.getElementById('uen').value = '202312345A';
     document.getElementById('company-size').value = '11-50';
     document.getElementById('esg-name').value = 'Joel Tsi';
     document.getElementById('esg-role').value = 'Director';
-    // Pre-select ICT industry
     const ictBtn = document.querySelector('[data-ind="ict"]');
-    if (ictBtn) selectIndustry('ict', ictBtn);
-    // Pre-select CoP intent
+    if (ictBtn) window.selectIndustry('ict', ictBtn);
     const copBtn = document.querySelector('[data-intent="cop"]');
     if (copBtn) { copBtn.classList.add('active'); selectedIntents.add('cop'); document.getElementById('cop-note').style.display = 'block'; }
+    window.updatePreview();
   }
-  updatePreview();
 });
 </script>
 </body>

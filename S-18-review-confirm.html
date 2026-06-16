@@ -257,7 +257,7 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
 <div class="sum-card">
   <div class="sum-hdr">
     <div class="sum-hdr-title">Total emissions</div>
-    <div class="sum-hdr-sub">ZYT Sustainability · 2024 · All scopes</div>
+    <div class="sum-hdr-sub" id="sum-hdr-sub">ZYT Sustainability · 2024 · All scopes</div>
   </div>
   <div class="sum-grand">
     <div class="sum-grand-lbl">Estimated grand total</div>
@@ -294,56 +294,55 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
 </div>
 </div>
 
-<script>
-// ── DEMO DATA ──
-// Simulates what would come from Supabase after user has completed data entry
-const DEMO = {
-  company: 'ZYT Sustainability Consultancy Pte Ltd',
-  year: 2024,
-  clusters: [
-    { id:'power',    icon:'⚡', name:'Power & energy',         sub:'Electricity, generator, solar, district cooling',
-      s1:0, s2:12.4, s3_cat3:0.21, sgd:29800, status:'complete', acc:'medium',
-      scopes:['s2','s3'], notes:'Monthly bills entered for 4 months, extrapolated' },
-    { id:'transport',icon:'🚚', name:'Transport & fleet',       sub:'Vehicles, freight, business travel',
-      s1:8.2, s2:0, s3:3.4, sgd:18600, status:'complete', acc:'medium',
-      scopes:['s1','s3'], notes:'1 diesel van + Grab travel entered' },
-    { id:'cooling',  icon:'❄', name:'Cooling & refrigeration', sub:'Refrigerant leakage, TRU diesel',
-      s1:0, s2:0, s3:0, sgd:0, status:'na', acc:'none',
-      scopes:['s1'], notes:'Marked N/A — no cold room or reefer' },
-    { id:'cooking',  icon:'🔥', name:'Cooking & process heat',  sub:'Town gas, LPG, boilers',
-      s1:0, s2:0, s3:0, sgd:0, status:'na', acc:'none',
-      scopes:['s1'], notes:'Marked N/A — professional services' },
-    { id:'waste',    icon:'♻', name:'Waste & water',           sub:'General waste, food waste, PUB water',
-      s1:0, s2:0, s3:1.8, sgd:4200, status:'partial', acc:'low',
-      scopes:['s3'], notes:'Only general waste entered — water bills not yet added' },
-    { id:'people',   icon:'🚶', name:'People & commuting',      sub:'MRT, bus, car, WFH electricity',
-      s1:0, s2:0, s3:2.1, sgd:0, status:'complete', acc:'medium',
-      scopes:['s3'], notes:'Staff survey data entered' },
-    { id:'digital',  icon:'💻', name:'Digital & IT',            sub:'Cloud services, hardware',
-      s1:0, s2:0, s3:0.9, sgd:8400, status:'complete', acc:'low',
-      scopes:['s3'], notes:'Cloud spend-based estimate' },
-    { id:'procure',  icon:'📦', name:'Procurement & supply chain', sub:'Packaging, services, goods',
-      s1:0, s2:0, s3:2.2, sgd:12000, status:'partial', acc:'low',
-      scopes:['s3'], notes:'Packaging entered; professional services not yet added' },
-  ]
+<script type="module">
+import { aggregateClusters, loadCompanyProfile } from './js/zyt-core/schema.js';
+import { CLUSTERS, goTo } from './js/zyt-core/config.js';
+
+// ── REAL DATA (aggregated from all 8 emissions clusters) ──
+const agg = aggregateClusters();
+const profile = loadCompanyProfile();
+
+const DATA = {
+  company: profile?.companyName || 'Your company',
+  year: profile?.reportingYear || String(new Date().getFullYear()),
+  clusters: CLUSTERS.map(c => {
+    const a = agg.clusters[c.id] || { s1: 0, s2: 0, s3: 0, sgd: 0, status: 'not_started', acc: 'none', entryCount: 0, scopesPresent: [] };
+    let notes;
+    if (a.status === 'na') notes = 'Marked not applicable';
+    else if (a.status === 'not_started') notes = 'No data entered yet';
+    else notes = `${a.entryCount} item${a.entryCount === 1 ? '' : 's'} recorded`;
+
+    return {
+      id: c.id,
+      icon: c.icon,
+      name: c.name,
+      sub: c.sub,
+      s1: a.s1 / 1000,
+      s2: a.s2 / 1000,
+      s3: a.s3 / 1000,
+      sgd: a.sgd,
+      status: a.status,
+      acc: a.acc,
+      scopes: a.scopesPresent.length > 0 ? a.scopesPresent : c.scopes.map(s => s.toLowerCase()),
+      notes,
+    };
+  }),
 };
 
 // ── CALCULATE TOTALS ──
-let totals = { s1:0, s2:0, s3:0, sgd:0 };
-DEMO.clusters.forEach(c => {
-  totals.s1 += (c.s1||0);
-  totals.s2 += (c.s2||0);
-  totals.s3 += (c.s3||0) + (c.s3_cat3||0);
-  totals.sgd += (c.sgd||0);
-});
+const totals = {
+  s1: agg.scope1_kgco2e / 1000,
+  s2: agg.scope2_kgco2e / 1000,
+  s3: agg.scope3_kgco2e / 1000,
+  sgd: agg.total_sgd,
+};
 const grand = totals.s1 + totals.s2 + totals.s3;
 
 // ── RENDER SCORE ──
 function renderScore() {
-  const complete = DEMO.clusters.filter(c=>c.status==='complete'||c.status==='na').length;
-  const partial  = DEMO.clusters.filter(c=>c.status==='partial').length;
-  const total    = DEMO.clusters.length;
-  const pct      = Math.round((complete + partial * 0.5) / total * 100);
+  const complete = DATA.clusters.filter(c=>c.status==='complete'||c.status==='na').length;
+  const total    = DATA.clusters.length;
+  const pct      = Math.round(complete / total * 100);
 
   document.getElementById('score-pct').textContent = pct + '%';
 
@@ -382,37 +381,39 @@ function renderScopeCards() {
   document.getElementById('s1-val').textContent = totals.s1.toFixed(2);
   document.getElementById('s2-val').textContent = totals.s2.toFixed(2);
   document.getElementById('s3-val').textContent = totals.s3.toFixed(2);
-  document.getElementById('s1-sgd').textContent = totals.sgd > 0 ? `≈ SGD ${Math.round(totals.sgd * 0.4).toLocaleString()} fuel costs` : '—';
-  document.getElementById('s2-sgd').textContent = totals.s2 > 0 ? `≈ SGD ${Math.round(DEMO.clusters[0].sgd).toLocaleString()} electricity` : '—';
+  document.getElementById('s1-sgd').textContent = agg.scope1_sgd > 0 ? `≈ SGD ${Math.round(agg.scope1_sgd).toLocaleString()} fuel costs` : '—';
+  document.getElementById('s2-sgd').textContent = agg.scope2_sgd > 0 ? `≈ SGD ${Math.round(agg.scope2_sgd).toLocaleString()} electricity` : '—';
   document.getElementById('s3-sgd').textContent = totals.s3 > 0 ? `Scope 3 — no direct cost` : '—';
-  // Cat breakdown (demo values)
-  document.getElementById('c-fuel').textContent = totals.s1 > 0 ? `~ ${(totals.s1).toFixed(1)} t` : '—';
-  document.getElementById('c-elec').textContent = totals.s2 > 0 ? `~ ${totals.s2.toFixed(1)} t` : '—';
-  document.getElementById('c-cat7').textContent = `~ 2.1 t`;
-  document.getElementById('c-cat1').textContent = `~ 3.1 t`;
-  document.getElementById('c-cat5').textContent = `~ 1.8 t`;
-  document.getElementById('c-cat6').textContent = `~ 0.8 t`;
-  document.getElementById('c-cat4').textContent = `—`;
-  document.getElementById('c-cat9').textContent = `—`;
-  document.getElementById('c-fug').textContent = `—`;
-  document.getElementById('c-dc').textContent = `—`;
-  document.getElementById('c-cat3') && (document.getElementById('c-cat3').textContent = `~ 0.21 t`);
+
+  // Cat breakdown — real values from aggregateClusters()
+  const fmtT = kg => kg > 0 ? `~ ${(kg/1000).toFixed(2)} t` : '—';
+  const cat = agg.scope3_by_category;
+  document.getElementById('c-fuel').textContent = fmtT(agg.scope1_fuel_kgco2e);
+  document.getElementById('c-fug').textContent  = fmtT(agg.scope1_fugitive_kgco2e);
+  document.getElementById('c-elec').textContent = fmtT(agg.scope2_grid_kgco2e);
+  document.getElementById('c-dc').textContent   = fmtT(agg.scope2_dc_kgco2e);
+  document.getElementById('c-cat1').textContent = fmtT(cat[1]||0);
+  document.getElementById('c-cat4').textContent = fmtT(cat[4]||0);
+  document.getElementById('c-cat5').textContent = fmtT(cat[5]||0);
+  document.getElementById('c-cat6').textContent = fmtT(cat[6]||0);
+  document.getElementById('c-cat7').textContent = fmtT(cat[7]||0);
+  document.getElementById('c-cat9').textContent = fmtT(cat[9]||0);
+  document.getElementById('c-cat3') && (document.getElementById('c-cat3').textContent = fmtT(cat[3]||0));
 }
 
 // ── RENDER CLUSTER ROWS ──
 function renderClusters() {
   const grid = document.getElementById('cluster-grid');
   const statusConfig = {
-    complete: { cls:'complete', icon:'✓', label:'Complete', cls2:'status-complete' },
-    partial:  { cls:'partial',  icon:'◐', label:'Partial',  cls2:'status-partial' },
-    na:       { cls:'complete', icon:'—', label:'N/A',      cls2:'status-complete' },
-    empty:    { cls:'empty',    icon:'○', label:'Not started', cls2:'status-empty' },
+    complete:    { cls:'complete', icon:'✓', label:'Complete',    cls2:'status-complete' },
+    na:          { cls:'complete', icon:'—', label:'N/A',         cls2:'status-complete' },
+    not_started: { cls:'empty',    icon:'○', label:'Not started', cls2:'status-empty' },
   };
   const scopeColors = { s1:'#f4a88a', s2:'#8ab4f4', s3:'#a8d4a8' };
 
-  grid.innerHTML = DEMO.clusters.map(c => {
-    const cfg = statusConfig[c.status] || statusConfig.empty;
-    const co2 = (c.s1||0) + (c.s2||0) + (c.s3||0) + (c.s3_cat3||0);
+  grid.innerHTML = DATA.clusters.map(c => {
+    const cfg = statusConfig[c.status] || statusConfig.not_started;
+    const co2 = (c.s1||0) + (c.s2||0) + (c.s3||0);
     const scopes = c.scopes || [];
     return `<div class="cluster-row ${cfg.cls}" onclick="goToCluster('${c.id}')">
       <div class="cl-icon">${c.icon}</div>
@@ -421,7 +422,7 @@ function renderClusters() {
         <div class="cl-sub">${c.sub}</div>
       </div>
       <div class="cl-scope">${scopes.map(s => `<div class="scope-dot" style="background:${scopeColors[s]||'#ccc'}" title="${s}"></div>`).join('')}</div>
-      <div class="cl-co2 ${co2 > 0 ? '' : 'empty-val'}">${co2 > 0 ? '~ '+co2.toFixed(1)+' t' : c.status==='na'?'N/A':'—'}</div>
+      <div class="cl-co2 ${co2 > 0 ? '' : 'empty-val'}">${co2 > 0 ? '~ '+co2.toFixed(2)+' t' : c.status==='na'?'N/A':'—'}</div>
       <div class="cl-status ${cfg.cls2}"><span>${cfg.icon}</span><span>${cfg.label}</span></div>
     </div>`;
   }).join('');
@@ -429,7 +430,7 @@ function renderClusters() {
 
 // ── RENDER MISSING ──
 function renderMissing() {
-  const missing = DEMO.clusters.filter(c => c.status === 'partial' || c.status === 'empty');
+  const missing = DATA.clusters.filter(c => c.status === 'not_started');
   const card = document.getElementById('missing-card');
   const list = document.getElementById('missing-list');
   if (missing.length > 0) {
@@ -448,7 +449,7 @@ function renderMissing() {
 function renderAccuracy() {
   const rows = document.getElementById('acc-rows');
   const accColors = { high:'#a8d4a8', medium:'#e8c87a', low:'#f0b4a8', none:'#c2bfb6' };
-  rows.innerHTML = DEMO.clusters.filter(c=>c.status!=='na').map(c => {
+  rows.innerHTML = DATA.clusters.filter(c=>c.status!=='na').map(c => {
     const cls = c.acc === 'high' ? 'acc-high' : c.acc === 'medium' ? 'acc-med' : c.acc === 'low' ? 'acc-low' : 'acc-none';
     const label = c.acc === 'high' ? 'High' : c.acc === 'medium' ? 'Medium' : c.acc === 'low' ? 'Low' : 'Not entered';
     return `<div class="acc-row">
@@ -461,6 +462,7 @@ function renderAccuracy() {
 
 // ── RENDER SIDEBAR ──
 function renderSidebar() {
+  document.getElementById('sum-hdr-sub').textContent = `${DATA.company} · ${DATA.year} · All scopes`;
   document.getElementById('grand-total').textContent = grand.toFixed(2);
   document.getElementById('ss1').textContent = totals.s1.toFixed(2) + ' tCO₂e';
   document.getElementById('ss2').textContent = totals.s2.toFixed(2) + ' tCO₂e';
@@ -475,25 +477,17 @@ function renderSidebar() {
 
 // ── NAVIGATION ──
 function goToCluster(id) {
-  const screens = { power:'S-10', transport:'S-11', cooling:'S-12', cooking:'S-13', waste:'S-14', people:'S-15', digital:'S-16', procure:'S-17' };
-  const clusterMap = {
-        'S-10': 'S-10-power-energy-v3.html',
-        'S-11': 'S-11-transport-fleet.html',
-        'S-12': 'S-12-cooling-refrigeration.html',
-        'S-13': 'S-13-cooking-process-heat.html',
-        'S-14': 'S-14-waste-water.html',
-        'S-15': 'S-15-people-commuting.html',
-        'S-16': 'S-16-digital-it.html',
-        'S-17': 'S-17-procurement.html',
-      };
-      if (clusterMap[id]) window.location.href = clusterMap[id];
+  const cluster = CLUSTERS.find(c => c.id === id);
+  if (cluster) goTo(cluster.screen);
 }
 
 function proceedToResults() {
-  window.location.href = 'S-19-carbon-overview.html';
+  goTo('S-19');
 }
 
 // ── INIT ──
+window.goToCluster = goToCluster;
+window.proceedToResults = proceedToResults;
 window.addEventListener('load', () => {
   renderScore();
   renderScopeCards();

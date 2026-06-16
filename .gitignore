@@ -1,0 +1,43 @@
+# ============================================================
+# ZYT.ESG — .gitignore for the PUBLIC repo (jtzyt24/ZYT-ESG)
+#
+# This repo is public and serves the live GitHub Pages site.
+# The files below contain internal architecture notes, the full
+# Supabase schema, and project status commentary that should
+# never be pushed here — they belong only in a private working
+# copy. This file exists specifically because PROJECT_STATUS.md
+# and DATA_INVENTORY.md were accidentally pushed to the (now
+# private) zyt-esg-app repo on 2026-06-16 — see PROJECT_STATUS.md
+# in your private copy for the full incident note.
+#
+# IMPORTANT: git only ignores files going forward from when this
+# .gitignore is added. If any of these files are already tracked
+# in this repo's history, adding this file alone does NOT remove
+# them from past commits — see the note in your private
+# PROJECT_STATUS.md about history rewriting if full historical
+# removal is ever needed.
+# ============================================================
+
+# Internal project documentation — architecture notes, roadmap,
+# retrofit history. Not needed for the live site to function.
+PROJECT_STATUS.md
+
+# PDPA Step 2.1 personal data inventory — internal compliance
+# working doc, not part of the deployed app.
+DATA_INVENTORY.md
+
+# Full Supabase schema (table definitions, RLS policies, seed
+# data, triggers). The live app only needs the Supabase anon/
+# public key (already in js/supabase.js, by design exposable) —
+# it never needs the schema file itself.
+database.sql
+
+# Legacy Netlify config — unused since GitHub Pages became the
+# deploy target. Harmless if pushed, but doesn't belong here.
+netlify.toml
+
+# Common editor/OS clutter — never useful in a deploy repo
+.DS_Store
+*.swp
+.vscode/
+.idea/
