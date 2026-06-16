@@ -641,6 +641,9 @@ export function aggregateClusters() {
   let scope1_fuel_kgco2e = 0, scope1_fugitive_kgco2e = 0;
   let scope2_grid_kgco2e = 0, scope2_dc_kgco2e = 0;
   const scope3_by_category = {};
+  // Keyed by "activityName|||clusterId" so the same activity name in two
+  // different clusters doesn't merge into one row — needed because the
+  // report table (S-24) shows a "Cluster" column per source line.
   const sourceMaps = { 1: new Map(), 2: new Map(), 3: new Map() };
 
   for (const clusterId of Object.keys(CLUSTER_STORAGE_KEYS)) {
@@ -667,6 +670,7 @@ export function aggregateClusters() {
         const kg = e.emissionsKgCo2e || 0;
         const cost = e.costSgd || 0;
         const name = e.activityName || e.activityKey || 'Unnamed activity';
+        const sourceKey = `${name}|||${clusterId}`;
         sgd += cost;
 
         if (e.scope === 1) {
@@ -675,14 +679,16 @@ export function aggregateClusters() {
           scope1_sgd += cost;
           if (scope1Category(e) === 'fugitive') scope1_fugitive_kgco2e += kg;
           else scope1_fuel_kgco2e += kg;
-          sourceMaps[1].set(name, (sourceMaps[1].get(name) || 0) + kg);
+          const prev = sourceMaps[1].get(sourceKey);
+          sourceMaps[1].set(sourceKey, { name, clusterId, kgco2e: (prev?.kgco2e || 0) + kg });
         } else if (e.scope === 2) {
           s2 += kg;
           scope2_kgco2e += kg;
           scope2_sgd += cost;
           if (scope2Category(e) === 'dc') scope2_dc_kgco2e += kg;
           else scope2_grid_kgco2e += kg;
-          sourceMaps[2].set(name, (sourceMaps[2].get(name) || 0) + kg);
+          const prev = sourceMaps[2].get(sourceKey);
+          sourceMaps[2].set(sourceKey, { name, clusterId, kgco2e: (prev?.kgco2e || 0) + kg });
         } else {
           s3 += kg;
           scope3_kgco2e += kg;
@@ -690,7 +696,8 @@ export function aggregateClusters() {
           if (e.scope3Category) {
             scope3_by_category[e.scope3Category] = (scope3_by_category[e.scope3Category] || 0) + kg;
           }
-          sourceMaps[3].set(name, (sourceMaps[3].get(name) || 0) + kg);
+          const prev = sourceMaps[3].get(sourceKey);
+          sourceMaps[3].set(sourceKey, { name, clusterId, scope3Category: e.scope3Category || null, kgco2e: (prev?.kgco2e || 0) + kg });
         }
       }
     }
@@ -704,9 +711,7 @@ export function aggregateClusters() {
   }
 
   const toSourceList = (map) =>
-    [...map.entries()]
-      .map(([name, kgco2e]) => ({ name, kgco2e }))
-      .sort((a, b) => b.kgco2e - a.kgco2e);
+    [...map.values()].sort((a, b) => b.kgco2e - a.kgco2e);
 
   return {
     clusters,

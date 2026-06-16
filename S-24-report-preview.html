@@ -274,19 +274,19 @@
   <!-- Sidebar TOC -->
   <div class="sidebar">
     <div class="toc-label">Report sections</div>
-    <div class="toc-item active" onclick="scrollTo('sec-cover')"><span class="toc-num">—</span> Cover</div>
-    <div class="toc-item" onclick="scrollTo('sec-1')"><span class="toc-num">1</span> Company overview</div>
-    <div class="toc-item" onclick="scrollTo('sec-2')"><span class="toc-num">2</span> About this report</div>
-    <div class="toc-item" onclick="scrollTo('sec-3')"><span class="toc-num">3</span> Sustainability context</div>
-    <div class="toc-item" onclick="scrollTo('sec-4')"><span class="toc-num">4</span> Scope 1 emissions</div>
-    <div class="toc-item" onclick="scrollTo('sec-5')"><span class="toc-num">5</span> Scope 2 emissions</div>
-    <div class="toc-item" onclick="scrollTo('sec-6')"><span class="toc-num">6</span> Scope 3 emissions</div>
-    <div class="toc-item" onclick="scrollTo('sec-7')"><span class="toc-num">7</span> Total emissions</div>
-    <div class="toc-item" onclick="scrollTo('sec-8')"><span class="toc-num">8</span> Targets</div>
-    <div class="toc-item" onclick="scrollTo('sec-9')"><span class="toc-num">9</span> Actions taken</div>
-    <div class="toc-item" onclick="scrollTo('sec-10')"><span class="toc-num">10</span> Our people</div>
-    <div class="toc-item" onclick="scrollTo('sec-11')"><span class="toc-num">11</span> ESG governance</div>
-    <div class="toc-item" onclick="scrollTo('sec-12')"><span class="toc-num">A</span> Appendix</div>
+    <div class="toc-item active" onclick="scrollToSection('sec-cover')"><span class="toc-num">—</span> Cover</div>
+    <div class="toc-item" onclick="scrollToSection('sec-1')"><span class="toc-num">1</span> Company overview</div>
+    <div class="toc-item" onclick="scrollToSection('sec-2')"><span class="toc-num">2</span> About this report</div>
+    <div class="toc-item" onclick="scrollToSection('sec-3')"><span class="toc-num">3</span> Sustainability context</div>
+    <div class="toc-item" onclick="scrollToSection('sec-4')"><span class="toc-num">4</span> Scope 1 emissions</div>
+    <div class="toc-item" onclick="scrollToSection('sec-5')"><span class="toc-num">5</span> Scope 2 emissions</div>
+    <div class="toc-item" onclick="scrollToSection('sec-6')"><span class="toc-num">6</span> Scope 3 emissions</div>
+    <div class="toc-item" onclick="scrollToSection('sec-7')"><span class="toc-num">7</span> Total emissions</div>
+    <div class="toc-item" onclick="scrollToSection('sec-8')"><span class="toc-num">8</span> Targets</div>
+    <div class="toc-item" onclick="scrollToSection('sec-9')"><span class="toc-num">9</span> Actions taken</div>
+    <div class="toc-item" onclick="scrollToSection('sec-10')"><span class="toc-num">10</span> Our people</div>
+    <div class="toc-item" onclick="scrollToSection('sec-11')"><span class="toc-num">11</span> ESG governance</div>
+    <div class="toc-item" onclick="scrollToSection('sec-12')"><span class="toc-num">A</span> Appendix</div>
   </div>
 
   <!-- Report canvas -->
@@ -601,17 +601,34 @@
   </div>
 </div>
 
-<script>
-// ── Populate from localStorage ──
+<script type="module">
+import { aggregateClusters, loadCompanyProfile, loadSocialData, loadGovernanceData, loadContextData } from './js/zyt-core/schema.js';
+import { CLUSTERS } from './js/zyt-core/config.js';
+
+const CLUSTER_NAMES = Object.fromEntries(CLUSTERS.map(c => [c.id, c.name]));
+
+function fmtT(kg, decimals = 2) {
+  return (kg / 1000).toFixed(decimals);
+}
+
+function loadTargetsData() {
+  const raw = localStorage.getItem('zyt_targets_data');
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch (e) { return null; }
+}
+
+// ── Populate from real data (Supabase-synced localStorage + aggregateClusters) ──
 function load() {
-  const profile = JSON.parse(localStorage.getItem('zyt_company_profile') || '{}');
-  const social = JSON.parse(localStorage.getItem('zyt_social_data') || '{}');
-  const gov = JSON.parse(localStorage.getItem('zyt_governance_data') || '{}');
-  const ctx = JSON.parse(localStorage.getItem('zyt_context_data') || '{}');
+  const profile = loadCompanyProfile() || {};
+  const social = loadSocialData() || {};
+  const gov = loadGovernanceData() || {};
+  const ctx = loadContextData() || {};
+  const targetsData = loadTargetsData();
+  const agg = aggregateClusters();
   const isUNGC = localStorage.getItem('zyt_intent_ungc') === 'true';
 
   const company = profile.companyName || 'Your Company';
-  const year = profile.reportingYear || 2024;
+  const year = profile.reportingYear || new Date().getFullYear();
 
   // Cover
   document.getElementById('cover-company').textContent = company;
@@ -622,7 +639,7 @@ function load() {
   document.getElementById('r-company').textContent = company;
   document.getElementById('r-uen').textContent = profile.uen || '—';
   document.getElementById('r-industry').textContent = profile.industry || '—';
-  document.getElementById('r-size').textContent = profile.size || '—';
+  document.getElementById('r-size').textContent = profile.companySize || '—';
   document.getElementById('r-period').textContent = `1 January ${year} – 31 December ${year}`;
   const respPerson = profile.responsiblePerson ? `${profile.responsiblePerson}${profile.responsiblePersonRole ? ', ' + profile.responsiblePersonRole : ''}` : '—';
   document.getElementById('r-person').textContent = respPerson;
@@ -643,58 +660,147 @@ function load() {
   }
   document.getElementById('r-company-short').textContent = company;
 
-  // Sections 7 dynamic
+  // ── SECTION 4/5/6: Scope 1/2/3 emissions tables — real data via aggregateClusters() ──
+  const scopeLabel = n => `<span class="scope-label sl-${n}">S${n}</span>`;
+
+  function renderSourceRows(sources, scopeNum) {
+    const colCount = 4;
+    if (!sources.length) {
+      return `<tr><td colspan="${colCount - 1}" style="color:var(--text-light);font-style:italic">No data entered yet for this scope</td><td class="mono">—</td></tr>`;
+    }
+    return sources.map(s => {
+      const clusterName = CLUSTER_NAMES[s.clusterId] || s.clusterId;
+      if (scopeNum === 3 && s.scope3Category) {
+        // Scope 3 table: Category | Source | Scope | tCO2e
+        return `<tr><td>Cat ${s.scope3Category}</td><td>${s.name} (${clusterName})</td><td>${scopeLabel(3)}</td><td class="mono">${fmtT(s.kgco2e)}</td></tr>`;
+      }
+      return `<tr><td>${s.name}</td><td>${clusterName}</td><td>${scopeLabel(scopeNum)}</td><td class="mono">${fmtT(s.kgco2e)}</td></tr>`;
+    }).join('');
+  }
+
+  document.getElementById('s1-table-body').innerHTML =
+    renderSourceRows(agg.s1_sources, 1) +
+    `<tr class="total-row"><td colspan="3"><strong>Total Scope 1</strong></td><td class="mono" id="s1-total-row"><strong>${fmtT(agg.scope1_kgco2e)}</strong></td></tr>`;
+
+  document.getElementById('s2-table-body').innerHTML =
+    renderSourceRows(agg.s2_sources, 2) +
+    `<tr class="total-row"><td colspan="3"><strong>Total Scope 2</strong></td><td class="mono" id="s2-total-row"><strong>${fmtT(agg.scope2_kgco2e)}</strong></td></tr>`;
+
+  document.getElementById('s3-table-body').innerHTML =
+    renderSourceRows(agg.s3_sources, 3) +
+    `<tr class="total-row"><td colspan="3"><strong>Total Scope 3</strong></td><td class="mono" id="s3-total-row"><strong>${fmtT(agg.scope3_kgco2e)}</strong></td></tr>`;
+
+  // ── SECTION 7: Total emissions summary ──
+  const totalKg = agg.total_kgco2e;
+  const totalT = totalKg / 1000;
+  const pct = kg => totalKg > 0 ? (kg / totalKg * 100).toFixed(1) + '%' : '0%';
+
   document.getElementById('r-year-s7').textContent = year;
   document.getElementById('r-company-s7').textContent = company;
+  document.getElementById('r-total-t').textContent = totalT.toFixed(1);
+  // Equivalences: 1 return SIN-LON flight ≈ 0.6 tCO2e/passenger (rough); 1 tree absorbs ≈ 0.0217 tCO2e/yr
+  const flightsEquiv = Math.round(totalT / 0.6);
+  const treesEquiv = Math.round(totalT / 0.0217);
+  const equivEl = document.querySelector('#sec-7 .rs-body p');
+  if (equivEl) {
+    equivEl.innerHTML = `In <span id="r-year-s7">${year}</span>, <span id="r-company-s7">${company}</span> produced a total greenhouse gas footprint of <strong id="r-total-t">${totalT.toFixed(1)}</strong> tCO₂e` +
+      (totalKg > 0 ? ` — equivalent to approximately <strong>${flightsEquiv.toLocaleString()} return flights</strong> from Singapore to London, or the annual carbon absorption of <strong>${treesEquiv.toLocaleString()} trees</strong>.` : '.');
+  }
+
+  document.getElementById('s7-s1').textContent = fmtT(agg.scope1_kgco2e);
+  document.getElementById('s7-s2').textContent = fmtT(agg.scope2_kgco2e);
+  document.getElementById('s7-s3').textContent = fmtT(agg.scope3_kgco2e);
+  document.getElementById('s7-s1-pct').textContent = pct(agg.scope1_kgco2e);
+  document.getElementById('s7-s2-pct').textContent = pct(agg.scope2_kgco2e);
+  document.getElementById('s7-s3-pct').textContent = pct(agg.scope3_kgco2e);
+  document.getElementById('s7-total').innerHTML = `<strong>${totalT.toFixed(2)}</strong>`;
+
+  // Intensity metrics
+  const empCount = social.totalEmployees || 0;
+  if (empCount > 0) {
+    document.getElementById('r-int-emp').innerHTML = `<strong>${(totalT / empCount).toFixed(2)}</strong> tCO₂e / FTE`;
+  } else {
+    document.getElementById('r-int-emp').innerHTML = `<span style="color:var(--text-light);font-style:italic">Not available — enter employee count in Social (S-31/32)</span>`;
+  }
+  const revenueSgd = profile.annualRevenueSgd || 0;
+  if (revenueSgd > 0) {
+    document.getElementById('r-int-rev').innerHTML = `<strong>${(totalKg / (revenueSgd / 1000)).toFixed(1)}</strong> kgCO₂e / SGD 1,000`;
+  } else {
+    document.getElementById('r-int-rev').innerHTML = `<span style="color:var(--text-light);font-style:italic">Not available — enter annual revenue in Company Profile (S-06)</span>`;
+  }
+  const energySgd = (agg.scope1_sgd || 0) + (agg.scope2_sgd || 0);
+  document.getElementById('r-sgd-total').innerHTML = energySgd > 0 ? `<strong>SGD ${Math.round(energySgd).toLocaleString()}</strong>` : '<span style="color:var(--text-light);font-style:italic">Not available</span>';
+
+  // ── SECTION 8: Targets — real data from S-21, with honest fallback ──
   document.getElementById('r-year-s8').textContent = year;
+  const targetsListEl = document.getElementById('r-targets-list');
+  if (targetsData && targetsData.targets && targetsData.targets.length > 0) {
+    const totalCarbon = targetsData.targets.reduce((sum, t) => sum + (parseFloat(t.carbon) || 0), 0);
+    const totalSaving = targetsData.targets.reduce((sum, t) => sum + (parseFloat(t.saving) || 0), 0);
+    targetsListEl.innerHTML = `<div class="target-row"><div class="target-bullet"></div><div>
+      <div class="target-text">We have committed to <strong>${targetsData.targets.length}</strong> emissions reduction target${targetsData.targets.length !== 1 ? 's' : ''}, targeting a combined reduction of approximately <strong>${totalCarbon.toFixed(1)} tCO₂e</strong>.</div>
+      <div class="target-meta">Estimated annual saving: SGD ${Math.round(totalSaving).toLocaleString()} · See Targets (S-21) for full detail on each commitment</div>
+    </div></div>`;
+  } else {
+    targetsListEl.innerHTML = `<div style="color:var(--text-light);font-style:italic;font-size:13.5px">No targets have been set yet. <a href="S-21-target-setting.html" style="color:var(--accent)">Set targets in S-21 →</a></div>`;
+  }
+
+  // ── SECTION 9: Actions ──
   document.getElementById('r-year-s9').textContent = year;
 
   // Footer
   document.getElementById('rf-company').textContent = `${company} · Sustainability Report ${year}`;
 
-  // Social data
+  // ── Social data — corrected field names matching schema.js's createSocialData() ──
   if (social.totalEmployees) document.getElementById('rs-emp').textContent = social.totalEmployees;
-  if (social.genderM && social.genderF && social.totalEmployees) {
-    const m = Math.round(social.genderM / social.totalEmployees * 100);
-    const f = Math.round(social.genderF / social.totalEmployees * 100);
+  if (social.employeesMale && social.employeesFemale && social.totalEmployees) {
+    const m = Math.round(social.employeesMale / social.totalEmployees * 100);
+    const f = Math.round(social.employeesFemale / social.totalEmployees * 100);
     document.getElementById('rs-gender').textContent = `${m}% M · ${f}% F`;
   }
-  if (social.trainingHrsTotal) {
-    document.getElementById('rs-train-hrs').textContent = social.trainingHrsTotal;
-    if (social.trainingAvgPerEmp) document.getElementById('rs-train-avg').textContent = social.trainingAvgPerEmp;
+  if (social.totalTrainingHours) {
+    document.getElementById('rs-train-hrs').textContent = social.totalTrainingHours;
+    if (social.avgTrainingHoursPerEmp) document.getElementById('rs-train-avg').textContent = social.avgTrainingHoursPerEmp;
   }
-  if (social.injFatal !== undefined) document.getElementById('rs-fatal').textContent = social.injFatal || '0';
-  if (social.injRec !== undefined) document.getElementById('rs-inj').textContent = social.injRec || '0';
-  if (social.bizsafe) {
-    const lvl = social.bizsafe === 'none' ? 'Not certified' : 'bizSAFE ' + (social.bizsafe === 'star' ? 'Star ⭐' : 'Level ' + social.bizsafe);
+  if (social.fatalities !== undefined && social.fatalities !== null) document.getElementById('rs-fatal').textContent = social.fatalities || '0';
+  if (social.recordableInjuries !== undefined && social.recordableInjuries !== null) document.getElementById('rs-inj').textContent = social.recordableInjuries || '0';
+  if (social.bizsafeLevel) {
+    const lvl = social.bizsafeLevel === 'none' ? 'Not certified' : 'bizSAFE ' + (social.bizsafeLevel === 'star' ? 'Star ⭐' : 'Level ' + social.bizsafeLevel);
     document.getElementById('rs-bizsafe').textContent = lvl;
   }
 
-  // Governance data
+  // ── Governance data — corrected field names matching schema.js's createGovernanceData() ──
   if (profile.responsiblePerson) document.getElementById('rg-person').textContent = respPerson;
-  if (gov.mgmtTotal && gov.mgmtFemale) {
-    const fPct = Math.round(gov.mgmtFemale / gov.mgmtTotal * 100);
-    document.getElementById('rg-mgmt-gender').textContent = `${gov.mgmtTotal} total · ${fPct}% female`;
+  if (gov.mgmtTeamTotal && gov.mgmtTeamFemale) {
+    const fPct = Math.round(gov.mgmtTeamFemale / gov.mgmtTeamTotal * 100);
+    document.getElementById('rg-mgmt-gender').textContent = `${gov.mgmtTeamTotal} total · ${fPct}% female`;
   }
-  if (gov.esgFrequency) document.getElementById('rg-freq').textContent = gov.esgFrequency.replace('_', ' ');
-  if (gov.acPolicy) document.getElementById('rg-ac-policy').textContent = gov.acPolicy === 'yes' ? `Yes${gov.acDesc ? ' — ' + gov.acDesc : ''}` : 'No';
+  if (gov.esgReviewFrequency) document.getElementById('rg-freq').textContent = gov.esgReviewFrequency.replace('_', ' ');
+  if (gov.anticorruptionPolicy !== undefined) {
+    document.getElementById('rg-ac-policy').textContent = gov.anticorruptionPolicy ? `Yes${gov.anticorruptionPolicyDesc ? ' — ' + gov.anticorruptionPolicyDesc : ''}` : 'No';
+  }
   if (gov.certifications && gov.certifications.length) {
     document.getElementById('rg-certs').textContent = gov.certifications.join(' · ');
   }
+  // Note: assuranceType is not currently captured by S-33's form — leave as template default if absent
   if (gov.assuranceType) {
     const assuranceMap = { none: 'None (self-declared)', internal: 'Internal review', external: 'External (limited)', external_reasonable: 'External (reasonable)' };
     document.getElementById('rg-assurance').textContent = assuranceMap[gov.assuranceType] || gov.assuranceType;
+  } else {
+    document.getElementById('rg-assurance').textContent = 'None (self-declared)';
   }
 
   // UNGC appendix
   if (isUNGC) document.getElementById('ungc-appendix').style.display = 'block';
 }
 
-function scrollTo(id) {
+
+function scrollToSection(id) {
   document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
   document.querySelectorAll('.toc-item').forEach(i => i.classList.remove('active'));
   event.target.classList.add('active');
 }
+window.scrollToSection = scrollToSection;
 
 // ── Intersection observer for TOC highlight ──
 const tocMap = {
