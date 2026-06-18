@@ -849,6 +849,29 @@ if (savedCtx) {
   } catch(e) {}
 }
 
+// ── Pre-select from S-02's intent if the user hasn't already made an
+// S-23-specific choice. S-02's intent values (buyer/financing/cost_savings/
+// annual_sr/pcr) map onto S-23's options (buyer/financing/cost/annual/ungc)
+// — annual_sr maps to 'ungc' specifically since that's the S-02 option
+// whose description covers UNGC CoP reporting. This avoids re-asking a
+// question the user already answered at S-02, while still letting them
+// change it here if S-23's finer-grained options fit better.
+if (!selectedIntent) {
+  const s02Intent = localStorage.getItem('zyt_intent');
+  const INTENT_MAP_S02_TO_S23 = {
+    buyer: 'buyer',
+    financing: 'financing',
+    cost_savings: 'cost',
+    annual_sr: 'ungc',
+    pcr: null, // no S-23 equivalent — PCR is a different report type entirely
+  };
+  const mapped = s02Intent ? INTENT_MAP_S02_TO_S23[s02Intent] : null;
+  if (mapped) {
+    const opt = document.querySelector(`[data-intent="${mapped}"]`);
+    if (opt) selectIntent(opt, mapped);
+  }
+}
+
 // ── Set year in limitations ──
 const profileY = JSON.parse(localStorage.getItem('zyt_company_profile') || '{}');
 if (profileY.reportingYear) document.getElementById('limit-year').textContent = profileY.reportingYear;

@@ -263,7 +263,7 @@
     <div class="nav-crumb">Report → <strong>Preview</strong></div>
   </div>
   <div class="cn-right">
-    <button class="btn btn-ghost" onclick="window.history.back()">← Back</button>
+    <button class="btn btn-ghost" onclick="goBack()">← Back</button>
     <button class="btn btn-ghost" onclick="window.print()">🖨 Print</button>
     <button class="btn btn-primary" onclick="window.location.href='S-25-generate.html'">Generate PDF →</button>
   </div>
@@ -596,7 +596,7 @@
 <div class="action-bar">
   <div class="action-bar-left">Review the report above — click any section's Edit button to make changes</div>
   <div class="action-bar-right">
-    <button class="btn btn-ghost" onclick="window.history.back()">← Back</button>
+    <button class="btn btn-ghost" onclick="goBack()">← Back</button>
     <button class="btn btn-primary" onclick="window.location.href='S-25-generate.html'">Generate PDF →</button>
   </div>
 </div>
@@ -794,6 +794,22 @@ function load() {
   if (isUNGC) document.getElementById('ungc-appendix').style.display = 'block';
 }
 
+
+// ── Smart back navigation ──
+// When this page is opened via S-25's window.open('S-24-report-preview.html?print=1', '_blank'),
+// it's a freshly-created tab with no browser history — history.back() is a
+// silent no-op in that case. Detect the print=1 param and close the tab
+// instead; otherwise (normal in-app navigation, e.g. from S-21) fall back
+// to history.back() as before.
+function goBack() {
+  const isPrintTab = new URLSearchParams(window.location.search).get('print') === '1';
+  if (isPrintTab) {
+    window.close();
+  } else {
+    window.history.back();
+  }
+}
+window.goBack = goBack;
 
 function scrollToSection(id) {
   document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });

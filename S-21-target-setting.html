@@ -644,7 +644,7 @@ nav {
     <div class="nav-sep">›</div>
     <div class="nav-step active">Set targets</div>
     <div class="nav-sep">›</div>
-    <div class="nav-step">Carbon Passport</div>
+    <div class="nav-step">Report</div>
   </div>
 </nav>
 
@@ -653,35 +653,31 @@ nav {
   <div class="page-head">
     <div class="page-eyebrow">Step 3 of 4 — Alignment</div>
     <h1 class="page-title">Set your reduction targets</h1>
-    <p class="page-sub">Based on your 2024 emissions data, we've identified your highest-impact opportunities. Select the targets you're committing to — they'll be embedded in your Carbon Passport and tracked year on year.</p>
+    <p class="page-sub" id="page-sub">Based on your emissions data, we've identified your highest-impact opportunities. Select the targets you're committing to — they'll be embedded in your Sustainability Report and tracked year on year.</p>
   </div>
 
   <!-- BASELINE STRIP -->
   <div class="baseline-strip">
     <div class="baseline-item">
-      <div class="bl-label">Your 2024 baseline</div>
-      <div class="bl-value">47.3</div>
+      <div class="bl-label" id="bl-year-label">Your baseline</div>
+      <div class="bl-value" id="bl-total">0.0</div>
       <div class="bl-unit">tCO₂e total emissions</div>
-      <div class="bl-scope">
-        <span class="bl-tag" style="background:#FAECE7;color:#712B13">S1: 18.4t</span>
-        <span class="bl-tag" style="background:#E6F1FB;color:#0C447C">S2: 14.2t</span>
-        <span class="bl-tag" style="background:#EAF3DE;color:#27500A">S3: 14.7t</span>
-      </div>
+      <div class="bl-scope" id="bl-scope-tags"></div>
     </div>
     <div class="baseline-item">
       <div class="bl-label">Annual energy cost</div>
-      <div class="bl-value">SGD 38,400</div>
+      <div class="bl-value" id="bl-energy-cost">SGD 0</div>
       <div class="bl-unit">electricity + fuel combined</div>
     </div>
     <div class="baseline-item">
       <div class="bl-label">Highest impact source</div>
-      <div class="bl-value">Transport</div>
-      <div class="bl-unit">fleet diesel — 12.1 tCO₂e</div>
+      <div class="bl-value" id="bl-top-source">—</div>
+      <div class="bl-unit" id="bl-top-source-detail">No data entered yet</div>
     </div>
     <div class="baseline-item">
       <div class="bl-label">Avoidable emissions</div>
-      <div class="bl-value">~14.2t</div>
-      <div class="bl-unit">30% reduction is achievable</div>
+      <div class="bl-value" id="bl-avoidable">~0t</div>
+      <div class="bl-unit">est. 20–30% reduction achievable</div>
     </div>
   </div>
 
@@ -690,213 +686,7 @@ nav {
   <p class="section-sub">Ranked by SGD savings per year. Select any you're ready to commit to.</p>
 
   <div class="targets-list" id="targets-list">
-
-    <!-- TARGET 1 -->
-    <div class="target-card" data-id="t1" data-carbon="6.8" data-saving="8400" data-payback="8">
-      <div class="tc-header" onclick="toggleTarget('t1')">
-        <div class="tc-check">
-          <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <div class="tc-body">
-          <div class="tc-top">
-            <span class="tc-name">Reduce diesel fleet fuel consumption</span>
-            <span class="tc-cluster">🚚 Transport & fleet</span>
-            <span class="tc-who">Logistics coordinator</span>
-          </div>
-          <p class="tc-desc">Your 3 diesel vans account for 12.1 tCO₂e — your single largest emission source. Route optimisation and driver behaviour coaching typically reduces fuel use by 15–20% with zero capital investment.</p>
-          <div class="tc-metrics">
-            <span class="tc-metric carbon"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3.5v2.5l1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Reduce by 6.8 tCO₂e/yr</span>
-            <span class="tc-metric cost"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1v10M3.5 3.5h3.5a1.5 1.5 0 010 3H4a1.5 1.5 0 000 3H8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Save SGD 8,400/yr in diesel</span>
-            <span class="tc-metric payback"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3v3l2 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Payback: immediate</span>
-            <span class="tc-metric scope">Scope 1 — Mobile combustion</span>
-          </div>
-        </div>
-      </div>
-      <div class="tc-expand">
-        <div class="tc-expand-inner">
-          <div class="tc-field">
-            <label>Target reduction %</label>
-            <select onchange="updateStatement('t1')">
-              <option value="15">15% reduction (conservative)</option>
-              <option value="20" selected>20% reduction (recommended)</option>
-              <option value="25">25% reduction (ambitious)</option>
-            </select>
-          </div>
-          <div class="tc-field">
-            <label>Target year</label>
-            <select onchange="updateStatement('t1')">
-              <option>2025</option>
-              <option selected>2026</option>
-              <option>2027</option>
-            </select>
-          </div>
-          <div class="tc-statement" id="stmt-t1">
-            <div class="tc-statement-label">Your target statement</div>
-            <div class="tc-statement-text" id="stmt-text-t1">
-              "We commit to reducing Scope 1 mobile combustion emissions from our diesel fleet by <strong>20%</strong> by end of <strong>2026</strong>, against our 2024 baseline of 12.1 tCO₂e, through route optimisation and driver behaviour improvements."
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TARGET 2 -->
-    <div class="target-card" data-id="t2" data-carbon="4.2" data-saving="5800" data-payback="14">
-      <div class="tc-header" onclick="toggleTarget('t2')">
-        <div class="tc-check">
-          <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <div class="tc-body">
-          <div class="tc-top">
-            <span class="tc-name">Reduce grid electricity consumption</span>
-            <span class="tc-cluster">⚡ Power & energy</span>
-            <span class="tc-who">Facilities manager / office manager</span>
-          </div>
-          <p class="tc-desc">Your annual electricity bill of SGD 29,000 is above average for your industry. Lighting upgrades to LED and smart aircon scheduling can cut consumption by 15–20% with a payback of 12–18 months.</p>
-          <div class="tc-metrics">
-            <span class="tc-metric carbon"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3.5v2.5l1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Reduce by 4.2 tCO₂e/yr</span>
-            <span class="tc-metric cost"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1v10M3.5 3.5h3.5a1.5 1.5 0 010 3H4a1.5 1.5 0 000 3H8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Save SGD 5,800/yr in electricity</span>
-            <span class="tc-metric payback"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3v3l2 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Payback: 14 months</span>
-            <span class="tc-metric scope">Scope 2 — Grid electricity</span>
-          </div>
-        </div>
-      </div>
-      <div class="tc-expand">
-        <div class="tc-expand-inner">
-          <div class="tc-field">
-            <label>Target reduction %</label>
-            <select onchange="updateStatement('t2')">
-              <option value="10">10% reduction (conservative)</option>
-              <option value="15">15% reduction (recommended)</option>
-              <option value="20" selected>20% reduction (ambitious)</option>
-            </select>
-          </div>
-          <div class="tc-field">
-            <label>Target year</label>
-            <select onchange="updateStatement('t2')">
-              <option>2025</option>
-              <option selected>2026</option>
-              <option>2027</option>
-            </select>
-          </div>
-          <div class="tc-statement" id="stmt-t2">
-            <div class="tc-statement-label">Your target statement</div>
-            <div class="tc-statement-text" id="stmt-text-t2">
-              "We commit to reducing Scope 2 electricity emissions by <strong>20%</strong> by end of <strong>2026</strong>, against our 2024 baseline of 14.2 tCO₂e, through LED lighting upgrades and air-conditioning scheduling improvements."
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TARGET 3 -->
-    <div class="target-card" data-id="t3" data-carbon="3.1" data-saving="4200" data-payback="0">
-      <div class="tc-header" onclick="toggleTarget('t3')">
-        <div class="tc-check">
-          <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <div class="tc-body">
-          <div class="tc-top">
-            <span class="tc-name">Fix refrigerant leaks — cold room & AC</span>
-            <span class="tc-cluster">❄ Cooling & refrigeration</span>
-            <span class="tc-who">Facilities manager</span>
-          </div>
-          <p class="tc-desc">Your AC and cold room refrigerant top-up records suggest a leak rate above the Singapore average. Proactive leak detection and repair eliminates a high-GWP emission source at very low cost — typically SGD 300–800 per unit.</p>
-          <div class="tc-metrics">
-            <span class="tc-metric carbon"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3.5v2.5l1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Reduce by 3.1 tCO₂e/yr</span>
-            <span class="tc-metric cost"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1v10M3.5 3.5h3.5a1.5 1.5 0 010 3H4a1.5 1.5 0 000 3H8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Save SGD 4,200/yr in refrigerant</span>
-            <span class="tc-metric payback"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3v3l2 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Payback: immediate</span>
-            <span class="tc-metric scope">Scope 1 — Fugitive emissions</span>
-          </div>
-        </div>
-      </div>
-      <div class="tc-expand">
-        <div class="tc-expand-inner">
-          <div class="tc-field">
-            <label>Target reduction %</label>
-            <select onchange="updateStatement('t3')">
-              <option value="50">50% reduction (conservative)</option>
-              <option value="75" selected>75% reduction (recommended)</option>
-              <option value="100">Eliminate entirely (ambitious)</option>
-            </select>
-          </div>
-          <div class="tc-field">
-            <label>Target year</label>
-            <select onchange="updateStatement('t3')">
-              <option selected>2025</option>
-              <option>2026</option>
-              <option>2027</option>
-            </select>
-          </div>
-          <div class="tc-statement" id="stmt-t3">
-            <div class="tc-statement-label">Your target statement</div>
-            <div class="tc-statement-text" id="stmt-text-t3">
-              "We commit to reducing Scope 1 fugitive emissions from refrigerant leakage by <strong>75%</strong> by end of <strong>2025</strong>, against our 2024 baseline of 4.1 tCO₂e, through scheduled leak detection and prompt repair of AC and cold room units."
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TARGET 4 -->
-    <div class="target-card" data-id="t4" data-carbon="1.8" data-saving="2100" data-payback="24">
-      <div class="tc-header" onclick="toggleTarget('t4')">
-        <div class="tc-check">
-          <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <div class="tc-body">
-          <div class="tc-top">
-            <span class="tc-name">Reduce general and food waste to landfill</span>
-            <span class="tc-cluster">♻ Waste & water</span>
-            <span class="tc-who">Operations / kitchen supervisor</span>
-          </div>
-          <p class="tc-desc">Your estimated 480 kg/month of food waste going to incineration represents both a carbon and a procurement cost. Portion control and stock rotation improvements in the kitchen typically reduce food waste by 20–30%.</p>
-          <div class="tc-metrics">
-            <span class="tc-metric carbon"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3.5v2.5l1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Reduce by 1.8 tCO₂e/yr</span>
-            <span class="tc-metric cost"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1v10M3.5 3.5h3.5a1.5 1.5 0 010 3H4a1.5 1.5 0 000 3H8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Save SGD 2,100/yr in food cost</span>
-            <span class="tc-metric payback"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3v3l2 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Payback: 24 months</span>
-            <span class="tc-metric scope">Scope 3 — Waste</span>
-          </div>
-        </div>
-      </div>
-      <div class="tc-expand">
-        <div class="tc-expand-inner">
-          <div class="tc-field">
-            <label>Target reduction %</label>
-            <select onchange="updateStatement('t4')">
-              <option value="20" selected>20% reduction (conservative)</option>
-              <option value="30">30% reduction (recommended)</option>
-              <option value="50">50% reduction (ambitious)</option>
-            </select>
-          </div>
-          <div class="tc-field">
-            <label>Target year</label>
-            <select onchange="updateStatement('t4')">
-              <option>2025</option>
-              <option selected>2026</option>
-              <option>2027</option>
-            </select>
-          </div>
-          <div class="tc-statement" id="stmt-t4">
-            <div class="tc-statement-label">Your target statement</div>
-            <div class="tc-statement-text" id="stmt-text-t4">
-              "We commit to reducing Scope 3 waste emissions from food and general waste by <strong>20%</strong> by end of <strong>2026</strong>, against our 2024 baseline, through kitchen portion control and stock rotation improvements."
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ADD CUSTOM -->
-    <button class="add-custom" onclick="this.textContent='Coming soon'; setTimeout(()=>this.textContent='+ Add custom target',2000)">
-      <div class="add-custom-icon">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="#8c8a84" stroke-width="1.5" stroke-linecap="round"/></svg>
-      </div>
-      <div class="add-custom-text">
-        <strong>Add a custom target</strong> — set your own emission source, reduction %, and timeline
-      </div>
-    </button>
-
+    <!-- Populated dynamically by renderTargetCards() based on real aggregateClusters() data -->
   </div>
 
   <!-- COMMITMENT SUMMARY -->
@@ -925,7 +715,7 @@ nav {
         </div>
       </div>
       <button class="btn-primary" id="generate-btn" onclick="generatePassport()" disabled style="opacity:0.4;cursor:not-allowed">
-        Generate Carbon Passport with targets →
+        Continue to Sustainability Report with targets →
       </button>
       <button class="btn-secondary" onclick="window.location.href='S-23-sustainability-context.html'">
         Skip for now — generate report without targets
@@ -945,29 +735,209 @@ nav {
 
 </div>
 
-<script>
-const selected = new Set();
+<script type="module">
+import { aggregateClusters, loadCompanyProfile } from './js/zyt-core/schema.js';
+import { CLUSTERS } from './js/zyt-core/config.js';
 
-const STMTS = {
-  t1: {
-    template: (pct, yr) => `"We commit to reducing Scope 1 mobile combustion emissions from our diesel fleet by <strong>${pct}%</strong> by end of <strong>${yr}</strong>, against our 2024 baseline of 12.1 tCO₂e, through route optimisation and driver behaviour improvements."`,
-    defaultCarbon: 6.8, defaultSaving: 8400
+const CLUSTER_INFO = Object.fromEntries(CLUSTERS.map(c => [c.id, c]));
+const selected = new Set();
+let TARGET_CARDS = []; // populated by buildTargetCards()
+
+// ── Target template library — one per cluster, generalized from the
+// original 4 hardcoded examples. Each only renders if the user actually
+// has emissions in that cluster (checked in buildTargetCards()).
+// scopeKey selects which of agg.clusters[id].{s1,s2,s3} this target acts on.
+const TEMPLATES = {
+  power: {
+    name: 'Reduce grid electricity consumption',
+    scopeLabel: 'Scope 2 — Grid electricity',
+    scopeKey: 's2',
+    desc: (kg, sgd) => `Your annual electricity spend is approximately SGD ${Math.round(sgd).toLocaleString()}. Lighting upgrades to LED and smart aircon scheduling typically cut consumption by 15–20%, often with a payback of 12–18 months.`,
+    statementVerb: 'reducing Scope 2 electricity emissions',
+    statementAction: 'through LED lighting upgrades and air-conditioning scheduling improvements',
+    options: [10, 15, 20], recommended: 15, paybackMonths: 14,
   },
-  t2: {
-    template: (pct, yr) => `"We commit to reducing Scope 2 electricity emissions by <strong>${pct}%</strong> by end of <strong>${yr}</strong>, against our 2024 baseline of 14.2 tCO₂e, through LED lighting upgrades and air-conditioning scheduling improvements."`,
-    defaultCarbon: 4.2, defaultSaving: 5800
+  transport: {
+    name: 'Reduce fleet fuel consumption',
+    scopeLabel: 'Scope 1 — Mobile combustion',
+    scopeKey: 's1',
+    desc: (kg) => `Your vehicle fleet accounts for ${(kg/1000).toFixed(1)} tCO₂e. Route optimisation and driver behaviour coaching typically reduce fuel use by 15–20% with little to no capital investment.`,
+    statementVerb: 'reducing Scope 1 mobile combustion emissions from our vehicle fleet',
+    statementAction: 'through route optimisation and driver behaviour improvements',
+    options: [10, 15, 20], recommended: 15, paybackMonths: 1,
   },
-  t3: {
-    template: (pct, yr) => `"We commit to reducing Scope 1 fugitive emissions from refrigerant leakage by <strong>${pct}%</strong> by end of <strong>${yr}</strong>, against our 2024 baseline of 4.1 tCO₂e, through scheduled leak detection and prompt repair of AC and cold room units."`,
-    defaultCarbon: 3.1, defaultSaving: 4200
+  cooling: {
+    name: 'Fix refrigerant leaks — cold room & AC',
+    scopeLabel: 'Scope 1 — Fugitive emissions',
+    scopeKey: 's1',
+    desc: () => `Refrigerant top-ups suggest leakage above best practice. Proactive leak detection and repair eliminates a high-GWP emission source at low cost — typically SGD 300–800 per unit.`,
+    statementVerb: 'reducing Scope 1 fugitive emissions from refrigerant leakage',
+    statementAction: 'through scheduled leak detection and prompt repair of AC and cold room units',
+    options: [50, 75, 100], recommended: 75, paybackMonths: 1,
   },
-  t4: {
-    template: (pct, yr) => `"We commit to reducing Scope 3 waste emissions from food and general waste by <strong>${pct}%</strong> by end of <strong>${yr}</strong>, against our 2024 baseline, through kitchen portion control and stock rotation improvements."`,
-    defaultCarbon: 1.8, defaultSaving: 2100
-  }
+  cooking: {
+    name: 'Reduce process heat fuel consumption',
+    scopeLabel: 'Scope 1 — Stationary combustion',
+    scopeKey: 's1',
+    desc: (kg) => `Cooking and process heat account for ${(kg/1000).toFixed(1)} tCO₂e. Equipment maintenance and usage scheduling typically reduce fuel consumption by 10–15%.`,
+    statementVerb: 'reducing Scope 1 stationary combustion emissions from cooking and process heat',
+    statementAction: 'through equipment maintenance and usage optimisation',
+    options: [10, 15, 20], recommended: 15, paybackMonths: 6,
+  },
+  waste: {
+    name: 'Reduce general and food waste',
+    scopeLabel: 'Scope 3 — Waste',
+    scopeKey: 's3',
+    desc: (kg) => `Waste disposal accounts for ${(kg/1000).toFixed(1)} tCO₂e. Portion control, stock rotation, and waste segregation typically reduce waste volumes by 20–30%.`,
+    statementVerb: 'reducing Scope 3 waste emissions',
+    statementAction: 'through portion control and stock rotation improvements',
+    options: [20, 30, 50], recommended: 30, paybackMonths: 24,
+  },
+  people: {
+    name: 'Reduce commuting emissions',
+    scopeLabel: 'Scope 3 — Category 7',
+    scopeKey: 's3',
+    desc: (kg) => `Employee commuting accounts for ${(kg/1000).toFixed(1)} tCO₂e. Encouraging public transport or hybrid work arrangements can meaningfully reduce this over time.`,
+    statementVerb: 'reducing Scope 3 employee commuting emissions',
+    statementAction: 'through hybrid work arrangements and public transport incentives',
+    options: [10, 15, 25], recommended: 15, paybackMonths: 1,
+  },
+  digital: {
+    name: 'Reduce cloud & IT emissions',
+    scopeLabel: 'Scope 3 — Category 1',
+    scopeKey: 's3',
+    desc: (kg) => `Cloud services and IT hardware account for ${(kg/1000).toFixed(1)} tCO₂e. Right-sizing cloud resources and extending hardware refresh cycles typically reduce this by 10–20%.`,
+    statementVerb: 'reducing Scope 3 emissions from cloud services and IT hardware',
+    statementAction: 'through cloud resource right-sizing and extended hardware refresh cycles',
+    options: [10, 15, 20], recommended: 15, paybackMonths: 1,
+  },
+  procurement: {
+    name: 'Reduce procurement & packaging emissions',
+    scopeLabel: 'Scope 3 — Category 1',
+    scopeKey: 's3',
+    desc: (kg) => `Procurement and packaging account for ${(kg/1000).toFixed(1)} tCO₂e. Switching to lower-carbon packaging materials and consolidating suppliers typically reduce this by 10–20%.`,
+    statementVerb: 'reducing Scope 3 procurement and packaging emissions',
+    statementAction: 'through lower-carbon packaging materials and supplier consolidation',
+    options: [10, 15, 20], recommended: 15, paybackMonths: 12,
+  },
 };
 
-function toggleTarget(id) {
+// ── Build target cards from real data — only clusters with actual emissions ──
+function buildTargetCards(agg) {
+  const cards = [];
+  for (const [clusterId, tpl] of Object.entries(TEMPLATES)) {
+    const c = agg.clusters[clusterId];
+    if (!c) continue;
+    const kg = c[tpl.scopeKey] || 0;
+    if (kg <= 0) continue; // only suggest targets for clusters with real emissions
+
+    const info = CLUSTER_INFO[clusterId];
+    const sgd = c.sgd || 0;
+    const recPct = tpl.recommended;
+    const estCarbon = +(kg / 1000 * (recPct / 100)).toFixed(1);
+    const estSaving = Math.round(sgd * (recPct / 100));
+
+    cards.push({
+      id: 't_' + clusterId,
+      clusterId,
+      name: tpl.name,
+      icon: info?.icon || '•',
+      clusterName: info?.name || clusterId,
+      role: info?.role || '',
+      desc: tpl.desc(kg, sgd),
+      scopeLabel: tpl.scopeLabel,
+      baselineT: +(kg / 1000).toFixed(1),
+      options: tpl.options,
+      recommended: recPct,
+      paybackMonths: tpl.paybackMonths,
+      statementVerb: tpl.statementVerb,
+      statementAction: tpl.statementAction,
+      carbon: estCarbon,
+      saving: estSaving,
+    });
+  }
+  // Rank by estimated SGD savings per year, descending
+  cards.sort((a, b) => b.saving - a.saving);
+  return cards;
+}
+
+function paybackLabel(months) {
+  if (months <= 1) return 'Payback: immediate';
+  return `Payback: ${months} months`;
+}
+
+function statementText(card, pct, yr) {
+  const baselineNote = card.baselineT > 0 ? `, against our baseline of ${card.baselineT} tCO₂e` : '';
+  return `"We commit to ${card.statementVerb} by <strong>${pct}%</strong> by end of <strong>${yr}</strong>${baselineNote}, ${card.statementAction}."`;
+}
+
+function renderTargetCards(cards) {
+  const list = document.getElementById('targets-list');
+  if (cards.length === 0) {
+    list.innerHTML = `<div style="padding:32px;text-align:center;color:var(--ink3);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg)">
+      No emissions data found yet — enter your data in <a href="S-09-data-entry-hub.html" style="color:var(--green)">Data entry</a> first, then come back here to set reduction targets.
+    </div>`;
+    return;
+  }
+
+  const currentYear = new Date().getFullYear();
+  list.innerHTML = cards.map(card => {
+    const yearOptions = [currentYear, currentYear + 1, currentYear + 2];
+    const recIdx = card.options.indexOf(card.recommended);
+    return `
+    <div class="target-card" data-id="${card.id}" data-carbon="${card.carbon}" data-saving="${card.saving}" data-payback="${card.paybackMonths}">
+      <div class="tc-header" onclick="window.toggleTarget('${card.id}')">
+        <div class="tc-check">
+          <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="tc-body">
+          <div class="tc-top">
+            <span class="tc-name">${card.name}</span>
+            <span class="tc-cluster">${card.icon} ${card.clusterName}</span>
+            <span class="tc-who">${card.role}</span>
+          </div>
+          <p class="tc-desc">${card.desc}</p>
+          <div class="tc-metrics">
+            <span class="tc-metric carbon">Reduce by ~${card.carbon} tCO₂e/yr</span>
+            <span class="tc-metric cost">${card.saving > 0 ? 'Save SGD ' + card.saving.toLocaleString() + '/yr' : 'No direct cost savings'}</span>
+            <span class="tc-metric payback">${paybackLabel(card.paybackMonths)}</span>
+            <span class="tc-metric scope">${card.scopeLabel}</span>
+          </div>
+        </div>
+      </div>
+      <div class="tc-expand">
+        <div class="tc-expand-inner">
+          <div class="tc-field">
+            <label>Target reduction %</label>
+            <select onchange="window.updateStatement('${card.id}')">
+              ${card.options.map((opt, i) => `<option value="${opt}" ${i === recIdx ? 'selected' : ''}>${opt}% reduction${i === recIdx ? ' (recommended)' : i === 0 ? ' (conservative)' : ' (ambitious)'}</option>`).join('')}
+            </select>
+          </div>
+          <div class="tc-field">
+            <label>Target year</label>
+            <select onchange="window.updateStatement('${card.id}')">
+              ${yearOptions.map((y, i) => `<option ${i === 1 ? 'selected' : ''}>${y}</option>`).join('')}
+            </select>
+          </div>
+          <div class="tc-statement" id="stmt-${card.id}">
+            <div class="tc-statement-label">Your target statement</div>
+            <div class="tc-statement-text" id="stmt-text-${card.id}">${statementText(card, card.recommended, yearOptions[1])}</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('') + `
+    <button class="add-custom" onclick="this.textContent='Coming soon'; setTimeout(()=>this.textContent='+ Add custom target',2000)">
+      <div class="add-custom-icon">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="#8c8a84" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div class="add-custom-text">
+        <strong>Add a custom target</strong> — set your own emission source, reduction %, and timeline
+      </div>
+    </button>`;
+}
+
+window.toggleTarget = function(id) {
   const card = document.querySelector(`[data-id="${id}"]`);
   if (selected.has(id)) {
     selected.delete(id);
@@ -977,15 +947,25 @@ function toggleTarget(id) {
     card.classList.add('selected');
   }
   updateSummary();
-}
+};
 
-function updateStatement(id) {
+window.updateStatement = function(id) {
   const card = document.querySelector(`[data-id="${id}"]`);
   const selects = card.querySelectorAll('select');
   const pct = selects[0].value;
   const yr = selects[1].value;
-  document.getElementById(`stmt-text-${id}`).innerHTML = STMTS[id].template(pct, yr);
-}
+  const cardData = TARGET_CARDS.find(c => c.id === id);
+  document.getElementById(`stmt-text-${id}`).innerHTML = statementText(cardData, pct, yr);
+  // Recompute carbon/saving estimate proportionally to the new pct vs the
+  // recommended baseline pct, so the commitment summary stays accurate.
+  const scaledCarbon = +(cardData.baselineT * (pct / 100)).toFixed(1);
+  card.dataset.carbon = scaledCarbon;
+  card.dataset.pct = pct;
+  card.dataset.yr = yr;
+  if (selected.has(id)) updateSummary();
+};
+
+let baselineTotalT = 0;
 
 function updateSummary() {
   const count = selected.size;
@@ -1026,28 +1006,83 @@ function updateSummary() {
 
     const item = document.createElement('div');
     item.className = 'commitment-item';
-    item.innerHTML = `<div class="ci-dot"></div><div class="ci-text">${stmtText}</div><button class="ci-remove" onclick="toggleTarget('${id}')">✕</button>`;
+    item.innerHTML = `<div class="ci-dot"></div><div class="ci-text">${stmtText}</div><button class="ci-remove" onclick="window.toggleTarget('${id}')">✕</button>`;
     items.appendChild(item);
   });
 
   document.getElementById('total-carbon').textContent = `${totalCarbon.toFixed(1)} t`;
   document.getElementById('total-saving').textContent = `SGD ${totalSaving.toLocaleString()}`;
-  document.getElementById('total-pct').textContent = `${Math.round((totalCarbon / 47.3) * 100)}%`;
+  document.getElementById('total-pct').textContent = baselineTotalT > 0 ? `${Math.round((totalCarbon / baselineTotalT) * 100)}%` : '—';
 }
 
-function generatePassport() {
+window.generatePassport = function() {
   const targets = [];
   document.querySelectorAll('.target-card.selected').forEach(card => {
+    const id = card.dataset.id;
+    const cardData = TARGET_CARDS.find(c => c.id === id);
+    const selects = card.querySelectorAll('select');
+    const pct = card.dataset.pct || selects[0]?.value || cardData.recommended;
+    const yr = card.dataset.yr || selects[1]?.value || (new Date().getFullYear() + 1);
     targets.push({
-      id: card.dataset.id,
+      id,
+      clusterId: cardData.clusterId,
       carbon: card.dataset.carbon,
       saving: card.dataset.saving,
       payback: card.dataset.payback,
+      pct,
+      year: yr,
+      // Save the resolved statement text too (gap #9 fix) — strip HTML tags
+      // for a clean plain-text version usable directly in the report.
+      statement: document.getElementById(`stmt-text-${id}`).textContent,
     });
   });
   localStorage.setItem('zyt_targets_data', JSON.stringify({ targets, savedAt: Date.now() }));
   window.location.href = 'S-23-sustainability-context.html';
-}
+};
+
+// ── Init: load real data and render ──
+window.addEventListener('load', () => {
+  const agg = aggregateClusters();
+  const profile = loadCompanyProfile();
+  const year = profile?.reportingYear || new Date().getFullYear();
+
+  baselineTotalT = agg.total_kgco2e / 1000;
+
+  document.getElementById('bl-year-label').textContent = `Your ${year} baseline`;
+  document.getElementById('page-sub').textContent = `Based on your ${year} emissions data, we've identified your highest-impact opportunities. Select the targets you're committing to — they'll be embedded in your Sustainability Report and tracked year on year.`;
+  document.getElementById('bl-total').textContent = baselineTotalT.toFixed(1);
+
+  const scopeTagColors = [
+    ['S1', agg.scope1_kgco2e, '#FAECE7', '#712B13'],
+    ['S2', agg.scope2_kgco2e, '#E6F1FB', '#0C447C'],
+    ['S3', agg.scope3_kgco2e, '#EAF3DE', '#27500A'],
+  ];
+  document.getElementById('bl-scope-tags').innerHTML = scopeTagColors
+    .filter(([, kg]) => kg > 0)
+    .map(([label, kg, bg, fg]) => `<span class="bl-tag" style="background:${bg};color:${fg}">${label}: ${(kg/1000).toFixed(1)}t</span>`)
+    .join('');
+
+  const energyCost = (agg.scope1_sgd || 0) + (agg.scope2_sgd || 0);
+  document.getElementById('bl-energy-cost').textContent = energyCost > 0 ? `SGD ${Math.round(energyCost).toLocaleString()}` : 'SGD 0';
+
+  // Highest-impact source: the single source with the highest kgco2e across all scopes
+  const allSources = [...agg.s1_sources, ...agg.s2_sources, ...agg.s3_sources];
+  if (allSources.length > 0) {
+    const top = allSources[0]; // already sorted descending within each list; find global max
+    const globalTop = allSources.reduce((a, b) => (b.kgco2e > a.kgco2e ? b : a), allSources[0]);
+    const clusterName = CLUSTER_INFO[globalTop.clusterId]?.name || globalTop.clusterId;
+    document.getElementById('bl-top-source').textContent = clusterName;
+    document.getElementById('bl-top-source-detail').textContent = `${globalTop.name} — ${(globalTop.kgco2e/1000).toFixed(1)} tCO₂e`;
+  }
+
+  // Avoidable emissions: rough heuristic, 20% of total as an illustrative estimate
+  const avoidableT = baselineTotalT * 0.2;
+  document.getElementById('bl-avoidable').textContent = baselineTotalT > 0 ? `~${avoidableT.toFixed(1)}t` : '~0t';
+
+  TARGET_CARDS = buildTargetCards(agg);
+  renderTargetCards(TARGET_CARDS);
+  updateSummary();
+});
 </script>
 </body>
 </html>

@@ -632,7 +632,12 @@ function proceed() {
   if (!chosen) return;
   const intent = INTENTS[chosen];
   localStorage.setItem('zyt_intent', intent);
-  localStorage.setItem('zyt_intent_ungc', intent === 'ungc_cop' ? 'true' : 'false');
+  // 'annual_sr' ("I want to produce our Sustainability Report") is the
+  // option whose description explicitly covers UNGC CoP commitments —
+  // there's no separate dedicated UNGC card. Previously checked against
+  // 'ungc_cop', a value that never appears in INTENTS, so this flag was
+  // always false regardless of what the user picked. Fixed 2026-06-16.
+  localStorage.setItem('zyt_intent_ungc', intent === 'annual_sr' ? 'true' : 'false');
   localStorage.setItem('zyt_intent_pcr', intent === 'pcr' ? 'true' : 'false');
   window.location.href = 'S-03-signup.html';
 }

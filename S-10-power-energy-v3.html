@@ -218,7 +218,7 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
     <div class="ns">Targets</div><div class="ns-sep">›</div>
     <div class="ns">Report</div>
   </div>
-  <button class="btn-back">
+  <button class="btn-back" onclick="goTo('S-09')">
     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 2L4 6l4 4"/></svg>
     Back to hub
   </button>
@@ -657,9 +657,9 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
 </div><!-- /layout -->
 
 <script type="module">
-import { createClusterData, createEmissionEntry, saveClusterData, loadClusterData, emissionEntryToDbRow } from './js/zyt-core/schema.js';
+import { createClusterData, createEmissionEntry, saveClusterData, loadClusterData, emissionEntryToDbRow, hydrateOneClusterFromSupabase } from './js/zyt-core/schema.js';
 import { goTo } from './js/zyt-core/config.js';
-import { getSession, upsertEmissions } from './js/supabase.js';
+import { getSession, upsertEmissions, supabase } from './js/supabase.js';
 
 const CLUSTER_ID = 'power';
 
@@ -1311,10 +1311,24 @@ window.attachFile = attachFile;
 window.attachMonthFile = attachMonthFile;
 window.saveAndNext = saveAndNext;
 window.saveAndExit = saveAndExit;
+window.goTo = goTo;
 
 // ── INIT ──
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
   updateSolarContext('own');
+  // Refresh this cluster's data from Supabase first (if logged in), so edits
+  // made in a different browser/session aren't shadowed by stale localStorage.
+  // Falls back silently to whatever localStorage already has if there's no
+  // session, no period, or the fetch fails.
+  try {
+    const session = await getSession();
+    const periodId = localStorage.getItem('zyt_period_id');
+    if (session && periodId) {
+      await hydrateOneClusterFromSupabase(supabase, periodId, CLUSTER_ID);
+    }
+  } catch (e) {
+    console.warn('[S-10] Supabase refresh failed, using local data:', e);
+  }
   restoreFromSaved();
   updateProgress();
 });

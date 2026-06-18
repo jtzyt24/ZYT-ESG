@@ -97,7 +97,7 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
     <div class="ns">Targets</div><div class="ns-sep">›</div>
     <div class="ns">Report</div>
   </div>
-  <button class="btn-back">← Back to hub</button>
+  <button class="btn-back" onclick="goTo('S-09')">← Back to hub</button>
 </nav>
 
 <div class="layout">
@@ -271,9 +271,9 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
 </div>
 
 <script type="module">
-import { createClusterData, createEmissionEntry, saveClusterData, loadClusterData, emissionEntryToDbRow } from './js/zyt-core/schema.js';
+import { createClusterData, createEmissionEntry, saveClusterData, loadClusterData, emissionEntryToDbRow, hydrateOneClusterFromSupabase } from './js/zyt-core/schema.js';
 import { goTo } from './js/zyt-core/config.js';
-import { getSession, upsertEmissions } from './js/supabase.js';
+import { getSession, upsertEmissions, supabase } from './js/supabase.js';
 
 const CLUSTER_ID = 'digital';
 
@@ -573,9 +573,19 @@ window.calcHW = calcHW;
 window.calcDC2 = calcDC2;
 window.saveAndNext = saveAndNext;
 window.saveAndExit = saveAndExit;
+window.goTo = goTo;
 
 // ── INIT ──
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
+  try {
+    const session = await getSession();
+    const periodId = localStorage.getItem('zyt_period_id');
+    if (session && periodId) {
+      await hydrateOneClusterFromSupabase(supabase, periodId, CLUSTER_ID);
+    }
+  } catch (e) {
+    console.warn('[S-16] Supabase refresh failed, using local data:', e);
+  }
   restoreFromSaved();
   updateSummary();
 });

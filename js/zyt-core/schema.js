@@ -269,6 +269,42 @@ export async function hydrateClustersFromSupabase(supabaseClient, periodId) {
   return count;
 }
 
+/**
+ * Fetches emissions_data rows for a SINGLE cluster from Supabase and writes
+ * them to localStorage via saveClusterData(), overwriting whatever is there.
+ * Used by each cluster screen (S-10–S-17) on page load — fixes the gap where
+ * S-05's one-time hydration at login goes stale if the user edited that
+ * cluster from a different browser/session afterward, or if a cluster
+ * screen is opened directly without going through S-05's full hydration.
+ *
+ * Unlike hydrateClustersFromSupabase(), this DOES overwrite local data even
+ * if Supabase returns zero rows for the cluster (an empty array is a valid,
+ * meaningful "this cluster has no entries in Supabase" result for a single-
+ * cluster targeted refresh — the caller already knows which cluster it's
+ * asking about, unlike the all-clusters case where an absent cluster might
+ * just mean "this cluster wasn't included in the query" risk doesn't apply).
+ *
+ * Returns true if Supabase was reachable and the local cluster data was
+ * refreshed (including to an empty state), false if there was no session,
+ * no period, or the fetch failed — in all of which cases the caller should
+ * fall back to whatever is already in localStorage.
+ */
+export async function hydrateOneClusterFromSupabase(supabaseClient, periodId, clusterId) {
+  if (!periodId || !clusterId) return false;
+  const { data: rows, error } = await supabaseClient
+    .from('emissions_data')
+    .select('*')
+    .eq('period_id', periodId)
+    .eq('cluster', clusterId);
+  if (error) return false;
+
+  const data = createClusterData(clusterId);
+  data.saved = true;
+  data.entries = (rows || []).map(dbRowToEmissionEntry);
+  saveClusterData(clusterId, data);
+  return true;
+}
+
 // ============================================================
 // 4. SOCIAL DATA — zyt_social_data
 // Mirrors: social_data table
