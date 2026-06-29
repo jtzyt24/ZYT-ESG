@@ -1081,6 +1081,48 @@ window.addEventListener('load', () => {
 
   TARGET_CARDS = buildTargetCards(agg);
   renderTargetCards(TARGET_CARDS);
+
+  // ── Restore previously saved target selections ──
+  // If the user previously clicked "Continue to Sustainability Report with targets →",
+  // their selections were saved to zyt_targets_data. Re-select those cards
+  // so returning users don't have to re-pick their targets every visit.
+  const raw = localStorage.getItem('zyt_targets_data');
+  if (raw) {
+    try {
+      const saved = JSON.parse(raw);
+      if (saved.targets && saved.targets.length) {
+        saved.targets.forEach(t => {
+          // Match by clusterId (new format) or id (legacy)
+          const cardData = TARGET_CARDS.find(c => c.id === t.id || c.clusterId === t.clusterId);
+          if (!cardData) return;
+          const el = document.querySelector(`[data-id="${cardData.id}"]`);
+          if (el) {
+            selected.add(cardData.id);
+            el.classList.add('selected');
+            // Restore the saved pct/year selections if present
+            const selects = el.querySelectorAll('select');
+            if (t.pct && selects[0]) {
+              selects[0].value = t.pct;
+            }
+            if (t.year && selects[1]) {
+              selects[1].value = t.year;
+            }
+            el.dataset.pct = t.pct || '';
+            el.dataset.yr = t.year || '';
+            el.dataset.carbon = t.carbon || el.dataset.carbon;
+            // Refresh the statement text with the restored pct/year
+            if (t.pct && t.year) {
+              const stmtEl = document.getElementById(`stmt-text-${cardData.id}`);
+              if (stmtEl) stmtEl.innerHTML = statementText(cardData, t.pct, t.year);
+            }
+          }
+        });
+      }
+    } catch (e) {
+      console.warn('[S-21] Could not restore saved target selections:', e);
+    }
+  }
+
   updateSummary();
 });
 </script>

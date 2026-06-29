@@ -108,7 +108,7 @@
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (profile) {
         // Reverse-lookup the revenue bucket string from the stored midpoint
@@ -141,7 +141,7 @@
           .select('id')
           .eq('profile_id', userId)
           .eq('year', year)
-          .single();
+          .maybeSingle();
 
         if (period?.id) {
           localStorage.setItem('zyt_period_id', period.id);

@@ -846,6 +846,15 @@ if (savedCtx) {
     }
     if (d.signatoryName) document.getElementById('sign-name').value = d.signatoryName;
     if (d.signatoryRole) document.getElementById('sign-role').value = d.signatoryRole;
+    // ── Restore material topic selections ──
+    if (d.materialTopics && d.materialTopics.length) {
+      document.querySelectorAll('.material-item').forEach(item => {
+        const title = item.querySelector('.mi-title')?.textContent;
+        if (title && d.materialTopics.includes(title)) {
+          item.classList.add('selected');
+        }
+      });
+    }
   } catch(e) {}
 }
 
