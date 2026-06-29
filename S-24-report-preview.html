@@ -501,12 +501,12 @@
         <div class="rs-eyebrow s">Section 10 — Social</div>
         <div class="rs-title">Our people</div>
         <div class="social-metrics" id="r-social-metrics">
-          <div class="sm-item"><div class="sm-label">Total employees</div><div class="sm-val" id="rs-emp">42</div><div class="sm-unit">headcount, 31 Dec 2024</div></div>
-          <div class="sm-item"><div class="sm-label">Gender split</div><div class="sm-val" id="rs-gender">57% M · 43% F</div><div class="sm-unit">GRI 405-1</div></div>
-          <div class="sm-item"><div class="sm-label">Total training hours</div><div class="sm-val" id="rs-train-hrs">420</div><div class="sm-unit">all staff, reporting year</div></div>
-          <div class="sm-item"><div class="sm-label">Avg training hours / employee</div><div class="sm-val" id="rs-train-avg">10.0</div><div class="sm-unit">GRI 404-1</div></div>
-          <div class="sm-item"><div class="sm-label">Work-related fatalities</div><div class="sm-val" id="rs-fatal">0</div><div class="sm-unit">GRI 403-9</div></div>
-          <div class="sm-item"><div class="sm-label">Recordable injuries</div><div class="sm-val" id="rs-inj">0</div><div class="sm-unit">GRI 403-9</div></div>
+          <div class="sm-item"><div class="sm-label">Total employees</div><div class="sm-val" id="rs-emp">—</div><div class="sm-unit">headcount, 31 Dec <span id="rs-emp-year"></span></div></div>
+          <div class="sm-item"><div class="sm-label">Gender split</div><div class="sm-val" id="rs-gender">—</div><div class="sm-unit">GRI 405-1</div></div>
+          <div class="sm-item"><div class="sm-label">Total training hours</div><div class="sm-val" id="rs-train-hrs">—</div><div class="sm-unit">all staff, reporting year</div></div>
+          <div class="sm-item"><div class="sm-label">Avg training hours / employee</div><div class="sm-val" id="rs-train-avg">—</div><div class="sm-unit">GRI 404-1</div></div>
+          <div class="sm-item"><div class="sm-label">Work-related fatalities</div><div class="sm-val" id="rs-fatal">—</div><div class="sm-unit">GRI 403-9</div></div>
+          <div class="sm-item"><div class="sm-label">Recordable injuries</div><div class="sm-val" id="rs-inj">—</div><div class="sm-unit">GRI 403-9</div></div>
         </div>
         <div style="margin-top:4px">
           <div style="font-size:12.5px;color:var(--text-muted);margin-bottom:4px;font-weight:500">bizSAFE status:</div>
@@ -626,6 +626,11 @@ function load() {
   const targetsData = loadTargetsData();
   const agg = aggregateClusters();
   const isUNGC = localStorage.getItem('zyt_intent_ungc') === 'true';
+
+  // Diagnostic — helps identify stale/missing social+gov data in console
+  console.log('[S-24] social data keys:', Object.keys(social).filter(k => social[k] !== null && social[k] !== undefined && social[k] !== ''));
+  console.log('[S-24] social.totalEmployees:', social.totalEmployees, '| social.employeesMale:', social.employeesMale);
+  console.log('[S-24] gov.mgmtTeamTotal:', gov.mgmtTeamTotal, '| gov.anticorruptionPolicy:', gov.anticorruptionPolicy);
 
   const company = profile.companyName || 'Your Company';
   const year = profile.reportingYear || new Date().getFullYear();
@@ -752,7 +757,16 @@ function load() {
   document.getElementById('rf-company').textContent = `${company} · Sustainability Report ${year}`;
 
   // ── Social data — corrected field names matching schema.js's createSocialData() ──
-  if (social.totalEmployees) document.getElementById('rs-emp').textContent = social.totalEmployees;
+  // Set the year in the "headcount, 31 Dec YYYY" subtext
+  const empYearEl = document.getElementById('rs-emp-year');
+  if (empYearEl) empYearEl.textContent = year;
+
+  if (social.totalEmployees) {
+    document.getElementById('rs-emp').textContent = social.totalEmployees;
+  } else {
+    document.getElementById('rs-emp').textContent = '—';
+    document.getElementById('r-social-metrics').style.opacity = '0.5';
+  }
   if (social.employeesMale && social.employeesFemale && social.totalEmployees) {
     const m = Math.round(social.employeesMale / social.totalEmployees * 100);
     const f = Math.round(social.employeesFemale / social.totalEmployees * 100);
