@@ -8,8 +8,8 @@
 //   SUPABASE_KEY = anon/public key (safe to expose in browser)
 // ============================================================
 
-const SUPABASE_URL = 'https://hgwsadwrhhedyaljnpbg.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhnd3NhZHdyaGhlZHlhbGpucGJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MzcyMTIsImV4cCI6MjA5NjQxMzIxMn0.Z-6ektpgxn8JMafxGGYcQkdrHx9TtZpduxJHGwj8LMo';
+const SUPABASE_URL = 'https://ojjfwlldwazndznwuyzc.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9qamZ3bGxkd2F6bmR6bnd1eXpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNjk1NDksImV4cCI6MjA5MTc0NTU0OX0.SukWx_DHH1hYJGOVC5GjZURZR0ASe6e5OxmS78OnMEI';
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -65,23 +65,23 @@ export function loadLocal(key) {
 
 export async function upsertProfile(userId, profileData) {
   return supabase
-    .from('profiles')
+    .from('esg_profiles')
     .upsert({ id: userId, ...profileData, updated_at: new Date().toISOString() });
 }
 
 export async function getProfile(userId) {
-  return supabase.from('profiles').select('*').eq('id', userId).single();
+  return supabase.from('esg_profiles').select('*').eq('id', userId).single();
 }
 
 // ── Reporting period helpers ─────────────────────────────────
 
 export async function getOrCreatePeriod(profileId, year) {
   let { data, error } = await supabase
-    .from('reporting_periods')
+    .from('esg_reporting_periods')
     .select('*').eq('profile_id', profileId).eq('year', year).single();
   if (error?.code === 'PGRST116') {
     const result = await supabase
-      .from('reporting_periods')
+      .from('esg_reporting_periods')
       .insert({ profile_id: profileId, year, start_date: `${year}-01-01`, end_date: `${year}-12-31`, status: 'draft' })
       .select().single();
     return result;
@@ -92,16 +92,16 @@ export async function getOrCreatePeriod(profileId, year) {
 // ── Emissions helpers ────────────────────────────────────────
 
 export async function upsertEmissions(periodId, cluster, rows) {
-  await supabase.from('emissions_data').delete()
+  await supabase.from('esg_emissions_data').delete()
     .eq('period_id', periodId).eq('cluster', cluster);
   if (!rows?.length) return { data: null, error: null };
-  return supabase.from('emissions_data')
+  return supabase.from('esg_emissions_data')
     .insert(rows.map(r => ({ ...r, period_id: periodId })));
 }
 
 export async function getEmissionTotals(periodId) {
   const { data, error } = await supabase
-    .from('emissions_data').select('scope, emissions_kgco2e, cost_sgd')
+    .from('esg_emissions_data').select('scope, emissions_kgco2e, cost_sgd')
     .eq('period_id', periodId);
   if (error) return { error };
   const totals = { scope1: 0, scope2: 0, scope3: 0, totalCostSgd: 0 };
@@ -117,13 +117,13 @@ export async function getEmissionTotals(periodId) {
 // ── Social & Governance helpers ──────────────────────────────
 
 export async function upsertSocialData(periodId, data) {
-  return supabase.from('social_data')
+  return supabase.from('esg_social_data')
     .upsert({ period_id: periodId, ...data, updated_at: new Date().toISOString() },
              { onConflict: 'period_id' });
 }
 
 export async function upsertGovernanceData(periodId, data) {
-  return supabase.from('governance_data')
+  return supabase.from('esg_governance_data')
     .upsert({ period_id: periodId, ...data, updated_at: new Date().toISOString() },
              { onConflict: 'period_id' });
 }

@@ -573,7 +573,7 @@ window.addEventListener('load', async () => {
   if (session) {
     try {
       const { data: profile } = await supabase
-        .from('profiles')
+        .from('esg_profiles')
         .select('*')
         .eq('id', session.user.id)
         .maybeSingle();

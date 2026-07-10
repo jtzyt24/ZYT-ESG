@@ -788,7 +788,7 @@
       try {
         const periodId = localStorage.getItem('zyt_period_id');
         if (periodId) {
-          const { data: row } = await supabase.from('governance_data').select('*').eq('period_id', periodId).maybeSingle();
+          const { data: row } = await supabase.from('esg_governance_data').select('*').eq('period_id', periodId).maybeSingle();
           if (row) {
             populateForm({
               mgmtTeamTotal: row.mgmt_team_total,

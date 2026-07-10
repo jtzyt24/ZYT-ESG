@@ -246,7 +246,7 @@ export function dbRowToEmissionEntry(row) {
  */
 export async function hydrateClustersFromSupabase(supabaseClient, periodId) {
   const { data: rows, error } = await supabaseClient
-    .from('emissions_data')
+    .from('esg_emissions_data')
     .select('*')
     .eq('period_id', periodId);
   if (error || !rows) return 0;
@@ -292,7 +292,7 @@ export async function hydrateClustersFromSupabase(supabaseClient, periodId) {
 export async function hydrateOneClusterFromSupabase(supabaseClient, periodId, clusterId) {
   if (!periodId || !clusterId) return false;
   const { data: rows, error } = await supabaseClient
-    .from('emissions_data')
+    .from('esg_emissions_data')
     .select('*')
     .eq('period_id', periodId)
     .eq('cluster', clusterId);
@@ -486,14 +486,14 @@ export async function hydrateSocialGovernanceFromSupabase(supabaseClient, period
   const result = { social: false, governance: false };
 
   const { data: socialRow } = await supabaseClient
-    .from('social_data').select('*').eq('period_id', periodId).maybeSingle();
+    .from('esg_social_data').select('*').eq('period_id', periodId).maybeSingle();
   if (socialRow) {
     saveSocialData(dbRowToSocialData(socialRow));
     result.social = true;
   }
 
   const { data: govRow } = await supabaseClient
-    .from('governance_data').select('*').eq('period_id', periodId).maybeSingle();
+    .from('esg_governance_data').select('*').eq('period_id', periodId).maybeSingle();
   if (govRow) {
     saveGovernanceData(dbRowToGovernanceData(govRow));
     result.governance = true;

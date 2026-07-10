@@ -246,10 +246,79 @@
   .ungc-partial { background: #FEF3C7; color: #92400E; }
 
   @media print {
-    .chrome-nav, .sidebar, .action-bar, .section-edit-btn { display: none !important; }
-    body { background: white; }
-    .report-canvas { padding: 0; }
-    .report-page { box-shadow: none; max-width: 100%; }
+    /* ── Page setup: A4, 18mm margins ── */
+    @page {
+      size: A4 portrait;
+      margin: 18mm 16mm 20mm 16mm;
+    }
+
+    /* ── Hide all app chrome ── */
+    .chrome-nav,
+    .sidebar,
+    .action-bar,
+    .section-edit-btn,
+    .btn-edit { display: none !important; }
+
+    /* ── Reset layout for print ── */
+    html, body {
+      background: white !important;
+      font-size: 12px;
+      color: #1A1917;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .layout { display: block; }
+    .report-canvas { padding: 0; margin: 0; }
+
+    .report-page {
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      max-width: 100% !important;
+      width: 100% !important;
+      overflow: visible !important;
+      margin: 0 !important;
+    }
+
+    /* ── Cover: full first page ── */
+    .cover {
+      page-break-after: always;
+      break-after: page;
+      min-height: 0;
+      padding: 40mm 0 20mm;
+    }
+
+    /* ── Each report section starts on a new page ── */
+    .report-section {
+      page-break-before: always;
+      break-before: page;
+      padding-top: 0 !important;
+    }
+
+    /* ── Prevent orphaned headings and broken tables ── */
+    h1, h2, h3,
+    .section-header,
+    .section-title { page-break-after: avoid; break-after: avoid; }
+
+    table { page-break-inside: auto; break-inside: auto; }
+    tr    { page-break-inside: avoid; break-inside: avoid; }
+    thead { display: table-header-group; }
+
+    /* ── Typography adjustments for print ── */
+    .section-title { font-size: 15px; }
+    .rs-body { font-size: 12px; line-height: 1.7; }
+    .cover-company { font-size: 22px; }
+    .cover-title   { font-size: 14px; }
+
+    /* ── Metric cards: flow as grid on print ── */
+    .metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .metric-card { border: 1px solid #E2E0D8; padding: 8px 10px; border-radius: 4px; }
+
+    /* ── Ensure footer text is visible ── */
+    .report-footer { border-top: 1px solid #E2E0D8; padding-top: 8px; font-size: 10px; color: #9B9890; }
+
+    /* ── Links: show URL in brackets ── */
+    a[href]::after { content: none; }
   }
 </style>
 </head>
@@ -307,7 +376,7 @@
           <div class="cover-badges">
             <span class="cover-badge">GHG Protocol</span>
             <span class="cover-badge">SGX Core ESG Metrics</span>
-            <span class="cover-badge" id="cover-ungc-badge" style="display:none">UNGC CoP</span>
+            <span class="cover-badge" id="cover-ungc-badge" style="display:none">UNGC</span>
             <span class="cover-badge">SEFR Jan 2026</span>
           </div>
           <div class="cover-zyt">Prepared using ZYT.ESG<br>zyt.one/esg</div>
@@ -853,6 +922,15 @@ Object.keys(tocMap).forEach(id => {
 });
 
 load();
+
+// ── Auto-trigger print when opened from S-25 with ?print=1 ──
+// Give the browser 800ms to finish rendering fonts and images before
+// opening the print dialog, so the output isn't blank.
+if (new URLSearchParams(window.location.search).get('print') === '1') {
+  window.addEventListener('load', () => {
+    setTimeout(() => window.print(), 800);
+  });
+}
 </script>
 </body>
 </html>

@@ -1065,7 +1065,7 @@
         const periodId = localStorage.getItem('zyt_period_id');
         if (periodId) {
           const { supabase } = await import('./js/supabase.js');
-          const { data: row } = await supabase.from('social_data').select('*').eq('period_id', periodId).maybeSingle();
+          const { data: row } = await supabase.from('esg_social_data').select('*').eq('period_id', periodId).maybeSingle();
           if (row) {
             // DB row uses snake_case columns — map back to camelCase before populating
             await populateForm({

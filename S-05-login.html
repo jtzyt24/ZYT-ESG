@@ -105,7 +105,7 @@
   async function onLoginSuccess(userId) {
     try {
       const { data: profile } = await supabase
-        .from('profiles')
+        .from('esg_profiles')
         .select('*')
         .eq('id', userId)
         .maybeSingle();
@@ -137,7 +137,7 @@
         // Also fetch and cache the reporting period id
         const year = profile.reporting_year || new Date().getFullYear();
         const { data: period } = await supabase
-          .from('reporting_periods')
+          .from('esg_reporting_periods')
           .select('id')
           .eq('profile_id', userId)
           .eq('year', year)
