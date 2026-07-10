@@ -616,6 +616,7 @@ nav {
     <div class="nav-s">Report</div>
   </div>
   <button class="nav-save" onclick="localStorage.setItem('zyt_draft_saved', Date.now()); this.textContent='Saved ✓'; setTimeout(()=>this.textContent='Save draft',2000)">Save draft</button>
+  <button onclick="window._zytSignOut()" style="height:28px;padding:0 12px;border-radius:5px;border:1px solid rgba(0,0,0,0.15);background:transparent;font-family:inherit;font-size:12px;cursor:pointer;color:#666;white-space:nowrap">Sign out</button>
 </nav>
 
 <!-- TOTALS BAR -->
@@ -1066,5 +1067,6 @@ computeTotals();
 computeStatus();
 </script>
 
+<script type="module" src="./js/logout.js"></script>
 </body>
 </html>

@@ -276,7 +276,10 @@
     <div class="nav-divider"></div>
     <div class="nav-crumb">Report → <strong>Sustainability Context</strong></div>
   </div>
-  <div class="save-indicator"><div class="save-dot"></div> Auto-saved</div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="save-indicator"><div class="save-dot"></div> Auto-saved</div>
+    <button onclick="window._zytSignOut()" style="height:28px;padding:0 12px;border-radius:5px;border:1px solid rgba(0,0,0,0.15);background:transparent;font-family:inherit;font-size:12px;cursor:pointer;color:#666">Sign out</button>
+  </div>
 </nav>
 
 <div class="page-wrap">
@@ -894,5 +897,6 @@ if (govData.assuranceType && govData.assuranceType !== 'none') {
 updateCompletionStatus();
 </script>
 
+<script type="module" src="./js/logout.js"></script>
 </body>
 </html>

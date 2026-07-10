@@ -43,6 +43,9 @@
   .btn-submit:hover { filter:brightness(1.1); }
   .btn-submit:disabled { opacity:0.6; cursor:not-allowed; }
   .error-box { background:var(--red-light); border:1px solid #FCA5A5; border-radius:var(--radius-sm); padding:10px 13px; font-size:13px; color:var(--red); margin-bottom:14px; display:none; }
+  .info-box { background:#EFF6FF; border:1px solid #93C5FD; border-radius:var(--radius-sm); padding:12px 14px; font-size:13px; color:#1D4ED8; margin-bottom:14px; display:none; line-height:1.5; }
+  .info-box strong { display:block; margin-bottom:3px; font-weight:600; }
+  .info-box a { color:#1D4ED8; font-weight:500; text-decoration:underline; }
   .auth-footer { text-align:center; font-size:13px; color:var(--text-muted); margin-top:18px; }
   .auth-footer a { color:var(--accent); font-weight:500; }
   .skip-link { display:block; text-align:center; margin-top:14px; font-size:13px; color:var(--text-light); cursor:pointer; }
@@ -64,6 +67,10 @@
 
   <div class="auth-card">
     <div class="error-box" id="error-box"></div>
+    <div class="info-box" id="info-box">
+      <strong>You already have an account.</strong>
+      This email is registered — <a href="S-05-login.html">log in instead →</a>
+    </div>
 
     <div class="field">
       <label for="email">Work email</label>
@@ -98,6 +105,12 @@
     const el = document.getElementById('error-box');
     el.textContent = msg;
     el.style.display = 'block';
+    document.getElementById('info-box').style.display = 'none';
+  }
+
+  function showAlreadyRegistered() {
+    document.getElementById('info-box').style.display = 'block';
+    document.getElementById('error-box').style.display = 'none';
   }
 
   window.checkStrength = (pw) => {
@@ -116,7 +129,10 @@
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     const password2 = document.getElementById('password2').value;
+
+    // Reset both message boxes on each attempt
     document.getElementById('error-box').style.display = 'none';
+    document.getElementById('info-box').style.display = 'none';
 
     if (!email) return showError('Please enter your email address.');
     if (password.length < 8) return showError('Password must be at least 8 characters.');
@@ -127,8 +143,19 @@
     btn.disabled = true;
 
     const { data, error } = await signUp(email, password);
+
     if (error) {
       showError(error.message);
+      btn.textContent = 'Create account →';
+      btn.disabled = false;
+      return;
+    }
+
+    // Supabase returns error:null with an empty identities array when the
+    // email is already registered (anti-enumeration behaviour). Detect it
+    // and redirect to login rather than silently proceeding to S-04.
+    if (!data.user || data.user.identities?.length === 0) {
+      showAlreadyRegistered();
       btn.textContent = 'Create account →';
       btn.disabled = false;
       return;

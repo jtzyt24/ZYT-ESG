@@ -335,6 +335,7 @@
     <button class="btn btn-ghost" onclick="goBack()">← Back</button>
     <button class="btn btn-ghost" onclick="window.print()">🖨 Print</button>
     <button class="btn btn-primary" onclick="window.location.href='S-25-generate.html'">Generate PDF →</button>
+    <button onclick="window._zytSignOut()" style="height:28px;padding:0 12px;border-radius:5px;border:1px solid rgba(0,0,0,0.15);background:transparent;font-family:inherit;font-size:12px;cursor:pointer;color:#666;margin-left:4px">Sign out</button>
   </div>
 </div>
 
@@ -932,5 +933,6 @@ if (new URLSearchParams(window.location.search).get('print') === '1') {
   });
 }
 </script>
+<script type="module" src="./js/logout.js"></script>
 </body>
 </html>

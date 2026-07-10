@@ -329,6 +329,7 @@
   <div class="nav-right">
     <button class="btn btn-ghost" onclick="window.print()" style="height:32px;font-size:13px">Print</button>
     <button class="btn btn-secondary" style="height:32px;font-size:13px" onclick="window.location.href='S-25-generate.html'">⬇ Download PDF</button>
+    <button onclick="window._zytSignOut()" style="height:28px;padding:0 12px;border-radius:5px;border:1px solid rgba(0,0,0,0.15);background:transparent;font-family:inherit;font-size:12px;cursor:pointer;color:#666">Sign out</button>
   </div>
 </nav>
 
@@ -830,5 +831,6 @@ function render() {
 render();
 </script>
 
+<script type="module" src="./js/logout.js"></script>
 </body>
 </html>

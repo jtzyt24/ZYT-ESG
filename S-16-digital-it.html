@@ -98,6 +98,7 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
     <div class="ns">Report</div>
   </div>
   <button class="btn-back" onclick="goTo('S-09')">← Back to hub</button>
+  <button onclick="window._zytSignOut()" style="margin-left:auto;height:28px;padding:0 12px;border-radius:5px;border:1px solid rgba(0,0,0,0.15);background:transparent;font-family:inherit;font-size:12px;cursor:pointer;color:#666;white-space:nowrap">Sign out</button>
 </nav>
 
 <div class="layout">
@@ -590,5 +591,6 @@ window.addEventListener('load', async () => {
   updateSummary();
 });
 </script>
+<script type="module" src="./js/logout.js"></script>
 </body>
 </html>
