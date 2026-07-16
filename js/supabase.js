@@ -8,8 +8,8 @@
 //   SUPABASE_KEY = anon/public key (safe to expose in browser)
 // ============================================================
 
-const SUPABASE_URL = 'https://ojjfwlldwazndznwuyzc.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9qamZ3bGxkd2F6bmR6bnd1eXpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNjk1NDksImV4cCI6MjA5MTc0NTU0OX0.SukWx_DHH1hYJGOVC5GjZURZR0ASe6e5OxmS78OnMEI';
+const SUPABASE_URL = 'https://hgwsadwrhhedyaljnpbg.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhnd3NhZHdyaGhlZHlhbGpucGJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MzcyMTIsImV4cCI6MjA5NjQxMzIxMn0.Z-6ektpgxn8JMafxGGYcQkdrHx9TtZpduxJHGwj8LMo';
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
