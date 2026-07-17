@@ -581,9 +581,13 @@ window.addEventListener('load', async () => {
 
       if (profile) {
         populateForm(profile);
-        return;
       }
+      // Logged in but no profile yet → show empty form.
+      // Do NOT fall through to localStorage — it may contain a
+      // previous user's data (localStorage is not user-scoped).
+      return;
     } catch (e) {
+      // Supabase unreachable — fall through to localStorage as best effort.
       console.warn('[S-06] Supabase load failed, falling back to localStorage:', e);
     }
   }
