@@ -31,7 +31,16 @@ export async function requireAuth() {
 }
 
 export async function signUp(email, password) {
-  return supabase.auth.signUp({ email, password });
+  return supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      // After the user clicks the confirmation link in their email, Supabase
+      // redirects here. S-05 auto-detects the active session and routes the
+      // newly confirmed user to S-06 (no profile yet) or S-09 (returning).
+      emailRedirectTo: new URL('S-05-login.html', window.location.href).href,
+    },
+  });
 }
 
 export async function signIn(email, password) {
