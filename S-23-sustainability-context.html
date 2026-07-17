@@ -897,6 +897,39 @@ if (govData.assuranceType && govData.assuranceType !== 'none') {
 updateCompletionStatus();
 </script>
 
+<script type="module">
+// Override the plain saveAndContinue with an async version that also syncs to Supabase.
+// Runs after the regular <script> block, so window.selectedIntent is already set.
+import { getSession, loadLocal, upsertContextData } from './js/supabase.js';
+
+window.saveAndContinue = async function() {
+  const materials = [...document.querySelectorAll('.material-item.selected')]
+    .map(m => m.querySelector('.mi-title').textContent.trim());
+  const other = document.getElementById('material-other')?.value?.trim();
+  if (other) materials.push(other);
+
+  const data = {
+    intent:        window.selectedIntent || '',
+    narrative:     document.getElementById('narrative-text').value,
+    signatoryName: document.getElementById('sign-name').value,
+    signatoryRole: document.getElementById('sign-role').value,
+    materialTopics: materials,
+  };
+
+  localStorage.setItem('zyt_context_data', JSON.stringify(data));
+
+  // Sync to Supabase — fail silently so navigation always completes
+  try {
+    const session = await getSession();
+    if (session) {
+      const periodId = loadLocal('zyt_period_id');
+      if (periodId) await upsertContextData(periodId, data);
+    }
+  } catch (e) { console.warn('[S-23] Supabase context sync failed:', e); }
+
+  window.location.href = 'S-24-report-preview.html';
+};
+</script>
 <script type="module" src="./js/logout.js"></script>
 </body>
 </html>

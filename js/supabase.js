@@ -137,6 +137,73 @@ export async function upsertGovernanceData(periodId, data) {
              { onConflict: 'period_id' });
 }
 
+// ── Targets helpers ──────────────────────────────────────────
+
+export async function upsertTargets(periodId, targets) {
+  // Delete-then-insert (same pattern as emissions — each save is a full replacement)
+  await supabase.from('esg_targets').delete().eq('period_id', periodId);
+  if (!targets?.length) return { data: null, error: null };
+  return supabase.from('esg_targets').insert(
+    targets.map(t => ({
+      period_id:     periodId,
+      target_id:     t.id,
+      cluster_id:    t.clusterId,
+      carbon_kgco2e: parseFloat(t.carbon)  || null,
+      saving_sgd:    parseFloat(t.saving)  || null,
+      payback_years: parseFloat(t.payback) || null,
+      reduction_pct: parseFloat(t.pct)     || null,
+      target_year:   parseInt(t.year)      || null,
+      statement:     t.statement || '',
+      updated_at:    new Date().toISOString(),
+    }))
+  );
+}
+
+export async function hydrateTargetsFromSupabase(periodId) {
+  const { data: rows, error } = await supabase
+    .from('esg_targets').select('*').eq('period_id', periodId);
+  if (error || !rows?.length) return false;
+  const targets = rows.map(r => ({
+    id:        r.target_id,
+    clusterId: r.cluster_id,
+    carbon:    String(r.carbon_kgco2e  ?? ''),
+    saving:    String(r.saving_sgd     ?? ''),
+    payback:   String(r.payback_years  ?? ''),
+    pct:       String(r.reduction_pct  ?? ''),
+    year:      String(r.target_year    ?? ''),
+    statement: r.statement || '',
+  }));
+  localStorage.setItem('zyt_targets_data', JSON.stringify({ targets, savedAt: Date.now() }));
+  return true;
+}
+
+// ── Context helpers ──────────────────────────────────────────
+
+export async function upsertContextData(periodId, data) {
+  return supabase.from('esg_context_data').upsert({
+    period_id:             periodId,
+    sustainability_context: data.narrative,
+    material_topics:       data.materialTopics,   // jsonb — arrays round-trip cleanly
+    signatory_name:        data.signatoryName,
+    signatory_role:        data.signatoryRole,
+    updated_at:            new Date().toISOString(),
+  }, { onConflict: 'period_id' });
+}
+
+export async function hydrateContextFromSupabase(periodId) {
+  const { data: row, error } = await supabase
+    .from('esg_context_data').select('*').eq('period_id', periodId).maybeSingle();
+  if (error || !row) return false;
+  const data = {
+    narrative:      row.sustainability_context || '',
+    materialTopics: row.material_topics || [],
+    signatoryName:  row.signatory_name  || '',
+    signatoryRole:  row.signatory_role  || '',
+  };
+  localStorage.setItem('zyt_context_data', JSON.stringify(data));
+  return true;
+}
+
 // ── Sync helpers (called on each screen save) ────────────────
 // These fail silently if no session — localStorage always works.
 
@@ -160,4 +227,20 @@ export async function syncGovernanceToSupabase(govData) {
   const periodId = loadLocal('zyt_period_id');
   if (!periodId) return;
   await upsertGovernanceData(periodId, govData);
+}
+
+export async function syncTargetsToSupabase(targets) {
+  const session = await getSession();
+  if (!session) return;
+  const periodId = loadLocal('zyt_period_id');
+  if (!periodId) return;
+  await upsertTargets(periodId, targets);
+}
+
+export async function syncContextToSupabase(contextData) {
+  const session = await getSession();
+  if (!session) return;
+  const periodId = loadLocal('zyt_period_id');
+  if (!periodId) return;
+  await upsertContextData(periodId, contextData);
 }

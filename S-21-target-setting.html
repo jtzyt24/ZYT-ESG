@@ -739,6 +739,7 @@ nav {
 <script type="module">
 import { aggregateClusters, loadCompanyProfile } from './js/zyt-core/schema.js';
 import { CLUSTERS } from './js/zyt-core/config.js';
+import { getSession, loadLocal, upsertTargets } from './js/supabase.js';
 
 const CLUSTER_INFO = Object.fromEntries(CLUSTERS.map(c => [c.id, c]));
 const selected = new Set();
@@ -1016,7 +1017,7 @@ function updateSummary() {
   document.getElementById('total-pct').textContent = baselineTotalT > 0 ? `${Math.round((totalCarbon / baselineTotalT) * 100)}%` : '—';
 }
 
-window.generatePassport = function() {
+window.generatePassport = async function() {
   const targets = [];
   document.querySelectorAll('.target-card.selected').forEach(card => {
     const id = card.dataset.id;
@@ -1038,6 +1039,14 @@ window.generatePassport = function() {
     });
   });
   localStorage.setItem('zyt_targets_data', JSON.stringify({ targets, savedAt: Date.now() }));
+  // Sync to Supabase — fail silently so navigation always completes
+  try {
+    const session = await getSession();
+    if (session) {
+      const periodId = loadLocal('zyt_period_id');
+      if (periodId) await upsertTargets(periodId, targets);
+    }
+  } catch (e) { console.warn('[S-21] Supabase targets sync failed:', e); }
   window.location.href = 'S-23-sustainability-context.html';
 };
 

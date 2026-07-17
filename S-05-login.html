@@ -87,7 +87,8 @@
 </div>
 
 <script type="module">
-  import { signIn, resetPassword, getSession, supabase } from './js/supabase.js';
+  import { signIn, resetPassword, getSession, supabase,
+           hydrateTargetsFromSupabase, hydrateContextFromSupabase } from './js/supabase.js';
   import { hydrateClustersFromSupabase, hydrateSocialGovernanceFromSupabase } from './js/zyt-core/schema.js';
 
   // ── Handle password-reset hash (Supabase redirects here with #access_token=...) ──
@@ -153,8 +154,10 @@
           try {
             await hydrateClustersFromSupabase(supabase, period.id);
             await hydrateSocialGovernanceFromSupabase(supabase, period.id);
+            await hydrateTargetsFromSupabase(period.id);
+            await hydrateContextFromSupabase(period.id);
           } catch (e) {
-            console.warn('[S-05] Cluster/social/governance hydration failed (continuing):', e);
+            console.warn('[S-05] Full hydration failed (continuing):', e);
           }
         }
 
