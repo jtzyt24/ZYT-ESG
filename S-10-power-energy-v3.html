@@ -1129,14 +1129,17 @@ function buildEntriesFromState() {
       const hrs = document.getElementById('wfh-hrs')?.value || '';
       const days = document.getElementById('wfh-days')?.value || '';
       const customW = document.getElementById('wfh-custom-w')?.value || '';
-      e.notes = `device=${dev};hrs=${hrs};days=${days};customW=${customW}`;
+      const genNa = document.getElementById('gen-na')?.checked ? '1' : '0';
+      e.notes = `device=${dev};hrs=${hrs};days=${days};customW=${customW};gen_na=${genNa}`;
     } else if (S.route === 'serviced') {
       const desks = document.getElementById('serv-desks')?.value || '';
       const area  = document.getElementById('serv-area')?.value  || '';
-      e.notes = `desks=${desks};area=${area}`;
+      const genNa = document.getElementById('gen-na')?.checked ? '1' : '0';
+      e.notes = `desks=${desks};area=${area};gen_na=${genNa}`;
     } else {
       // own or multiple — store route and SGD spend for full restoration
-      e.notes = `route=${S.route};sgd=${S.elec_sgd_yr.toFixed(2)}`;
+      const genNa = document.getElementById('gen-na')?.checked ? '1' : '0';
+      e.notes = `route=${S.route};sgd=${S.elec_sgd_yr.toFixed(2)};gen_na=${genNa}`;
     }
     entries.push(e);
 
@@ -1241,6 +1244,10 @@ function restoreFromSaved() {
             document.getElementById('wfh-result').textContent =
               `Monthly business electricity: ${(entry.quantity / 12).toFixed(1)} kWh · Annual: ${Math.round(entry.quantity)} kWh (restored)`;
           }
+          if (p.gen_na === '1') {
+            document.getElementById('gen-na').checked = true;
+            toggleNA('gen-inputs', document.getElementById('gen-na'), 'gen');
+          }
         } else if (entry.activityName.includes('serviced office')) {
           setRoute('serviced', document.querySelector('[data-r="serviced"]'));
           S.serv_kwh_yr = entry.quantity;
@@ -1250,6 +1257,10 @@ function restoreFromSaved() {
             document.getElementById('serv-area').value = pServ.area || '';
           } else if (pServ.area && parseFloat(pServ.area) > 0) {
             document.getElementById('serv-area').value = pServ.area;
+          }
+          if (pServ.gen_na === '1') {
+            document.getElementById('gen-na').checked = true;
+            toggleNA('gen-inputs', document.getElementById('gen-na'), 'gen');
           }
         } else {
           // restore via Annual mode — most lossless representation
@@ -1273,6 +1284,10 @@ function restoreFromSaved() {
           if (pOwn.sgd && parseFloat(pOwn.sgd) > 0) {
             document.getElementById('ea-sgd').value = parseFloat(pOwn.sgd).toFixed(2);
             S.elec_sgd_yr = parseFloat(pOwn.sgd);
+          }
+          if (pOwn.gen_na === '1') {
+            document.getElementById('gen-na').checked = true;
+            toggleNA('gen-inputs', document.getElementById('gen-na'), 'gen');
           }
         }
         break;
