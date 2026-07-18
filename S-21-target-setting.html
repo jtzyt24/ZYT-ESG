@@ -737,9 +737,9 @@ nav {
 </div>
 
 <script type="module">
-import { aggregateClusters, loadCompanyProfile } from './js/zyt-core/schema.js';
+import { aggregateClusters, loadCompanyProfile, hydrateClustersFromSupabase } from './js/zyt-core/schema.js';
 import { CLUSTERS } from './js/zyt-core/config.js';
-import { getSession, loadLocal, upsertTargets } from './js/supabase.js';
+import { getSession, loadLocal, upsertTargets, supabase } from './js/supabase.js';
 
 const CLUSTER_INFO = Object.fromEntries(CLUSTERS.map(c => [c.id, c]));
 const selected = new Set();
@@ -760,12 +760,12 @@ const TEMPLATES = {
     options: [10, 15, 20], recommended: 15, paybackMonths: 14,
   },
   transport: {
-    name: 'Reduce fleet fuel consumption',
-    scopeLabel: 'Scope 1 — Mobile combustion',
-    scopeKey: 's1',
-    desc: (kg) => `Your vehicle fleet accounts for ${(kg/1000).toFixed(1)} tCO₂e. Route optimisation and driver behaviour coaching typically reduce fuel use by 15–20% with little to no capital investment.`,
-    statementVerb: 'reducing Scope 1 mobile combustion emissions from our vehicle fleet',
-    statementAction: 'through route optimisation and driver behaviour improvements',
+    name: 'Reduce business travel & fleet emissions',
+    scopeLabel: 'Scope 1 & 3 — Transport',
+    scopeKey: 's1', // overridden in buildTargetCards — transport uses total cluster kg
+    desc: (kg) => `Business travel and fleet operations account for ${(kg/1000).toFixed(1)} tCO₂e. Substituting flights with video conferencing, consolidating trips, choosing economy class, and optimising fleet routes typically reduce this by 15–20%.`,
+    statementVerb: 'reducing Scope 1 and 3 transport emissions',
+    statementAction: 'through reduced business travel, video-first meeting policies, and fleet route optimisation',
     options: [10, 15, 20], recommended: 15, paybackMonths: 1,
   },
   cooling: {
@@ -830,7 +830,11 @@ function buildTargetCards(agg) {
   for (const [clusterId, tpl] of Object.entries(TEMPLATES)) {
     const c = agg.clusters[clusterId];
     if (!c) continue;
-    const kg = c[tpl.scopeKey] || 0;
+    // Transport covers fleet (Scope 1), flights, personal vehicles and hotels (Scope 3).
+    // Use total cluster emissions so the card appears even when there is no Scope 1 fleet data.
+    const kg = clusterId === 'transport'
+      ? ((c.s1 || 0) + (c.s2 || 0) + (c.s3 || 0))
+      : (c[tpl.scopeKey] || 0);
     if (kg <= 0) continue; // only suggest targets for clusters with real emissions
 
     const info = CLUSTER_INFO[clusterId];
@@ -1051,7 +1055,17 @@ window.generatePassport = async function() {
 };
 
 // ── Init: load real data and render ──
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
+  // Hydrate cluster data from Supabase before aggregating so this screen
+  // always reflects the latest saved data, even when reached directly.
+  try {
+    const session = await getSession();
+    if (session) {
+      const periodId = loadLocal('zyt_period_id');
+      if (periodId) await hydrateClustersFromSupabase(supabase, periodId);
+    }
+  } catch (e) { console.warn('[S-21] Hydration failed, using cached data:', e); }
+
   const agg = aggregateClusters();
   const profile = loadCompanyProfile();
   const year = profile?.reportingYear || new Date().getFullYear();
@@ -1072,7 +1086,12 @@ window.addEventListener('load', () => {
     .map(([label, kg, bg, fg]) => `<span class="bl-tag" style="background:${bg};color:${fg}">${label}: ${(kg/1000).toFixed(1)}t</span>`)
     .join('');
 
-  const energyCost = (agg.scope1_sgd || 0) + (agg.scope2_sgd || 0);
+  // Energy cost = Scope 2 electricity (power cluster total) + Scope 1 fuel costs.
+  // Use cluster-level sgd rather than scope2_sgd to avoid type-coercion issues
+  // when costSgd values arrive as strings from Supabase JSON.
+  const energyCost = (agg.clusters?.power?.sgd || 0)
+    + (agg.clusters?.cooking?.sgd || 0)
+    + (agg.scope1_sgd || 0);
   document.getElementById('bl-energy-cost').textContent = energyCost > 0 ? `SGD ${Math.round(energyCost).toLocaleString()}` : 'SGD 0';
 
   // Highest-impact source: the single source with the highest kgco2e across all scopes
