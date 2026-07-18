@@ -401,7 +401,7 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
       </div>
 
       <div class="na-row" style="margin-top:8px">
-        <input type="checkbox" class="na-cb" id="ac-no-topup" onchange="toggleNoTopup('ac', this)">
+        <input type="checkbox" class="na-cb" id="ac-no-topup" checked onchange="toggleNoTopup('ac', this)">
         <label class="na-lbl" for="ac-no-topup">No top-up was needed this year (no leak detected)</label>
       </div>
     </div>
@@ -999,6 +999,7 @@ function restoreFromSaved() {
     const p = parseNotes(entry.notes);
     switch (entry.activityKey) {
       case 'refrigerant_ac':
+        document.getElementById('ac-no-topup').checked = false;
         selectRefByName('ac', p.ref, p.manualGwp);
         if (p.mode === 'visits') {
           const btns = document.querySelectorAll('#ac-mode-tabs .mtab');

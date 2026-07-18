@@ -310,7 +310,7 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
         <div class="tip-ef">GHG Protocol default: road freight ~0.1 kgCO₂/tonne-km · No Singapore-specific SEFR factor yet — international default applied</div>
       </div>
       <div class="na-row">
-        <input type="checkbox" class="na-cb" id="inbound-na" onchange="toggleNA('inbound-inputs',this,'inbound')">
+        <input type="checkbox" class="na-cb" id="inbound-na" checked onchange="toggleNA('inbound-inputs',this,'inbound')">
         <label class="na-lbl" for="inbound-na">We don't use third-party freight (we collect our own stock)</label>
       </div>
       <div id="inbound-inputs">
@@ -366,7 +366,7 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
         <div class="tip-ef">GHG Protocol default: road freight ~0.1 kgCO₂/tonne-km · Last-mile delivery ~0.15–0.25 kgCO₂/km for small van</div>
       </div>
       <div class="na-row">
-        <input type="checkbox" class="na-cb" id="outbound-na" onchange="toggleNA('outbound-inputs',this,'outbound')">
+        <input type="checkbox" class="na-cb" id="outbound-na" checked onchange="toggleNA('outbound-inputs',this,'outbound')">
         <label class="na-lbl" for="outbound-na">We don't do outbound delivery (customers collect themselves)</label>
       </div>
       <div id="outbound-inputs">
@@ -424,7 +424,7 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
         <div class="tip-ef">ICAO Carbon Emissions Calculator methodology · Radiative forcing multiplier ×2 applied for high-altitude emissions</div>
       </div>
       <div class="na-row">
-        <input type="checkbox" class="na-cb" id="flights-na" onchange="toggleNA('flights-inputs',this,'flights')">
+        <input type="checkbox" class="na-cb" id="flights-na" checked onchange="toggleNA('flights-inputs',this,'flights')">
         <label class="na-lbl" for="flights-na">No business flights this year</label>
       </div>
       <div id="flights-inputs">
@@ -453,7 +453,7 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
         <div class="tip-ef">SEFR: Land Transport → ICE Car: 0.1732 kgCO₂/person-km · Battery Electric Car: 0.0618 kgCO₂/person-km</div>
       </div>
       <div class="na-row">
-        <input type="checkbox" class="na-cb" id="grab-na" onchange="toggleNA('grab-inputs',this,'grab')">
+        <input type="checkbox" class="na-cb" id="grab-na" checked onchange="toggleNA('grab-inputs',this,'grab')">
         <label class="na-lbl" for="grab-na">No business Grab/taxi this year</label>
       </div>
       <div id="grab-inputs">
@@ -482,7 +482,7 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
         <div class="tip-ef">SEFR: Land Transport → ICE Car: 0.1732 kgCO₂/person-km · EV: 0.0618 kgCO₂/person-km · Source: MOT Singapore</div>
       </div>
       <div class="na-row">
-        <input type="checkbox" class="na-cb" id="pv-na" onchange="toggleNA('pv-inputs',this,'pv')">
+        <input type="checkbox" class="na-cb" id="pv-na" checked onchange="toggleNA('pv-inputs',this,'pv')">
         <label class="na-lbl" for="pv-na">No staff use personal vehicles for business</label>
       </div>
       <div id="pv-inputs">
@@ -552,7 +552,7 @@ nav{height:52px;padding:0 28px;background:var(--card);border-bottom:1px solid va
         <div class="tip-ef">GHG Protocol: ~20 kgCO₂e/night (budget/standard) to ~60 kgCO₂e/night (luxury) · Using 30 kgCO₂e/night default</div>
       </div>
       <div class="na-row">
-        <input type="checkbox" class="na-cb" id="hotels-na" onchange="toggleNA('hotels-inputs',this,'hotels')">
+        <input type="checkbox" class="na-cb" id="hotels-na" checked onchange="toggleNA('hotels-inputs',this,'hotels')">
         <label class="na-lbl" for="hotels-na">No hotel stays for business this year</label>
       </div>
       <div id="hotels-inputs">
