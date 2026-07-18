@@ -101,9 +101,11 @@ export async function getOrCreatePeriod(profileId, year) {
 // ── Emissions helpers ────────────────────────────────────────
 
 export async function upsertEmissions(periodId, cluster, rows) {
+  // Guard: never DELETE without replacement rows. An empty-entries save (e.g.
+  // after a failed restore) must not silently wipe valid Supabase data.
+  if (!rows?.length) return { data: null, error: null };
   await supabase.from('esg_emissions_data').delete()
     .eq('period_id', periodId).eq('cluster', cluster);
-  if (!rows?.length) return { data: null, error: null };
   return supabase.from('esg_emissions_data')
     .insert(rows.map(r => ({ ...r, period_id: periodId })));
 }

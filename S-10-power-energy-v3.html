@@ -1125,12 +1125,19 @@ function buildEntriesFromState() {
     // For home-office route: encode raw calculator inputs in notes so the form
     // can be fully reconstructed on reload — same pattern as S-11 through S-17.
     if (S.route === 'home') {
-      const dev = document.getElementById('wfh-device')?.value || '';
-      const hrs = document.getElementById('wfh-hrs')?.value || '';
-      const days = document.getElementById('wfh-days')?.value || '';
+      const dev   = document.getElementById('wfh-device')?.value || '';
+      const hrs   = document.getElementById('wfh-hrs')?.value   || '';
+      const days  = document.getElementById('wfh-days')?.value  || '';
       const customW = document.getElementById('wfh-custom-w')?.value || '';
       const genNa = document.getElementById('gen-na')?.checked ? '1' : '0';
-      e.notes = `device=${dev};hrs=${hrs};days=${days};customW=${customW};gen_na=${genNa}`;
+      // Only encode WFH inputs if they have valid non-zero values.
+      // Empty hrs/days (from a legacy restore that didn't populate inputs)
+      // would write notes that corrupt S.wfh_kwh_yr on the next load via calcWFH.
+      if (parseFloat(hrs) > 0 && parseFloat(days) > 0) {
+        e.notes = `device=${dev};hrs=${hrs};days=${days};customW=${customW};gen_na=${genNa}`;
+      } else {
+        e.notes = `gen_na=${genNa}`; // preserve NA state without unsafe input values
+      }
     } else if (S.route === 'serviced') {
       const desks = document.getElementById('serv-desks')?.value || '';
       const area  = document.getElementById('serv-area')?.value  || '';
@@ -1228,9 +1235,16 @@ function restoreFromSaved() {
           // restore via WFH route: parse raw inputs from notes and reconstruct
           // the calculator so the form looks exactly as the user left it.
           setRoute('home', document.querySelector('[data-r="home"]'));
-          S.wfh_kwh_yr = entry.quantity;
+          const storedKwh = entry.quantity; // authoritative — always trust the DB value
+          S.wfh_kwh_yr = storedKwh;
           const p = parseNotes(entry.notes);
-          if (p.device !== undefined && p.hrs !== undefined) {
+          // Only use the new path if we have valid, non-zero numeric inputs.
+          // Empty or zero hrs/days (from a legacy restore that didn't set inputs)
+          // would make calcWFH() produce 0 and corrupt S.wfh_kwh_yr.
+          const validInputs = p.device !== undefined
+            && parseFloat(p.hrs) > 0
+            && parseFloat(p.days) > 0;
+          if (validInputs) {
             document.getElementById('wfh-device').value = p.device;
             document.getElementById('wfh-hrs').value    = p.hrs;
             document.getElementById('wfh-days').value   = p.days;
@@ -1238,11 +1252,12 @@ function restoreFromSaved() {
               document.getElementById('wfh-custom-row').style.display = 'block';
               document.getElementById('wfh-custom-w').value = p.customW;
             }
-            calcWFH(); // recomputes from restored inputs; display updates naturally
+            calcWFH(); // updates the display; may slightly differ from storedKwh
+            S.wfh_kwh_yr = storedKwh; // always restore authoritative value after calcWFH
           } else {
-            // Legacy entry (saved before this fix) — show computed kWh only
+            // Legacy entry or incomplete notes — show stored total only
             document.getElementById('wfh-result').textContent =
-              `Monthly business electricity: ${(entry.quantity / 12).toFixed(1)} kWh · Annual: ${Math.round(entry.quantity)} kWh (restored)`;
+              `Monthly business electricity: ${(storedKwh / 12).toFixed(1)} kWh · Annual: ${Math.round(storedKwh)} kWh (restored)`;
           }
           if (p.gen_na === '1') {
             document.getElementById('gen-na').checked = true;
