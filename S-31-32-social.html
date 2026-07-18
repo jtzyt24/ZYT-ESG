@@ -843,7 +843,7 @@
     <span id="completion-status">Complete required fields to continue →</span>
   </div>
   <div class="action-bar-right">
-    <button class="btn btn-ghost" onclick="window.history.back()">← Back</button>
+    <button class="btn btn-ghost" onclick="window.location.href='S-09-data-entry-hub.html'">← Back to hub</button>
     <button class="btn btn-primary" onclick="saveAndContinue()">Save & continue →</button>
   </div>
 </div>
@@ -991,16 +991,25 @@
     d.employeesFemale = f;
     d.employeesNonbinary = nb;
     d.employeesNotDisclosed = nd;
+    d.employeesUnder30 = parseInt(document.getElementById('age-u30')?.value) || null;
     d.employees30to50 = parseInt(document.getElementById('age-30to50')?.value) || null;
+    d.employeesOver50 = parseInt(document.getElementById('age-o50')?.value) || null;
+    d.employeesFulltime = parseInt(document.getElementById('ft-emp')?.value) || null;
+    d.employeesParttime = parseInt(document.getElementById('pt-emp')?.value) || null;
     d.newHires = parseInt(document.getElementById('new-hires').value) || null;
+    d.newHiresMale = parseInt(document.getElementById('nh-male')?.value) || null;
+    d.newHiresFemale = parseInt(document.getElementById('nh-female')?.value) || null;
     d.leavers = leavers;
     d.turnoverRatePct = (leavers && totalEmp) ? +(leavers/totalEmp*100).toFixed(1) : null;
     d.totalTrainingHours = trainHrs;
+    d.trainingHoursMale = parseFloat(document.getElementById('train-hrs-m')?.value) || null;
+    d.trainingHoursFemale = parseFloat(document.getElementById('train-hrs-f')?.value) || null;
     d.avgTrainingHoursPerEmp = (trainHrs && totalEmp) ? +(trainHrs/totalEmp).toFixed(1) : null;
     d.trainingTypes = [...document.querySelectorAll('.tt-tag.selected')].map(t => t.textContent);
     d.fatalities = parseInt(document.getElementById('inj-fatal').value) || 0;
     d.highConsequenceInjuries = parseInt(document.getElementById('inj-hci').value) || 0;
     d.recordableInjuries = parseInt(document.getElementById('inj-rec').value) || 0;
+    d.workRelatedIllHealth = parseInt(document.getElementById('inj-illhealth')?.value) || 0;
     d.bizsafeLevel = document.getElementById('bizsafe-value').value || 'none';
     return d;
   }
@@ -1038,12 +1047,21 @@
     if (d.employeesNonbinary) document.getElementById('g-nb').value = d.employeesNonbinary;
     if (d.employeesNotDisclosed) document.getElementById('g-nd').value = d.employeesNotDisclosed;
     if (d.employees30to50 && document.getElementById('age-30to50')) document.getElementById('age-30to50').value = d.employees30to50;
+    if (d.employeesUnder30) document.getElementById('age-u30').value = d.employeesUnder30;
+    if (d.employeesOver50) document.getElementById('age-o50').value = d.employeesOver50;
+    if (d.employeesFulltime) document.getElementById('ft-emp').value = d.employeesFulltime;
+    if (d.employeesParttime) document.getElementById('pt-emp').value = d.employeesParttime;
     if (d.newHires) document.getElementById('new-hires').value = d.newHires;
+    if (d.newHiresMale) document.getElementById('nh-male').value = d.newHiresMale;
+    if (d.newHiresFemale) document.getElementById('nh-female').value = d.newHiresFemale;
     if (d.leavers) document.getElementById('leavers').value = d.leavers;
     if (d.totalTrainingHours) document.getElementById('training-total').value = d.totalTrainingHours;
+    if (d.trainingHoursMale) document.getElementById('train-hrs-m').value = d.trainingHoursMale;
+    if (d.trainingHoursFemale) document.getElementById('train-hrs-f').value = d.trainingHoursFemale;
     if (d.fatalities) document.getElementById('inj-fatal').value = d.fatalities;
     if (d.highConsequenceInjuries) document.getElementById('inj-hci').value = d.highConsequenceInjuries;
     if (d.recordableInjuries) document.getElementById('inj-rec').value = d.recordableInjuries;
+    if (d.workRelatedIllHealth) document.getElementById('inj-illhealth').value = d.workRelatedIllHealth;
     if (d.trainingTypes) {
       document.querySelectorAll('.tt-tag').forEach(tag => {
         if (d.trainingTypes.includes(tag.textContent)) tag.classList.add('selected');
@@ -1075,13 +1093,22 @@
               employeesFemale: row.employees_female,
               employeesNonbinary: row.employees_nonbinary,
               employeesNotDisclosed: row.employees_not_disclosed,
+              employeesUnder30: row.employees_under30,
               employees30to50: row.employees_30to50,
+              employeesOver50: row.employees_over50,
+              employeesFulltime: row.employees_fulltime,
+              employeesParttime: row.employees_parttime,
               newHires: row.new_hires,
+              newHiresMale: row.new_hires_male,
+              newHiresFemale: row.new_hires_female,
               leavers: row.leavers,
               totalTrainingHours: row.total_training_hours,
+              trainingHoursMale: row.training_hours_male,
+              trainingHoursFemale: row.training_hours_female,
               fatalities: row.fatalities,
               highConsequenceInjuries: row.high_consequence_injuries,
               recordableInjuries: row.recordable_injuries,
+              workRelatedIllHealth: row.work_related_ill_health,
               trainingTypes: row.training_types,
               bizsafeLevel: row.bizsafe_level,
             });

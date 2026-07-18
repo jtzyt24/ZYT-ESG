@@ -494,16 +494,22 @@ window.saveProfile = async function() {
 
   // ── 1. Save to localStorage (always, even if Supabase fails) ──
   const localProfile = {
-    companyName:          name,
-    uen:                  uen,
-    companySize:          document.getElementById('company-size')?.value || '',
-    industry:             selectedIndustry,
-    reportingYear:        String(reportingYear),
-    responsiblePerson:    esgName,
-    responsiblePersonRole:esgRole,
-    annualRevenue:        revenueBucket,
-    annualRevenueSgd:     revenueMidpoint,
-    address:              document.getElementById('address')?.value.trim() || '',
+    companyName:            name,
+    uen:                    uen,
+    incorpYear:             document.getElementById('year-inc')?.value || '',
+    companySize:            document.getElementById('company-size')?.value || '',
+    industry:               selectedIndustry,
+    industrySub:            document.getElementById('subsector')?.value || '',
+    reportingYear:          String(reportingYear),
+    periodStart:            document.getElementById('period-start')?.value || '01-01',
+    boundary:               document.getElementById('boundary')?.value || 'operational_sg',
+    responsiblePerson:      esgName,
+    responsiblePersonRole:  esgRole,
+    responsiblePersonEmail: document.getElementById('esg-email')?.value.trim() || '',
+    annualRevenue:          revenueBucket,
+    annualRevenueSgd:       revenueMidpoint,
+    address:                document.getElementById('address')?.value.trim() || '',
+    intent:                 [...selectedIntents].join(',') || '',
   };
   localStorage.setItem('zyt_company_profile', JSON.stringify(localProfile));
 
@@ -512,15 +518,20 @@ window.saveProfile = async function() {
   if (session) {
     try {
       const dbProfile = {
-        company_name:           name,
-        uen:                    uen,
-        employee_count:         localProfile.companySize,
-        industry:               selectedIndustry,
-        reporting_year:         reportingYear,
-        responsible_person_name:esgName,
-        responsible_person_role:esgRole,
-        annual_revenue_sgd:     revenueMidpoint,
-        intent:                 [...selectedIntents].join(',') || null,
+        company_name:              name,
+        uen:                       uen,
+        incorp_year:               parseInt(document.getElementById('year-inc')?.value) || null,
+        employee_count:            localProfile.companySize,
+        industry:                  selectedIndustry,
+        industry_sub:              document.getElementById('subsector')?.value || null,
+        reporting_year:            reportingYear,
+        period_start:              document.getElementById('period-start')?.value || '01-01',
+        boundary:                  document.getElementById('boundary')?.value || 'operational_sg',
+        responsible_person_name:   esgName,
+        responsible_person_role:   esgRole,
+        responsible_person_email:  document.getElementById('esg-email')?.value.trim() || null,
+        annual_revenue_sgd:        revenueMidpoint,
+        intent:                    [...selectedIntents].join(',') || null,
       };
       await upsertProfile(session.user.id, dbProfile);
 
@@ -549,6 +560,24 @@ function populateForm(p) {
   if (p.reportingYear || p.reporting_year)
     document.getElementById('report-year').value = p.reportingYear || String(p.reporting_year);
 
+  // Year of incorporation
+  if (p.incorpYear || p.incorp_year)
+    document.getElementById('year-inc').value = p.incorpYear || p.incorp_year;
+
+  // Sub-sector
+  const sub = p.industrySub || p.industry_sub;
+  if (sub) document.getElementById('subsector').value = sub;
+
+  // ESG responsible person email
+  if (p.responsiblePersonEmail || p.responsible_person_email)
+    document.getElementById('esg-email').value = p.responsiblePersonEmail || p.responsible_person_email;
+
+  // Reporting period start and boundary
+  if (p.periodStart || p.period_start)
+    document.getElementById('period-start').value = p.periodStart || p.period_start;
+  if (p.boundary)
+    document.getElementById('boundary').value = p.boundary;
+
   // Revenue: localStorage already has the bucket string (annualRevenue).
   // A raw Supabase row only has the numeric annual_revenue_sgd — reverse-
   // lookup the bucket from the midpoint since the bucket itself isn't stored.
@@ -558,6 +587,18 @@ function populateForm(p) {
 
   if (p.address)
     document.getElementById('address').value = p.address;
+
+  // Restore intent button selections
+  const intentStr = p.intent || '';
+  if (intentStr) {
+    intentStr.split(',').filter(Boolean).forEach(iv => {
+      const btn = document.querySelector(`.intent-btn[data-intent="${iv}"]`);
+      if (btn) {
+        btn.classList.add('active');
+        selectedIntents.add(iv);
+      }
+    });
+  }
 
   const ind = p.industry || p.selectedIndustry;
   if (ind) {

@@ -128,15 +128,54 @@ export async function getEmissionTotals(periodId) {
 // ── Social & Governance helpers ──────────────────────────────
 
 export async function upsertSocialData(periodId, data) {
-  return supabase.from('esg_social_data')
-    .upsert({ period_id: periodId, ...data, updated_at: new Date().toISOString() },
-             { onConflict: 'period_id' });
+  return supabase.from('esg_social_data').upsert({
+    period_id:                  periodId,
+    total_employees:            data.totalEmployees,
+    employees_male:             data.employeesMale,
+    employees_female:           data.employeesFemale,
+    employees_nonbinary:        data.employeesNonbinary,
+    employees_not_disclosed:    data.employeesNotDisclosed,
+    employees_under30:          data.employeesUnder30,
+    employees_30to50:           data.employees30to50,
+    employees_over50:           data.employeesOver50,
+    employees_fulltime:         data.employeesFulltime,
+    employees_parttime:         data.employeesParttime,
+    new_hires:                  data.newHires,
+    new_hires_male:             data.newHiresMale,
+    new_hires_female:           data.newHiresFemale,
+    leavers:                    data.leavers,
+    turnover_rate_pct:          data.turnoverRatePct,
+    total_training_hours:       data.totalTrainingHours,
+    training_hours_male:        data.trainingHoursMale,
+    training_hours_female:      data.trainingHoursFemale,
+    avg_training_hours_per_emp: data.avgTrainingHoursPerEmp,
+    training_types:             data.trainingTypes,
+    fatalities:                 data.fatalities,
+    high_consequence_injuries:  data.highConsequenceInjuries,
+    recordable_injuries:        data.recordableInjuries,
+    work_related_ill_health:    data.workRelatedIllHealth,
+    bizsafe_level:              data.bizsafeLevel,
+    updated_at:                 new Date().toISOString(),
+  }, { onConflict: 'period_id' });
 }
 
 export async function upsertGovernanceData(periodId, data) {
-  return supabase.from('esg_governance_data')
-    .upsert({ period_id: periodId, ...data, updated_at: new Date().toISOString() },
-             { onConflict: 'period_id' });
+  return supabase.from('esg_governance_data').upsert({
+    period_id:                   periodId,
+    esg_review_frequency:        data.esgReviewFrequency,
+    mgmt_team_total:             data.mgmtTeamTotal,
+    mgmt_team_male:              data.mgmtTeamMale,
+    mgmt_team_female:            data.mgmtTeamFemale,
+    mgmt_team_female_pct:        data.mgmtTeamFemalePct,
+    anti_corruption_policy:      data.anticorruptionPolicy,
+    anti_corruption_policy_desc: data.anticorruptionPolicyDesc,
+    staff_with_ac_training:      data.staffWithAcTraining,
+    staff_ac_training_pct:       data.staffAcTrainingPct,
+    whistleblowing_channel:      data.whistleblowingChannel,
+    certifications:              data.certifications,
+    assurance_status:            data.assuranceType,
+    updated_at:                  new Date().toISOString(),
+  }, { onConflict: 'period_id' });
 }
 
 // ── Targets helpers ──────────────────────────────────────────
@@ -183,12 +222,13 @@ export async function hydrateTargetsFromSupabase(periodId) {
 
 export async function upsertContextData(periodId, data) {
   return supabase.from('esg_context_data').upsert({
-    period_id:             periodId,
+    period_id:              periodId,
     sustainability_context: data.narrative,
-    material_topics:       data.materialTopics,   // jsonb — arrays round-trip cleanly
-    signatory_name:        data.signatoryName,
-    signatory_role:        data.signatoryRole,
-    updated_at:            new Date().toISOString(),
+    material_topics:        data.materialTopics,
+    signatory_name:         data.signatoryName,
+    signatory_role:         data.signatoryRole,
+    intent:                 data.intent || null,
+    updated_at:             new Date().toISOString(),
   }, { onConflict: 'period_id' });
 }
 
@@ -201,6 +241,7 @@ export async function hydrateContextFromSupabase(periodId) {
     materialTopics: row.material_topics || [],
     signatoryName:  row.signatory_name  || '',
     signatoryRole:  row.signatory_role  || '',
+    intent:         row.intent          || '',
   };
   localStorage.setItem('zyt_context_data', JSON.stringify(data));
   return true;

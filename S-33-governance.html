@@ -737,6 +737,7 @@
     d.staffAcTrainingPct = parseFloat(document.getElementById('ac-staff-pct')?.value) || null;
     d.whistleblowingChannel = document.getElementById('whistle-policy').value === 'yes';
     d.certifications = certs;
+    d.assuranceType = document.getElementById('assurance-type')?.value || 'self';
     return d;
   }
 
@@ -757,7 +758,7 @@
       }
     })();
 
-    window.location.href = 'S-19-carbon-overview.html';
+    window.location.href = 'S-09-data-entry-hub.html';
   };
 
   // ── Populate form from a canonical GovernanceData object ──
@@ -771,15 +772,48 @@
         if (c.getAttribute('onclick')?.includes(`'${d.esgReviewFrequency}'`)) c.classList.add('selected');
       });
     }
+
+    // Anti-corruption policy — restore YN button state + show desc field
+    if (d.anticorruptionPolicy !== undefined && d.anticorruptionPolicy !== null) {
+      const val = d.anticorruptionPolicy === true || d.anticorruptionPolicy === 'yes';
+      document.getElementById('ac-policy').value = val ? 'yes' : 'no';
+      document.querySelectorAll('.yn-btn[onclick*="ac-policy"]').forEach(b => {
+        b.classList.toggle('active', val ? b.classList.contains('yes') : b.classList.contains('no'));
+      });
+      document.getElementById('ac-desc-field').style.display = val ? 'block' : 'none';
+    }
     if (d.anticorruptionPolicyDesc) document.getElementById('ac-desc').value = d.anticorruptionPolicyDesc;
     if (d.staffWithAcTraining) document.getElementById('ac-staff-trained').value = d.staffWithAcTraining;
-    if (d.certifications) {
-      d.certifications.forEach(cert => {
-        document.querySelectorAll('.cert-chip').forEach(c => {
-          if (c.textContent === cert) c.classList.add('selected');
+
+    // Whistleblowing — restore checkbox + YN button
+    if (d.whistleblowingChannel !== undefined && d.whistleblowingChannel !== null) {
+      const val = d.whistleblowingChannel === true || d.whistleblowingChannel === 'yes';
+      if (val) {
+        const cb = document.getElementById('show-whistle');
+        if (cb) { cb.checked = true; cb.dispatchEvent(new Event('change')); }
+        document.getElementById('whistle-policy').value = 'yes';
+        document.querySelectorAll('.yn-btn[onclick*="whistle-policy"]').forEach(b => {
+          b.classList.toggle('active', b.classList.contains('yes'));
         });
-      });
+      }
     }
+
+    // Certifications — match chips, put unmatched text into cert-other
+    if (d.certifications) {
+      const chipTexts = [...document.querySelectorAll('.cert-chip')].map(c => c.textContent);
+      const unmatched = [];
+      d.certifications.forEach(cert => {
+        const chip = document.querySelectorAll('.cert-chip');
+        let matched = false;
+        chip.forEach(c => { if (c.textContent === cert) { c.classList.add('selected'); matched = true; } });
+        if (!matched) unmatched.push(cert);
+      });
+      if (unmatched.length) document.getElementById('cert-other').value = unmatched.join(', ');
+    }
+
+    // Assurance type
+    if (d.assuranceType) document.getElementById('assurance-type').value = d.assuranceType;
+
     window.updateMgmtBar();
   }
 
@@ -796,9 +830,12 @@
               mgmtTeamMale: row.mgmt_team_male,
               mgmtTeamFemale: row.mgmt_team_female,
               esgReviewFrequency: row.esg_review_frequency,
+              anticorruptionPolicy: row.anti_corruption_policy,
               anticorruptionPolicyDesc: row.anti_corruption_policy_desc,
               staffWithAcTraining: row.staff_with_ac_training,
+              whistleblowingChannel: row.whistleblowing_channel,
               certifications: row.certifications,
+              assuranceType: row.assurance_status,
             });
             return;
           }
