@@ -153,6 +153,21 @@
             await hydrateSocialGovernanceFromSupabase(supabase, period.id);
             await hydrateTargetsFromSupabase(period.id);
             await hydrateContextFromSupabase(period.id);
+            // Coerce scope fields to numbers — Supabase TEXT columns return as
+            // strings but aggregateClusters() uses strict === number comparisons.
+            ['power','transport','cooling','cooking','waste','commuting','digital','procurement'].forEach(cid => {
+              try {
+                const key = `zyt_${cid}_data`;
+                const d = JSON.parse(localStorage.getItem(key) || 'null');
+                if (d?.entries) {
+                  d.entries.forEach(e => {
+                    if (e.scope != null) e.scope = parseInt(e.scope) || null;
+                    if (e.scope3Category != null) e.scope3Category = parseInt(e.scope3Category) || null;
+                  });
+                  localStorage.setItem(key, JSON.stringify(d));
+                }
+              } catch (_) {}
+            });
           } catch (e) {
             console.warn('[S-05] Full hydration failed (continuing):', e);
           }

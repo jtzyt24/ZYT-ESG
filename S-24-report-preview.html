@@ -98,31 +98,29 @@
 
   /* ── COVER PAGE ── */
   .cover {
-    background: linear-gradient(160deg, #1A2F23 0%, #2D5F3F 55%, #1A4A6B 100%);
+    background: #ffffff;
     padding: 64px 56px 48px;
-    color: white;
+    color: #1a1a1a;
     min-height: 320px;
     display: flex; flex-direction: column; justify-content: space-between;
     position: relative; overflow: hidden;
+    border-bottom: 3px solid #2D5F3F;
   }
   .cover::before {
     content: '';
-    position: absolute; top: -60px; right: -60px;
-    width: 300px; height: 300px; border-radius: 50%;
-    background: rgba(255,255,255,0.03);
   }
   .cover-top { position: relative; z-index: 1; }
-  .cover-report-type { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.55; margin-bottom: 12px; }
-  .cover-company { font-size: 28px; font-weight: 700; letter-spacing: -0.6px; margin-bottom: 6px; font-family: 'Lora', serif; }
-  .cover-title { font-size: 17px; opacity: 0.75; margin-bottom: 4px; }
-  .cover-year { font-size: 14px; opacity: 0.5; }
+  .cover-report-type { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.5; margin-bottom: 12px; color: #1a1a1a; }
+  .cover-company { font-size: 28px; font-weight: 700; letter-spacing: -0.6px; margin-bottom: 6px; font-family: 'Lora', serif; color: #111; }
+  .cover-title { font-size: 17px; color: #444; margin-bottom: 4px; }
+  .cover-year { font-size: 14px; color: #888; }
   .cover-bottom { display: flex; justify-content: space-between; align-items: flex-end; position: relative; z-index: 1; margin-top: 32px; }
   .cover-badges { display: flex; gap: 8px; flex-wrap: wrap; }
   .cover-badge {
-    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 4px; padding: 4px 10px; font-size: 11px; font-weight: 500;
+    background: #f4f4f4; border: 1px solid #ccc;
+    border-radius: 4px; padding: 4px 10px; font-size: 11px; font-weight: 500; color: #333;
   }
-  .cover-zyt { font-size: 11px; opacity: 0.4; text-align: right; }
+  .cover-zyt { font-size: 11px; color: #aaa; text-align: right; }
 
   /* ── REPORT SECTION ── */
   .report-section { padding: 40px 48px; border-bottom: 1px solid var(--border); position: relative; }
@@ -688,6 +686,21 @@ function loadTargetsData() {
 }
 
 // ── Populate from real data (Supabase-synced localStorage + aggregateClusters) ──
+// Coerce scope to number before aggregating — Supabase TEXT columns return strings
+// but aggregateClusters() uses strict === number comparisons.
+['power','transport','cooling','cooking','waste','commuting','digital','procurement'].forEach(cid => {
+  try {
+    const key = `zyt_${cid}_data`;
+    const d = JSON.parse(localStorage.getItem(key) || 'null');
+    if (d?.entries) {
+      d.entries.forEach(e => {
+        if (e.scope != null) e.scope = parseInt(e.scope) || null;
+        if (e.scope3Category != null) e.scope3Category = parseInt(e.scope3Category) || null;
+      });
+      localStorage.setItem(key, JSON.stringify(d));
+    }
+  } catch (_) {}
+});
 function load() {
   const profile = loadCompanyProfile() || {};
   const social = loadSocialData() || {};

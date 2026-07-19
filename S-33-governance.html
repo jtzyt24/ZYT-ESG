@@ -822,7 +822,7 @@
         const periodId = localStorage.getItem('zyt_period_id');
         if (periodId) {
           const { data: row } = await supabase.from('esg_governance_data').select('*').eq('period_id', periodId).maybeSingle();
-          if (row) {
+          if (row && row.esg_review_frequency !== null) {
             populateForm({
               mgmtTeamTotal: row.mgmt_team_total,
               mgmtTeamMale: row.mgmt_team_male,
