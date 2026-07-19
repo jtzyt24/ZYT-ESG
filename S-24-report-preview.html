@@ -378,7 +378,7 @@
             <span class="cover-badge" id="cover-ungc-badge" style="display:none">UNGC</span>
             <span class="cover-badge">SEFR Jan 2026</span>
           </div>
-          <div class="cover-zyt">Prepared using ZYT.ESG<br>zyt.one/esg</div>
+          <div class="cover-zyt">Prepared using ZYT.ESG<br>esg.zyt.one</div>
         </div>
       </div>
 
@@ -645,14 +645,14 @@
         </div>
 
         <div style="margin-top:20px;font-size:12px;color:var(--text-muted);padding-top:14px;border-top:1px solid var(--border)">
-          This report was prepared using ZYT.ESG (zyt.one/esg). ZYT.ESG is a sustainability reporting platform for Singapore SMEs. Emission factors are sourced from publicly available Singapore government data and are not independently verified by ZYT.ESG.
+          This report was prepared using ZYT.ESG (esg.zyt.one). ZYT.ESG is a sustainability reporting platform for Singapore SMEs. Emission factors are sourced from publicly available Singapore government data and are not independently verified by ZYT.ESG.
         </div>
       </div>
 
       <!-- Page footer -->
       <div class="report-footer">
         <div class="rf-left" id="rf-company">ZYT Solutions Pte Ltd · Sustainability Report 2024</div>
-        <div class="rf-right">Prepared using ZYT.ESG · zyt.one/esg</div>
+        <div class="rf-right">Prepared using ZYT.ESG · esg.zyt.one</div>
       </div>
 
     </div><!-- /report-page -->
@@ -764,10 +764,17 @@ function load() {
     if (!sources.length) {
       return `<tr><td colspan="${colCount - 1}" style="color:var(--text-light);font-style:italic">No data entered yet for this scope</td><td class="mono">—</td></tr>`;
     }
-    return sources.map(s => {
+    // Scope 3: sort by category number asc, then by emissions desc within category
+    const sorted = scopeNum === 3
+      ? [...sources].sort((a, b) => {
+          const catA = parseInt(a.scope3Category) || 99;
+          const catB = parseInt(b.scope3Category) || 99;
+          return catA !== catB ? catA - catB : b.kgco2e - a.kgco2e;
+        })
+      : sources;
+    return sorted.map(s => {
       const clusterName = CLUSTER_NAMES[s.clusterId] || s.clusterId;
       if (scopeNum === 3 && s.scope3Category) {
-        // Scope 3 table: Category | Source | Scope | tCO2e
         return `<tr><td>Cat ${s.scope3Category}</td><td>${s.name} (${clusterName})</td><td>${scopeLabel(3)}</td><td class="mono">${fmtT(s.kgco2e)}</td></tr>`;
       }
       return `<tr><td>${s.name}</td><td>${clusterName}</td><td>${scopeLabel(scopeNum)}</td><td class="mono">${fmtT(s.kgco2e)}</td></tr>`;
@@ -819,10 +826,14 @@ function load() {
     document.getElementById('r-int-emp').innerHTML = `<span style="color:var(--text-light);font-style:italic">Not available — enter employee count in Social (S-31/32)</span>`;
   }
   const revenueSgd = profile.annualRevenueSgd || 0;
-  if (revenueSgd > 0) {
-    document.getElementById('r-int-rev').innerHTML = `<strong>${(totalKg / (revenueSgd / 1000)).toFixed(1)}</strong> kgCO₂e / SGD 1,000`;
+  const revenueBucket = profile.annualRevenue || '';
+  if (revenueSgd > 0 && revenueBucket !== 'prefer') {
+    const intensity = (totalKg / (revenueSgd / 1000)).toFixed(1);
+    document.getElementById('r-int-rev').innerHTML =
+      `<strong>${intensity}</strong> kgCO₂e / SGD 1,000 <span style="font-size:11px;color:var(--text-light);font-style:italic">(estimated — based on revenue range in profile, not verified revenue)</span>`;
   } else {
-    document.getElementById('r-int-rev').innerHTML = `<span style="color:var(--text-light);font-style:italic">Not available — enter annual revenue in Company Profile (S-06)</span>`;
+    document.getElementById('r-int-rev').innerHTML =
+      `<span style="color:var(--text-light);font-style:italic">Not available — enter actual revenue in Profile to calculate</span>`;
   }
   const energySgd = (agg.scope1_sgd || 0) + (agg.scope2_sgd || 0);
   document.getElementById('r-sgd-total').innerHTML = energySgd > 0 ? `<strong>SGD ${Math.round(energySgd).toLocaleString()}</strong>` : '<span style="color:var(--text-light);font-style:italic">Not available</span>';
