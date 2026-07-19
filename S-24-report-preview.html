@@ -673,7 +673,7 @@
 
 <script type="module">
 import { aggregateClusters, loadCompanyProfile, loadSocialData, loadGovernanceData, loadContextData } from './js/zyt-core/schema.js';
-import { CLUSTERS } from './js/zyt-core/config.js';
+import { CLUSTERS, INDUSTRY_LABELS } from './js/zyt-core/config.js';
 
 const CLUSTER_NAMES = Object.fromEntries(CLUSTERS.map(c => [c.id, c.name]));
 
@@ -713,8 +713,16 @@ function load() {
   // Section 1
   document.getElementById('r-company').textContent = company;
   document.getElementById('r-uen').textContent = profile.uen || '—';
-  document.getElementById('r-industry').textContent = profile.industry || '—';
-  document.getElementById('r-size').textContent = profile.companySize || '—';
+  document.getElementById('r-industry').textContent = INDUSTRY_LABELS[profile.industry] || profile.industry || '—';
+  const SIZE_LABELS = {
+    '1-10': '1–10 employees (micro)',
+    '11-50': '11–50 employees (small)',
+    '51-200': '51–200 employees (medium)',
+    '201-500': '201–500 employees',
+    '500+': '500+ employees',
+  };
+  const rawSize = profile.companySize || profile.employee_count || '';
+  document.getElementById('r-size').textContent = SIZE_LABELS[rawSize] || rawSize || '—';
   document.getElementById('r-period').textContent = `1 January ${year} – 31 December ${year}`;
   const respPerson = profile.responsiblePerson ? `${profile.responsiblePerson}${profile.responsiblePersonRole ? ', ' + profile.responsiblePersonRole : ''}` : '—';
   document.getElementById('r-person').textContent = respPerson;

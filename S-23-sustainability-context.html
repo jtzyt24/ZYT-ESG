@@ -850,12 +850,16 @@ if (savedCtx) {
     if (d.signatoryName) document.getElementById('sign-name').value = d.signatoryName;
     if (d.signatoryRole) document.getElementById('sign-role').value = d.signatoryRole;
     // ── Restore material topic selections ──
-    if (d.materialTopics && d.materialTopics.length) {
-      document.querySelectorAll('.material-item').forEach(item => {
-        const title = item.querySelector('.mi-title')?.textContent;
-        if (title && d.materialTopics.includes(title)) {
-          item.classList.add('selected');
-        }
+    // Always clear HTML defaults first so deselections are honoured too.
+    // Without this, topics that start selected in HTML can never be
+    // deselected — they always revert to the HTML default on reload.
+    if (Array.isArray(d.materialTopics)) {
+      document.querySelectorAll('.material-item').forEach(item => item.classList.remove('selected'));
+      d.materialTopics.forEach(topic => {
+        const item = [...document.querySelectorAll('.material-item')].find(
+          mi => mi.querySelector('.mi-title')?.textContent?.trim() === topic
+        );
+        if (item) item.classList.add('selected');
       });
     }
   } catch(e) {}

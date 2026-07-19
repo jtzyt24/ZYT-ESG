@@ -1019,18 +1019,17 @@
     const data = buildSocialData();
     saveSocialData(data);
 
-    // Sync to Supabase if logged in — fire-and-forget, never blocks navigation
-    (async () => {
-      try {
-        const session = await getSession();
-        if (!session) return;
+    // Await Supabase sync before navigating — fire-and-forget was causing
+    // the fetch to be cancelled by page unload before completing.
+    try {
+      const session = await getSession();
+      if (session) {
         const periodId = localStorage.getItem('zyt_period_id');
-        if (!periodId) return;
-        await upsertSocialData(periodId, data);
-      } catch (e) {
-        console.warn('[S-31/32] Supabase sync failed (data saved locally):', e);
+        if (periodId) await upsertSocialData(periodId, data);
       }
-    })();
+    } catch (e) {
+      console.warn('[S-31/32] Supabase sync failed (data saved locally):', e);
+    }
 
     window.location.href = 'S-33-governance.html';
   };

@@ -532,6 +532,7 @@ window.saveProfile = async function() {
         responsible_person_email:  document.getElementById('esg-email')?.value.trim() || null,
         annual_revenue_sgd:        revenueMidpoint,
         intent:                    [...selectedIntents].join(',') || null,
+        address:                   document.getElementById('address')?.value.trim() || null,
       };
       await upsertProfile(session.user.id, dbProfile);
 
