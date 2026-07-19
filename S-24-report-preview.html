@@ -255,7 +255,7 @@
     .sidebar,
     .action-bar,
     .section-edit-btn,
-    .btn-edit { display: none !important; }
+    .btn-edit, .no-print { display: none !important; }
 
     /* ── Reset layout for print ── */
     html, body {
@@ -550,7 +550,7 @@
             </div>
           </div>
         </div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:14px">Targets set in S-21. <a href="S-21-target-setting.html" style="color:var(--accent)">Edit targets →</a></div>
+        <div class="no-print" style="font-size:12px;color:var(--text-muted);margin-top:14px">Targets set in S-21. <a href="S-21-target-setting.html" style="color:var(--accent)">Edit targets →</a></div>
       </div>
 
       <!-- SECTION 9: Actions -->
@@ -831,12 +831,22 @@ function load() {
   document.getElementById('r-year-s8').textContent = year;
   const targetsListEl = document.getElementById('r-targets-list');
   if (targetsData && targetsData.targets && targetsData.targets.length > 0) {
-    const totalCarbon = targetsData.targets.reduce((sum, t) => sum + (parseFloat(t.carbon) || 0), 0);
     const totalSaving = targetsData.targets.reduce((sum, t) => sum + (parseFloat(t.saving) || 0), 0);
-    targetsListEl.innerHTML = `<div class="target-row"><div class="target-bullet"></div><div>
-      <div class="target-text">We have committed to <strong>${targetsData.targets.length}</strong> emissions reduction target${targetsData.targets.length !== 1 ? 's' : ''}, targeting a combined reduction of approximately <strong>${totalCarbon.toFixed(1)} tCO₂e</strong>.</div>
-      <div class="target-meta">Estimated annual saving: SGD ${Math.round(totalSaving).toLocaleString()} · See Targets (S-21) for full detail on each commitment</div>
-    </div></div>`;
+    const rows = targetsData.targets.map(t => {
+      const pct   = t.pct   ? `${parseFloat(t.pct).toFixed(0)}% reduction` : '';
+      const year  = t.year  ? `by ${t.year}` : '';
+      const saving = t.saving ? `Est. annual saving: SGD ${Math.round(parseFloat(t.saving)).toLocaleString()}` : '';
+      const stmt  = t.statement || `Committed to ${pct} ${year}`.trim();
+      const meta  = [pct, year, saving].filter(Boolean).join(' · ');
+      return `<div class="target-row"><div class="target-bullet"></div><div>
+        <div class="target-text">${stmt}</div>
+        ${meta ? `<div class="target-meta">${meta}</div>` : ''}
+      </div></div>`;
+    }).join('');
+    targetsListEl.innerHTML = rows +
+      `<div class="target-meta" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+        ${targetsData.targets.length} committed target${targetsData.targets.length !== 1 ? 's' : ''} · Combined estimated annual saving: SGD ${Math.round(totalSaving).toLocaleString()}
+      </div>`;
   } else {
     targetsListEl.innerHTML = `<div style="color:var(--text-light);font-style:italic;font-size:13.5px">No targets have been set yet. <a href="S-21-target-setting.html" style="color:var(--accent)">Set targets in S-21 →</a></div>`;
   }
