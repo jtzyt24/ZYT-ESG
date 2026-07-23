@@ -1361,16 +1361,16 @@ function persist() {
   data.saved = true;
   data.entries = buildEntriesFromState();
   saveClusterData(CLUSTER_ID, data);
-  syncToSupabase(data.entries); // async, non-blocking
+  return syncToSupabase(data.entries); // awaited by save functions
 }
 
-function saveAndNext() {
-  persist();
+async function saveAndNext() {
+  await persist().catch(e => console.warn('Sync failed:', e));
   goTo('S-11');
 }
 
-function saveAndExit() {
-  persist();
+async function saveAndExit() {
+  await persist().catch(e => console.warn('Sync failed:', e));
   goTo('S-09');
 }
 
